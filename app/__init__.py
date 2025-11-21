@@ -78,9 +78,9 @@ def create_app():
     with app.app_context():
         try:
             db.create_all()
-            print("✅ Tablas de base de datos verificadas")
+            print(" Tablas de base de datos verificadas")
         except Exception as e:
-            print(f"❌ Error creando tablas: {e}")
+            print(f" Error creando tablas: {e}")
     
     # Iniciar scheduler para mantener BD activa (solo si no está corriendo)
     if not scheduler.running:

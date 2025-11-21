@@ -101,23 +101,24 @@ const ProductosController = {
             }
 
             // Generar HTML para cada producto
-            // Cambiar esta línea:
+
             container.innerHTML = productos.map(producto => `
     <div class="producto" data-id="${producto.id}">
         <img src="${producto.imagen}" alt="${producto.nombre}" 
              onerror="this.src='/static/img/placeholder.jpg'">
         <h3>${producto.nombre}</h3>
+        <p class="categoria">${producto.categoria}</p>
         <p class="descripcion">${producto.descripcion}</p>
         <p class="precio">$${typeof producto.precio === 'number' ? producto.precio.toFixed(2) : '0.00'}</p>
         <button class="btn-agregar-carrito" 
                 data-id="${producto.id}"
                 ${producto.stock === 0 ? 'disabled' : ''}>
-            ${producto.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito'}
+            ${producto.stock === 0 ? 'Sin Stock' : '<i class="fa-solid fa-cart-shopping"></i>Agregar al Carrito'}
         </button>
     </div>
 `).join('');
 
-            console.log('✅ Productos renderizados correctamente');
+            console.log('Productos renderizados correctamente');
 
             // Agregar event listeners a los botones
             this.agregarEventListeners();

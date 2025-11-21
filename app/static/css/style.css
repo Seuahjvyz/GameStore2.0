@@ -1,16 +1,14 @@
 /*Estilos para el registro y el inicio de sesion*/
 
 body {
+    margin: 0;
+    padding: 0;
     font-family: sans-serif;
-    margin: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: linear-gradient(#58009A, #623684);
+
+
 }
 
-.principal {
-    margin: 0;
-}
 
 /* ------------------------------------- R ------------------------------------- */
 /* ------------------------------------- E ------------------------------------- */
@@ -44,11 +42,12 @@ body {
 }
 
 .sidebar-register-btn:hover {
+
     transform: translateY(-2px);
 }
 
 .main-content {
-    padding: 48px 56px;
+    margin: 0;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -56,10 +55,11 @@ body {
 }
 
 .container {
+    margin: 0;
     max-width: 500px;
-    width: 100%;
+    width: 1000;
     background: #2a2a2a;
-    padding: 48px 40px;
+    padding: 10px 30px;
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 2px solid #3a3a3a;
@@ -67,15 +67,15 @@ body {
 
 h1 {
     font-size: 36px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-align: center;
-    color: #fff;
+    color: #ffffff;
     font-weight: 700;
     letter-spacing: -1px;
 }
 
 .description {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     text-align: center;
     color: #a0a0a0;
     font-size: 16px;

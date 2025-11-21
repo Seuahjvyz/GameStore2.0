@@ -159,6 +159,7 @@ def api_login():
             return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
         
         # Crear sesión
+        session.clear()
         session['user_id'] = usuario.id_usuario
         session['username'] = usuario.nombre_usuario
         session['user_role'] = usuario.rol_id
@@ -393,11 +394,11 @@ def api_productos():
                 Categoria.nombre == categoria_nombre,
                 Producto.activo == True
             ).all()
-            print(f"🔍 Filtrando por categoría: {categoria_nombre}, encontrados: {len(productos)} productos")
+            print(f" Filtrando por categoría: {categoria_nombre}, encontrados: {len(productos)} productos")
         else:
             # Todos los productos
             productos = Producto.query.filter_by(activo=True).all()
-            print(f"🔍 Todos los productos, encontrados: {len(productos)} productos")
+            print(f" Todos los productos, encontrados: {len(productos)} productos")
         
         productos_data = []
         for producto in productos:
@@ -419,7 +420,7 @@ def api_productos():
         })
         
     except Exception as e:
-        print(f"❌ Error obteniendo productos: {e}")
+        print(f" Error obteniendo productos: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al obtener productos'}), 500
