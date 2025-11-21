@@ -8,10 +8,6 @@
     <link rel="stylesheet" href="/static/css/stylee.css">
     <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <!-- BACKBONE Y DEPENDENCIAS -->
-    <script src="/static/js/libs/jquery.min.js"></script>
-    <script src="/static/js/libs/underscore.min.js"></script>
-    <script src="/static/js/libs/backbone.min.js"></script>
 </head>
 
 <body>
@@ -20,40 +16,25 @@
         <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
         <ul>
             <li><a class="enlace_barra_lateral_fijo" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
-
             <li><a class="enlace_barra_lateral" href="/perfil"><i class="fa-solid fa-circle-user"></i> Perfil</a></li>
-
-            <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i>
-                    Buscar</a>
-            </li>
-            <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i>
-                    Favoritos</a></li>
-
-            <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i>
-                    Pedidos</a></li>
-            <li>
-                <h3>Categorías</h3>
-            </li>
-            <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i>
-                    Juegos</a></li>
-            <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i>
-                    Accesorios</a></li>
-            <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i>
-                    Consolas</a></li>
-            <li><a class="enlace_barra_lateral" href="/controles"><i class="fa-solid fa-gamepad"></i>
-                    Controles</a></li>
-            <li><a class="enlace_barra_lateral" href="/carrito"><i class="fa-solid fa-cart-shopping"></i> Carrito</a>
-            </li>
-            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-user"></i>
-                    Admin</a></li>
+            <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar</a></li>
+            <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+            <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
+            <li><h3>Categorías</h3></li>
+            <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
+            <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a></li>
+            <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
+            <li><a class="enlace_barra_lateral" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
+            <li><a class="enlace_barra_lateral" href="/carrito"><i class="fa-solid fa-cart-shopping"></i> Carrito</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-user"></i> Admin</a></li>
         </ul>
     </nav>
 
     <main>
         <header class="encabezado">
             <section class="buscador">
-                <input type="text" id="buscar" placeholder="Buscar producto">
-                <button class="btn_buscar" id="buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input type="text" id="buscar-input" placeholder="Buscar producto">
+                <button class="btn_buscar" id="btn-buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
             </section>
 
             <section class="iconos">
@@ -62,33 +43,46 @@
                 </button>
                 <a class="icon" href="/carrito">
                     <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="carrito-count">0</span>
                 </a>
 
                 <!-- Menu usuario -->
                 <div class="user-menu-container">
-                    <button class="user-menu-btn" id="userMenuBtn"><i class="fa-solid fa-circle-user"></i><i
-                            class="fa-solid fa-chevron-down dropdown-arrow"></i></button>
-
+                    <button class="user-menu-btn" id="userMenuBtn">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                    </button>
                     <div class="user-dropdown-menu" id="userDropdown">
-
                         <div class="dropdown-content" id="dropdownContent">
+                            <a href="/login" class="dropdown-item">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                <span>Iniciar Sesión</span>
+                            </a>
+                            <a href="/registro" class="dropdown-item">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Registrarse</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/perfil" class="dropdown-item">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                            <a href="/carrito" class="dropdown-item">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span>Carrito</span>
+                            </a>
                         </div>
-
                     </div>
-
                 </div>
             </section>
         </header>
 
-
         <div class="principal">
-
             <div class="carousel-container">
                 <div class="carousel-slide slide-purple active">
                     <div class="slide-content">
                         <h2>PLay Station VR2</h2>
-                        <p>Vive el futuro del gaming con la realidad virtual más avanzada. Sumérgete en mundos
-                            increíbles con la tecnología de PS VR2 y experimenta PlayStation®5.</p>
+                        <p>Vive el futuro del gaming con la realidad virtual más avanzada. Sumérgete en mundos increíbles con la tecnología de PS VR2 y experimenta PlayStation®5.</p>
                         <button class="btn-comprar">Comprar ahora</button>
                     </div>
                     <div class="slide-image">
@@ -99,8 +93,7 @@
                 <div class="carousel-slide slide-red">
                     <div class="slide-content">
                         <h2>Nintendo Switch 2</h2>
-                        <p>La nueva generación de Nintendo Switch está aquí. Disfruta de tus juegos favoritos en
-                            cualquier lugar con mejor rendimiento y gráficos mejorados.</p>
+                        <p>La nueva generación de Nintendo Switch está aquí. Disfruta de tus juegos favoritos en cualquier lugar con mejor rendimiento y gráficos mejorados.</p>
                         <button class="btn-comprar">Comprar ahora</button>
                     </div>
                     <div class="slide-image">
@@ -111,8 +104,7 @@
                 <div class="carousel-slide slide-blue">
                     <div class="slide-content">
                         <h2>Xbox Series X</h2>
-                        <p>La consola más potente del mercado. Experimenta juegos en 4K a 120fps y disfruta de Game Pass
-                            con cientos de títulos incluidos.</p>
+                        <p>La consola más potente del mercado. Experimenta juegos en 4K a 120fps y disfruta de Game Pass con cientos de títulos incluidos.</p>
                         <button class="btn-comprar">Comprar ahora</button>
                     </div>
                     <div class="slide-image">
@@ -129,107 +121,28 @@
 
             <section class="productos-section">
                 <div class="productos-header">
-                    <h3>Productos</h3>
+                    <h3>Productos Destacados</h3>
                     <div class="filtros">
-                        <button class="filtro-btn active">Todos</button>
-                        <button class="filtro-btn">Populares</button>
-                        <button class="filtro-btn">Nuevos</button>
-                        <button class="filtro-btn">Ofertas</button>
+                        <button class="filtro-btn active" data-categoria="Todos">Todos</button>
+                        <button class="filtro-btn" data-categoria="Consolas">Consolas</button>
+                        <button class="filtro-btn" data-categoria="Juegos">Juegos</button>
+                        <button class="filtro-btn" data-categoria="Accesorios">Accesorios</button>
                     </div>
                 </div>
 
-                <section class="productos">
-
-                    <!-- Producto 1 -->
-                    <div class="producto">
-                        <div class="imagenes_producto">
-                            <img class="imagen_producto" src="/static/img/Imagenes/series x especial.png"
-                                alt="Xbox Series X">
-                        </div>
-                        <h3 class="product-title">XBOX SERIES X 2TB GALAXY BLACK LIMITED EDITION</h3>
-                        <p class="product-category">Hardware</p>
-                        <div class="product-price-section">
-                            <span class="product-price">$17,000.00</span>
-                        </div>
-                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
+                <section class="productos" id="productos-container">
+                    <div class="loading">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Cargando productos destacados...
                     </div>
-                    <!-- Producto 2 -->
-
-                    <div class="producto">
-                        <div class="imagenes_producto">
-                            <img class="imagen_producto" src="/static/img/Imagenes/zombies_xbox.png" alt="Zombies Xbox">
-                        </div>
-                        <h3 class="product-title">ZOMBIES GAME</h3>
-                        <p class="product-category">Juego Digital para Xbox</p>
-                        <div class="product-price-section">
-                            <span class="product-price">$450.00</span>
-                        </div>
-                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
-                    </div>
-
-                    <div class="producto">
-                        <div class="imagenes_producto">
-                            <img class="imagen_producto" src="/static/img/Imagenes/controlxboxwhite.png"
-                                alt="Control Xbox White">
-                        </div>
-                        <h3 class="product-title">CONTROL XBOX INALÁMBRICO WHITE PARA XBOX SERIES X Y S</h3>
-                        <p class="product-category">Controles</p>
-                        <div class="product-price-section">
-                            <span class="product-price">$1,496.99</span>
-                        </div>
-                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
-                    </div>
-
-                    <div class="producto">
-                        <div class="imagenes_producto">
-                            <img class="imagen_producto" src="/static/img/Audifonos_Gamer.jpg" alt="Audífonos Gamer">
-                        </div>
-                        <h3 class="product-title">AUDÍFONOS GAMER</h3>
-                        <p class="product-category">Accesorios de Consola</p>
-                        <div class="product-price-section">
-                            <span class="product-price">$760.00</span>
-                        </div>
-                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
-                    </div>
-
-                    <div class="producto">
-                        <div class="imagenes_producto">
-                            <img class="imagen_producto" src="/static/img/Imagenes/controlxboxblack.png"
-                                alt="Control Xbox Carbon Black">
-                        </div>
-                        <h3 class="product-title">CONTROL XBOX INALÁMBRICO CARBON BLACK</h3>
-                        <p class="product-category">Controles</p>
-                        <div class="product-price-section">
-                            <span class="product-price">$1,096.99</span>
-                        </div>
-                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
-                    </div>
-
-
                 </section>
-
             </section>
         </div>
     </main>
 
+    <!-- Scripts -->
     <script src="/static/js/funciones.js"></script>
-
-        <!-- BACKBONE MODULES -->
-    <script src="/static/js/models/producto.model.js"></script>
-    <script src="/static/js/collections/productos.collection.js"></script>
-    <script src="/static/js/views/producto.view.js"></script>
     <script src="/static/js/user-menu.js"></script>
-    <script src="/static/js/main.js"></script>
-    <script src="/static/js/agregar-carrito.js"></script>
-
-
-    <!-- En la sección de scripts, después de user-menu.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="/static/js/models/carrito.js"></script>
-    <script src="/static/js/views/carrito-view.js"></script>
-    <script src="/static/js/app-carrito.js"></script>
-
+    <script src="/static/js/productos-dinamicos.js"></script>
 </body>
 
 </html>

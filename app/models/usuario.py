@@ -1,6 +1,7 @@
 from app import db
+from flask_login import UserMixin
 
-class Usuario(db.Model):
+class Usuario(UserMixin, db.Model):
     __tablename__ = 'usuarios'
     
     id_usuario = db.Column(db.Integer, primary_key=True)
@@ -12,6 +13,10 @@ class Usuario(db.Model):
     ultimo_acceso = db.Column(db.TIMESTAMP, nullable=True)
     telefono = db.Column(db.String(15))
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id_rol'), nullable=False)
+    
+    # Para Flask-Login
+    def get_id(self):
+        return str(self.id_usuario)
     
     def __repr__(self):
         return f'<Usuario {self.nombre_usuario}>'

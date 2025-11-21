@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Admin - Game Store</title>
+    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body class="pagina-auth">
+    <main>
+        <div class="principal-auth">
+            <div class="main-content-auth">
+                <div class="container-auth">
+                    <h1 class="titulo-auth">Crear Cuenta de Administrador</h1>
+                    <p class="descripcion-auth">
+                        <i class="fa-solid fa-shield-alt"></i> Registro exclusivo para administradores del sistema!
+                    </p>
+
+                    <div class="admin-badge">
+                        <i class="fa-solid fa-shield-alt"></i> <strong>Acceso de Administrador</strong>
+                    </div>
+
+                    <form id="registro-form" class="form-section-auth">
+                        <div class="form-line-auth">
+                            <span class="label-auth">Nombre De Usuario:</span>
+                            <input type="text" id="username" name="username" class="input-field-auth" 
+                                   placeholder="Ingresa tu nombre de usuario" required>
+                            <span class="error-message-auth" id="username-error"></span>
+                        </div>
+
+                        <div class="form-line-auth">
+                            <span class="label-auth">Email:</span>
+                            <input type="email" id="email" name="email" class="input-field-auth" 
+                                   placeholder="Ingresa tu correo electrónico" required>
+                            <span class="error-message-auth" id="email-error"></span>
+                        </div>
+
+                        <div class="form-line-auth">
+                            <span class="label-auth">Contraseña:</span>
+                            <input type="password" id="password" name="password" class="input-field-auth" 
+                                   placeholder="Crea una contraseña segura" required>
+                            <span class="error-message-auth" id="password-error"></span>
+                        </div>
+
+                        <div class="form-line-auth">
+                            <span class="label-auth">Confirmar Contraseña:</span>
+                            <input type="password" id="confirm-password" name="confirm_password" class="input-field-auth" 
+                                   placeholder="Confirma tu contraseña" required>
+                            <span class="error-message-auth" id="confirm-error"></span>
+                        </div>
+
+                        <div class="auth-section">
+                            <button type="submit" class="btn-auth" id="registro-btn">
+                                <i class="fa-solid fa-shield-alt"></i> Crear Cuenta de Admin
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="sidebar-auth-section">
+                        <p class="texto-auth">¿Ya tienes cuenta?</p>
+                        <a class="btn-sidebar-auth" href="/login" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">Iniciar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- BACKBONE MODULES -->
+    <script src="/static/js/models/producto.model.js"></script>
+    <script src="/static/js/collections/productos.collection.js"></script>
+    <script src="/static/js/views/producto.view.js"></script>
+    <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/agregar-carrito.js"></script>
+
+    <!-- En la sección de scripts, después de user-menu.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
+    <script src="/static/js/models/carrito.js"></script>
+    <script src="/static/js/views/carrito-view.js"></script>
+    <script src="/static/js/app-carrito.js"></script>
+
+    <!-- jQuery y dependencias -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.1/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"></script>
+    
+    <!-- Script de registro admin CORREGIDO -->
+    <script src="/static/js/registro-admin.js"></script>
+
+</body>
+
+</html>

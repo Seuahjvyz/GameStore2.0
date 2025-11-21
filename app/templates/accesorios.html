@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -15,20 +15,15 @@
         <ul>
             <li><a class="enlace_barra_lateral" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
             <li><a class="enlace_barra_lateral" href="/perfil"><i class="fa-solid fa-circle-user"></i> Perfil</a></li>
-            <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar</a>
-            </li>
+            <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar</a></li>
             <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
             <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
-            <li>
-                <h3>Categorías</h3>
-            </li>
+            <li><h3>Categorías</h3></li>
             <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
-            <li><a class="enlace_barra_lateral_fijo" href="/accesorios"><i class="fa-solid fa-headset"></i>
-                    Accesorios</a></li>
+            <li><a class="enlace_barra_lateral_fijo" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a></li>
             <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
             <li><a class="enlace_barra_lateral" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
-            <li><a class="enlace_barra_lateral" href="/carrito"><i class="fa-solid fa-cart-shopping"></i> Carrito</a>
-            </li>
+            <li><a class="enlace_barra_lateral" href="/carrito"><i class="fa-solid fa-cart-shopping"></i> Carrito</a></li>
             <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-user"></i> Admin</a></li>
         </ul>
     </nav>
@@ -36,15 +31,15 @@
     <main>
         <header class="encabezado">
             <section class="buscador">
-                <input type="text" id="buscar" placeholder="Buscar producto">
-                <button class="btn_buscar" id="buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input type="text" id="buscar-input" placeholder="Buscar producto">
+                <button class="btn_buscar" id="btn-buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
             </section>
 
             <section class="iconos">
-                <button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i>
-                </button>
+                <button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i></button>
                 <a class="icon" href="/carrito">
                     <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="carrito-count">0</span>
                 </a>
 
                 <!-- Menu usuario -->
@@ -53,7 +48,6 @@
                         <i class="fa-solid fa-circle-user"></i>
                         <i class="fa-solid fa-chevron-down"></i>
                     </button>
-
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-content">
                             <a href="/login" class="dropdown-item">
@@ -76,6 +70,7 @@
                         </div>
                     </div>
                 </div>
+            </section>
         </header>
 
         <div class="principal">
@@ -84,29 +79,17 @@
                 <p class="header-subtitle">Encuentra los mejores accesorios para tu experiencia gaming</p>
 
                 <section class="productos" id="productos-container">
-                    <!-- Los productos se cargarán aquí dinámicamente -->
                     <div class="loading">
-                        <i class="fa-solid fa-spinner fa-spin"></i> Cargando productos...
+                        <i class="fa-solid fa-spinner fa-spin"></i> Cargando accesorios...
                     </div>
                 </section>
             </div>
         </div>
     </main>
-    <!-- BACKBONE MODULES -->
-    <script src="/static/js/models/producto.model.js"></script>
-    <script src="/static/js/collections/productos.collection.js"></script>
-    <script src="/static/js/views/producto.view.js"></script>
-    <script src="/static/js/user-menu.js"></script>
-    <script src="/static/js/main.js"></script>
-    <script src="/static/js/agregar-carrito.js"></script>
-<script src="/static/js/productos-dinamicos.js"></script>
 
-    <!-- En la sección de scripts, después de user-menu.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="/static/js/models/carrito.js"></script>
-    <script src="/static/js/views/carrito-view.js"></script>
-    <script src="/static/js/app-carrito.js"></script>
+    <!-- Scripts -->
+    <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/productos-dinamicos.js"></script>
 </body>
 
 </html>

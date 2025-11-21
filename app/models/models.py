@@ -2,8 +2,6 @@ from app import db
 from flask_login import UserMixin
 from datetime import datetime
 
-
-
 class Categoria(db.Model):
     __tablename__ = 'categorias'
     id_categoria = db.Column(db.Integer, primary_key=True)

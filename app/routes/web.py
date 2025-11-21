@@ -1,18 +1,16 @@
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for
 from functools import wraps
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import session
 from app import db
 from app.models.usuario import Usuario
-from app.models.role import Role  
-from werkzeug.security import check_password_hash
-from flask import session
-
-
+from app.models.models import Carrito, CarritoItem
+from app.models.models import Producto
+from app.models.models import Categoria
 
 web_bp = Blueprint('web', __name__)
 
-#-----------------------------------------PAGINA PRINCIPAL-----------------------------------------#
-
+# ----------------------------------------- DECORATORS ---------------------------------------- #
 
 def login_required(f):
     @wraps(f)
@@ -29,19 +27,37 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-#-----------------------------------------PAGINA PRINCIPAL-----------------------------------------#
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('web.login'))
+        
+        if session.get('user_role') != 1:  # 1 = Administrador
+            return jsonify({'error': 'Acceso denegado. Se requieren privilegios de administrador'}), 403
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
+# ----------------------------------------- RUTAS PRINCIPALES ---------------------------------------- #
 
 @web_bp.route('/')
 def index():
     return render_template('index.html')
 
-
-#-----------------------------------------LOGIN-----------------------------------------#
-
 @web_bp.route('/login')
 def login():
     return render_template('login.html')
+
+@web_bp.route('/registro')
+def registro():
+    return render_template('registro.html')
+
+@web_bp.route('/registro-admin')
+def registro_admin():
+    return render_template('admin_templates/RegistroAdmin.html')
+
+# ----------------------------------------- API LOGIN (ÚNICO) ---------------------------------------- #
 
 @web_bp.route('/api/login', methods=['POST'])
 def api_login():
@@ -54,14 +70,13 @@ def api_login():
         login_input = data.get('login_input')
         password = data.get('password')
         
-        # Validaciones básicas
         if not login_input:
             return jsonify({'error': 'Ingresa tu usuario o email'}), 400
         
         if not password:
             return jsonify({'error': 'Ingresa tu contraseña'}), 400
         
-        # Buscar usuario por nombre_usuario O correo
+        # Buscar usuario
         usuario = Usuario.query.filter(
             (Usuario.nombre_usuario == login_input) | (Usuario.correo == login_input)
         ).first()
@@ -73,39 +88,44 @@ def api_login():
         if not check_password_hash(usuario.password, password):
             return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
         
-        # Crear sesión (LOGIN EXITOSO)
+        # Crear sesión
         session['user_id'] = usuario.id_usuario
         session['username'] = usuario.nombre_usuario
         session['user_role'] = usuario.rol_id
         
-        print(f"LOGIN EXITOSO: {usuario.nombre_usuario}")
+        print(f"LOGIN EXITOSO: {usuario.nombre_usuario} (Rol: {usuario.rol_id})")
+        
+        # Redirigir según rol
+        if usuario.rol_id == 1:  # Administrador
+            redirect_url = '/admin'
+            message = 'Login de administrador exitoso'
+        else:  # Usuario normal
+            redirect_url = '/'
+            message = 'Login exitoso'
         
         return jsonify({
             'success': True, 
-            'message': 'Login exitoso',
-            'redirect_url': '/',  
+            'message': message,
+            'redirect_url': redirect_url,
             'user': {
                 'id': usuario.id_usuario,
                 'username': usuario.nombre_usuario,
-                'email': usuario.correo
+                'email': usuario.correo,
+                'role': usuario.rol_id
             }
         }), 200
         
     except Exception as e:
         print(f"Error en login: {e}")
         return jsonify({'error': 'Error interno del servidor'}), 500
-    
 
-#-----------------------------------------LOGOUT-----------------------------------------#
+# ----------------------------------------- LOGOUT ---------------------------------------- #
 
-
-# Ruta para cerrar sesión
 @web_bp.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
 
-# Ruta para verificar si hay usuario logueado
 @web_bp.route('/api/user-info')
 def user_info():
     if 'user_id' in session:
@@ -115,19 +135,14 @@ def user_info():
             'user': {
                 'id': usuario.id_usuario,
                 'username': usuario.nombre_usuario,
-                'email': usuario.correo
+                'email': usuario.correo,
+                'role': usuario.rol_id
             }
         })
     else:
         return jsonify({'logged_in': False})
 
-
-    
-#-----------------------------------------REGISTRO DE USUARIO-----------------------------------------#
-
-@web_bp.route('/registro')
-def registro():
-    return render_template('registro.html')
+# ----------------------------------------- REGISTROS ---------------------------------------- #
 
 @web_bp.route('/api/registro', methods=['POST'])
 def api_registro():
@@ -142,7 +157,7 @@ def api_registro():
         password = data.get('password')
         confirm_password = data.get('confirm_password')
         
-        # Validaciones básicas
+        # Validaciones
         if not username or len(username) < 6:
             return jsonify({'error': 'El nombre de usuario debe tener al menos 6 caracteres'}), 400
         
@@ -155,24 +170,21 @@ def api_registro():
         if password != confirm_password:
             return jsonify({'error': 'Las contraseñas no coinciden'}), 400
         
-        # VERIFICAR SI EL USUARIO YA EXISTE
-        usuario_existente = Usuario.query.filter_by(nombre_usuario=username).first()
-        if usuario_existente:
+        # Verificar si ya existe
+        if Usuario.query.filter_by(nombre_usuario=username).first():
             return jsonify({'error': 'Este usuario ya existe'}), 400
             
-        email_existente = Usuario.query.filter_by(correo=email).first()
-        if email_existente:
+        if Usuario.query.filter_by(correo=email).first():
             return jsonify({'error': 'Este email ya está registrado'}), 400
         
-        # CREAR NUEVO USUARIO (ENCRIPTAR CONTRASEÑA)
+        # Crear usuario normal
         nuevo_usuario = Usuario(
             nombre_usuario=username,
             correo=email,
             password=generate_password_hash(password),
-            rol_id=2  # Cliente por defecto
+            rol_id=2  # Cliente
         )
         
-        # GUARDAR EN BD
         db.session.add(nuevo_usuario)
         db.session.commit()
         
@@ -187,102 +199,122 @@ def api_registro():
         db.session.rollback()
         print(f"Error en registro: {e}")
         return jsonify({'error': 'Error interno del servidor'}), 500
-    
 
-#-----------------------------------------JUEGOS-----------------------------------------#
-    
+@web_bp.route('/api/registro-admin', methods=['POST'])
+def api_registro_admin():
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'Datos no proporcionados'}), 400
+        
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+        
+        # Validaciones
+        if not username or len(username) < 6:
+            return jsonify({'error': 'El nombre de usuario debe tener al menos 6 caracteres'}), 400
+        
+        if not email or '@' not in email:
+            return jsonify({'error': 'Email inválido'}), 400
+        
+        if not password or len(password) < 8:
+            return jsonify({'error': 'La contraseña debe tener al menos 8 caracteres'}), 400
+        
+        if password != confirm_password:
+            return jsonify({'error': 'Las contraseñas no coinciden'}), 400
+        
+        # Verificar si ya existe
+        if Usuario.query.filter_by(nombre_usuario=username).first():
+            return jsonify({'error': 'Este usuario ya existe'}), 400
+            
+        if Usuario.query.filter_by(correo=email).first():
+            return jsonify({'error': 'Este email ya está registrado'}), 400
+        
+        # Crear administrador
+        nuevo_admin = Usuario(
+            nombre_usuario=username,
+            correo=email,
+            password=generate_password_hash(password),
+            rol_id=1  # Administrador
+        )
+        
+        db.session.add(nuevo_admin)
+        db.session.commit()
+        
+        print(f"ADMINISTRADOR GUARDADO EN BD: {username}, Email: {email}")
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Administrador registrado exitosamente'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error en registro admin: {e}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+# ----------------------------------------- RUTAS DE PÁGINAS ---------------------------------------- #
 
 @web_bp.route('/juegos')
 def juegos():
     return render_template('juegos.html')
 
-
-#-----------------------------------------CONSOLAS-----------------------------------------#
-
-
 @web_bp.route('/consolas')
 def consolas():
     return render_template('consolas.html')
-
-
-
-#-----------------------------------------CONTROLES-----------------------------------------#
 
 @web_bp.route('/controles')
 def controles():
     return render_template('controles.html')
 
-#-----------------------------------------ACCESORIOS-----------------------------------------#
-
-
 @web_bp.route('/accesorios')
-def accesorios():  # ← Corregí el nombre de la función
+def accesorios():
     return render_template('accesorios.html')
-
-#-----------------------------------------CARRITO-----------------------------------------#
-
-
-
-
-#-----------------------------------------FAVORITOS-----------------------------------------#
-
 
 @web_bp.route('/favoritos')
 @login_required
 def favoritos():
     return render_template('favoritos.html')
 
-
-#-----------------------------------------PERFIL-----------------------------------------#
-
-
 @web_bp.route('/perfil')
-@login_required  # ← MISMA sangría que la función
-def perfil():    # ← MISMA sangría que el decorador
+@login_required
+def perfil():
     usuario = Usuario.query.get(session['user_id'])
     return render_template('perfiluser.html', usuario=usuario)
-
-#-----------------------------------------PEDIDOS-----------------------------------------#
-
 
 @web_bp.route('/pedidos')
 @login_required
 def pedidos():
     return render_template('pedidos.html')
 
-#-----------------------------------------PAGAR-----------------------------------------#
-
-
 @web_bp.route('/pagar')
 @login_required
 def pagar():
     return render_template('Pagar.html')
 
-
-
-#-----------------------------------------COMPRA FINALIZADA-----------------------------------------#
-
-
 @web_bp.route('/compra-finalizada')
 def compra_finalizada():
     return render_template('CompraFinalizada.html')
 
-#-----------------------------------------REGISTRO DE USUARIO-----------------------------------------#
-
-
 @web_bp.route('/admin')
+@admin_required
 def admin():
     return render_template('admin_templates/admin.html')
 
+@web_bp.route('/carrito')
+@login_required
+def carrito():
+    return render_template('Carrito.html')
 
-
-
+# ----------------------------------------- API PRODUCTOS ---------------------------------------- #
 
 @web_bp.route('/api/productos')
 def api_productos():
     try:
         from app.models import Producto, Categoria
-        # Obtener todos los productos activos con sus categorías
         productos = Producto.query.filter_by(activo=True).all()
         
         productos_data = []
@@ -336,16 +368,12 @@ def api_productos_por_categoria(categoria_id):
     except Exception as e:
         print(f"Error obteniendo productos por categoría: {e}")
         return jsonify({'success': False, 'error': 'Error al obtener productos'}), 500
-    
-    
-    # app/routes/web.py - Agrega estas rutas después de las rutas de productos
 
-#-----------------------------------------CARRITO API-----------------------------------------#
+# ----------------------------------------- CARRITO API ---------------------------------------- #
 
 @web_bp.route('/api/carrito/agregar', methods=['POST'])
 def agregar_al_carrito():
     try:
-        # Verificar si el usuario está autenticado
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'Debes iniciar sesión para agregar productos al carrito'}), 401
 
@@ -356,11 +384,9 @@ def agregar_al_carrito():
         producto_id = data.get('producto_id')
         cantidad = data.get('cantidad', 1)
 
-        # Validar datos
         if not producto_id:
             return jsonify({'success': False, 'error': 'ID de producto no proporcionado'}), 400
 
-        # Verificar que el producto existe y está activo
         from app.models import Producto, Carrito, CarritoItem
         producto = Producto.query.filter_by(id_producto=producto_id, activo=True).first()
         
@@ -370,7 +396,6 @@ def agregar_al_carrito():
         if producto.stock < cantidad:
             return jsonify({'success': False, 'error': 'Stock insuficiente'}), 400
 
-        # Obtener o crear carrito activo del usuario
         carrito = Carrito.query.filter_by(
             usuario_id=session['user_id'], 
             activo=True
@@ -379,22 +404,19 @@ def agregar_al_carrito():
         if not carrito:
             carrito = Carrito(usuario_id=session['user_id'])
             db.session.add(carrito)
-            db.session.flush()  # Para obtener el ID sin commit
+            db.session.flush()
 
-        # Verificar si el producto ya está en el carrito
         item_existente = CarritoItem.query.filter_by(
             carrito_id=carrito.id_carrito,
             producto_id=producto_id
         ).first()
 
         if item_existente:
-            # Actualizar cantidad si ya existe
             nueva_cantidad = item_existente.cantidad + cantidad
             if nueva_cantidad > producto.stock:
                 return jsonify({'success': False, 'error': 'Stock insuficiente'}), 400
             item_existente.cantidad = nueva_cantidad
         else:
-            # Crear nuevo item en el carrito
             nuevo_item = CarritoItem(
                 carrito_id=carrito.id_carrito,
                 producto_id=producto_id,
@@ -416,17 +438,8 @@ def agregar_al_carrito():
         print(f"Error agregando al carrito: {e}")
         return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
 
-# app/routes/web.py - Rutas para el carrito
-
-@web_bp.route('/carrito')
-@login_required
-def carrito():
-    """Página principal del carrito"""
-    return render_template('Carrito.html')
-
 @web_bp.route('/api/carrito/detalles')
 def api_carrito_detalles():
-    """Obtener detalles completos del carrito"""
     try:
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'No autenticado'}), 401
@@ -471,7 +484,7 @@ def api_carrito_detalles():
             'carrito': {
                 'items': items_data,
                 'subtotal': subtotal,
-                'total': subtotal,  # Por si agregas impuestos/envío después
+                'total': subtotal,
                 'count': len(carrito.items)
             }
         })
@@ -482,7 +495,6 @@ def api_carrito_detalles():
 
 @web_bp.route('/api/carrito/actualizar/<int:item_id>', methods=['PUT'])
 def actualizar_cantidad_carrito(item_id):
-    """Actualizar cantidad de un item en el carrito"""
     try:
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'No autenticado'}), 401
@@ -490,13 +502,12 @@ def actualizar_cantidad_carrito(item_id):
         data = request.get_json()
         nueva_cantidad = data.get('cantidad', 1)
 
-        from app.models import CarritoItem, Producto
+        from app.models import CarritoItem, Producto, Carrito
         item = CarritoItem.query.get(item_id)
         
         if not item:
             return jsonify({'success': False, 'error': 'Item no encontrado'}), 404
 
-        # Verificar que el item pertenece al usuario
         carrito = Carrito.query.filter_by(
             usuario_id=session['user_id'], 
             activo=True
@@ -505,13 +516,11 @@ def actualizar_cantidad_carrito(item_id):
         if not carrito or item.carrito_id != carrito.id_carrito:
             return jsonify({'success': False, 'error': 'No autorizado'}), 403
 
-        # Verificar stock
         producto = Producto.query.get(item.producto_id)
         if nueva_cantidad > producto.stock:
             return jsonify({'success': False, 'error': 'Stock insuficiente'}), 400
 
         if nueva_cantidad <= 0:
-            # Eliminar item si cantidad es 0 o menos
             db.session.delete(item)
         else:
             item.cantidad = nueva_cantidad
@@ -523,12 +532,9 @@ def actualizar_cantidad_carrito(item_id):
         db.session.rollback()
         print(f"Error actualizando carrito: {e}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
-    
-    
 
 @web_bp.route('/api/carrito/eliminar/<int:item_id>', methods=['DELETE'])
 def eliminar_item_carrito(item_id):
-    """Eliminar item del carrito"""
     try:
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'No autenticado'}), 401
@@ -539,7 +545,6 @@ def eliminar_item_carrito(item_id):
         if not item:
             return jsonify({'success': False, 'error': 'Item no encontrado'}), 404
 
-        # Verificar que el item pertenece al usuario
         carrito = Carrito.query.filter_by(
             usuario_id=session['user_id'], 
             activo=True
@@ -557,5 +562,3 @@ def eliminar_item_carrito(item_id):
         db.session.rollback()
         print(f"Error eliminando item: {e}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
-    
-    

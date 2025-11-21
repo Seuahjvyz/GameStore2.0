@@ -1,55 +1,44 @@
+// Carousel functionality for index page
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCarousel();
+});
 
-       
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-slide');
-        const dots = document.querySelectorAll('.dot');
+function initializeCarousel() {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    let currentSlide = 0;
 
-        function showSlide(index) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
-            
-            slides[index].classList.add('active');
-            dots[index].classList.add('active');
-        }
+    if (slides.length === 0) return;
 
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
-        }
-
+    function showSlide(n) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
         
-        setInterval(nextSlide, 5000);
-
-     
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentSlide = index;
-                showSlide(currentSlide);
-            });
-        });
-
+        currentSlide = (n + slides.length) % slides.length;
         
-        const filtros = document.querySelectorAll('.filtro-btn');
-        filtros.forEach(filtro => {
-            filtro.addEventListener('click', () => {
-                filtros.forEach(f => f.classList.remove('active'));
-                filtro.classList.add('active');
-            });
-        });
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }
 
-        
-        const botonesAgregar = document.querySelectorAll('.btn-agregar');
-        botonesAgregar.forEach(boton => {
-            boton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                boton.textContent = '✓ Agregado';
-                boton.style.background = '#8B00FF';
-                boton.style.color = '#ffffff';
-                
-                setTimeout(() => {
-                    boton.textContent = 'Agregar';
-                    boton.style.background = 'rgba(139, 0, 255, 0.2)';
-                    boton.style.color = '#8B00FF';
-                }, 2000);
-            });
+    // Dot click events
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            showSlide(index);
         });
+    });
+
+    // Auto-advance slides every 5 seconds
+    setInterval(() => {
+        showSlide(currentSlide + 1);
+    }, 5000);
+
+    // Carousel comprar buttons
+    document.querySelectorAll('.btn-comprar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const slide = this.closest('.carousel-slide');
+            const title = slide.querySelector('h2').textContent;
+            alert(`Redirigiendo a compra de: ${title}`);
+            // Aquí puedes redirigir a la página correspondiente
+        });
+    });
+}
