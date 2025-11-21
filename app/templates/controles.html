@@ -19,7 +19,7 @@
             <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar</a></li>
             <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
             <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
-            <li><h3>Categorías</h3></li>
+            <li><h3 style="color: white;">Categorías</h3></li>
             <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
             <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a></li>
             <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
@@ -43,7 +43,7 @@
                     <span class="carrito-count">0</span>
                 </a>
 
-                <!-- Menu usuario -->
+                 <!-- Menu usuario -->
                 <div class="user-menu-container">
                     <button class="user-menu-btn" id="userMenuBtn">
                         <i class="fa-solid fa-circle-user"></i>
@@ -51,30 +51,17 @@
                     </button>
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-content">
-                            <a href="/login" class="dropdown-item">
-                                <i class="fa-solid fa-right-to-bracket"></i>
-                                <span>Iniciar Sesión</span>
-                            </a>
-                            <a href="/registro" class="dropdown-item">
-                                <i class="fa-solid fa-user-plus"></i>
-                                <span>Registrarse</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="/perfil" class="dropdown-item">
-                                <i class="fa-solid fa-user"></i>
-                                <span>Mi Perfil</span>
-                            </a>
-                            <a href="/carrito" class="dropdown-item">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                <span>Carrito</span>
-                            </a>
+                            <!-- El contenido se cargará dinámicamente -->
+                            <div class="loading-menu">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </header>
 
-        <div class="principal">
+        <div class="principal" style="color: white;">
             <div class="controles">
                 <h1>Controles</h1>
                 <p class="subtitulo">Los mejores controles para tu experiencia gaming</p>
@@ -90,6 +77,7 @@
 
     <!-- Scripts -->
     <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/carrito-dinamico.js"></script>
     <script src="/static/js/productos-dinamicos.js"></script>
 </body>
 

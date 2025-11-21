@@ -49,7 +49,7 @@ class CarritoDinamico {
                 </div>
                 <h3>Tu carrito está vacío</h3>
                 <p>Agrega algunos productos increíbles</p>
-                <a href="/accesorios" class="btn btn-primary">Descubrir productos</a>
+                <a href="/" class="btn btn-primary">Descubrir productos</a>
             </div>
         `;
     }
@@ -119,18 +119,12 @@ class CarritoDinamico {
                     <span>Subtotal:</span>
                     <span>$${this.carritoData.subtotal.toFixed(2)}</span>
                 </div>
-                
-                <div class="resumen-linea">
-                    <span>Envío:</span>
-                    <span>Gratis</span>
-                </div>
-                
-                
+  
                 <button class="btn-pagar" id="btnPagar">
                     Proceder al Pago
                 </button>
                 
-                <a href="/accesorios" class="btn-seguir-comprando">
+                <a href="/" class="btn-seguir-comprando">
                     <i class="fa-solid fa-arrow-left"></i> Seguir comprando
                 </a>
             </div>
@@ -274,10 +268,7 @@ crearSeccionPagoHTML() {
                             <span>Subtotal:</span>
                             <span>$${this.carritoData.subtotal.toFixed(2)}</span>
                         </div>
-                        <div class="linea-total">
-                            <span>Envío:</span>
-                            <span>Gratis</span>
-                        </div>
+
                         <div class="linea-total total-final">
                             <span>Total:</span>
                             <span>$${this.carritoData.total.toFixed(2)}</span>

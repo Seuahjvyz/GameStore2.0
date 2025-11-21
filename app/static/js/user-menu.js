@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (userMenuBtn && userDropdown) {
         userMenuBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+            const isVisible = userDropdown.style.display === 'block';
+            userDropdown.style.display = isVisible ? 'none' : 'block';
         });
 
         // Close dropdown when clicking outside
@@ -29,31 +30,38 @@ async function cargarUsuarioActual() {
         const response = await fetch('/api/usuario/actual');
         if (response.ok) {
             const usuario = await response.json();
-            if (usuario && usuario.id_usuario) {
-                actualizarMenuUsuario(usuario);
+            if (usuario && usuario.id) {
+                actualizarMenuUsuario(usuario, true); // Usuario logueado
+            } else {
+                actualizarMenuUsuario(null, false); // Usuario NO logueado
             }
+        } else {
+            actualizarMenuUsuario(null, false); // Usuario NO logueado
         }
     } catch (error) {
         console.error('Error al cargar usuario:', error);
+        actualizarMenuUsuario(null, false); // Usuario NO logueado en caso de error
     }
 }
 
-function actualizarMenuUsuario(usuario) {
-    const dropdownContent = document.getElementById('dropdownContent') || document.querySelector('.dropdown-content');
-    if (dropdownContent && usuario) {
+function actualizarMenuUsuario(usuario, estaLogueado) {
+    const dropdownContent = document.querySelector('.dropdown-content');
+    if (!dropdownContent) {
+        console.error('No se encontró el elemento dropdown-content');
+        return;
+    }
+
+    if (estaLogueado && usuario) {
+        // Menú para usuarios logueados
         dropdownContent.innerHTML = `
             <div class="dropdown-user-info">
                 <i class="fa-solid fa-user"></i>
-                <span>Hola, ${usuario.nombre || usuario.nombre_usuario}</span>
+                <span>Hola, ${usuario.username || 'Usuario'}</span>
             </div>
             <div class="dropdown-divider"></div>
             <a href="/perfil" class="dropdown-item">
                 <i class="fa-solid fa-user"></i>
                 <span>Mi Perfil</span>
-            </a>
-            <a href="/carrito" class="dropdown-item">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span>Carrito</span>
             </a>
             <a href="/pedidos" class="dropdown-item">
                 <i class="fa-solid fa-box"></i>
@@ -65,5 +73,23 @@ function actualizarMenuUsuario(usuario) {
                 <span>Cerrar Sesión</span>
             </a>
         `;
+    } else {
+        // Menú para usuarios NO logueados
+        dropdownContent.innerHTML = `
+            <a href="/login" class="dropdown-item">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Iniciar Sesión</span>
+            </a>
+            <a href="/registro" class="dropdown-item">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Registrarse</span>
+            </a>
+        `;
+    }
+    
+    // Asegurar que el dropdown esté oculto inicialmente
+    const userDropdown = document.getElementById('userDropdown');
+    if (userDropdown) {
+        userDropdown.style.display = 'none';
     }
 }

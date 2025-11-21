@@ -1,84 +1,81 @@
-
-// productos-dinamicos.js - Versión corregida y simplificada
-
 const ProductosController = {
     // Inicializar el controlador
-    init: function() {
-        console.log('🔄 Inicializando ProductosController...');
+    init: function () {
+        console.log('Inicializando ProductosController...');
         this.cargarProductos();
         this.agregarEventListenersGlobales();
     },
 
     // Cargar productos desde la API
-    cargarProductos: function() {
-        console.log('🔄 Iniciando carga de productos...');
-        
+    cargarProductos: function () {
+        console.log('Iniciando carga de productos...');
+
         // Mostrar loading
         this.mostrarLoading();
-        
+
         // Determinar la categoría actual desde la URL
         const categoria = this.obtenerCategoriaActual();
         const url = categoria ? `/api/productos?categoria=${categoria}` : '/api/productos';
-        
+
         console.log(`📡 Solicitando productos desde: ${url}`);
-        
+
         fetch(url)
             .then(response => {
-                console.log('📡 Respuesta recibida, status:', response.status);
+                console.log(' Respuesta recibida, status:', response.status);
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('📦 Datos completos recibidos:', data);
-                
+                console.log('Datos completos recibidos:', data);
+
                 // VERIFICACIÓN CRÍTICA - Debug detallado
                 if (!data) {
-                    console.error('❌ data es null o undefined');
+                    console.error(' data es null o undefined');
                     this.mostrarError('No se recibieron datos del servidor');
                     return;
                 }
-                
+
                 if (!data.success) {
-                    console.error('❌ success es false:', data.error);
-                    this.mostrarError(data.error || 'Error en el servidor');
+                    console.error(' success es false:', data.error);
+                    this.mostrarError(data.error || 'Error en BD');
                     return;
                 }
-                
+
                 const productos = data.productos;
                 console.log('🔍 Productos extraídos:', productos);
-                
+
                 if (!productos) {
-                    console.error('❌ data.productos no existe');
+                    console.error(' data.productos no existe');
                     this.mostrarError('Formato de datos incorrecto');
                     return;
                 }
-                
+
                 if (!Array.isArray(productos)) {
-                    console.error('❌ productos no es un array:', typeof productos, productos);
+                    console.error(' productos no es un array:', typeof productos, productos);
                     this.mostrarError('Error en formato de productos');
                     return;
                 }
-                
-                console.log(`✅ ${productos.length} productos listos para mostrar`);
-                
+
+                console.log(` ${productos.length} productos listos para mostrar`);
+
                 if (productos.length === 0) {
                     this.mostrarMensaje('No hay productos disponibles en este momento');
                     return;
                 }
-                
+
                 // Si llegamos aquí, todo está bien
                 this.mostrarProductos(productos);
             })
             .catch(error => {
-                console.error('💥 Error en cargarProductos:', error);
+                console.error(' Error en cargarProductos:', error);
                 this.mostrarError('Error al cargar los productos: ' + error.message);
             });
     },
 
     // Obtener categoría actual desde la URL
-    obtenerCategoriaActual: function() {
+    obtenerCategoriaActual: function () {
         const path = window.location.pathname;
         if (path.includes('/juegos')) return 'Juegos';
         if (path.includes('/consolas')) return 'Consolas';
@@ -88,31 +85,30 @@ const ProductosController = {
     },
 
     // Mostrar productos en el contenedor
-    mostrarProductos: function(productos) {
+    mostrarProductos: function (productos) {
         try {
             console.log('🎨 Mostrando productos...');
             const container = document.getElementById('productos-container');
-            
+
             if (!container) {
-                console.error('❌ No se encontró el container con id "products-container"');
+                console.error(' No se encontró el container con id "products-container"');
                 return;
             }
-            
+
             if (productos.length === 0) {
                 container.innerHTML = '<div class="error">No hay productos disponibles</div>';
                 return;
             }
-            
+
             // Generar HTML para cada producto
             // Cambiar esta línea:
-container.innerHTML = productos.map(producto => `
+            container.innerHTML = productos.map(producto => `
     <div class="producto" data-id="${producto.id}">
         <img src="${producto.imagen}" alt="${producto.nombre}" 
              onerror="this.src='/static/img/placeholder.jpg'">
         <h3>${producto.nombre}</h3>
         <p class="descripcion">${producto.descripcion}</p>
         <p class="precio">$${typeof producto.precio === 'number' ? producto.precio.toFixed(2) : '0.00'}</p>
-        <p class="stock">Stock: ${producto.stock}</p>
         <button class="btn-agregar-carrito" 
                 data-id="${producto.id}"
                 ${producto.stock === 0 ? 'disabled' : ''}>
@@ -120,35 +116,35 @@ container.innerHTML = productos.map(producto => `
         </button>
     </div>
 `).join('');
-            
+
             console.log('✅ Productos renderizados correctamente');
-            
+
             // Agregar event listeners a los botones
             this.agregarEventListeners();
-            
+
         } catch (error) {
-            console.error('💥 Error en mostrarProductos:', error);
+            console.error(' Error en mostrarProductos:', error);
             this.mostrarError('Error al mostrar los productos');
         }
     },
 
     // Agregar event listeners a los botones
-    agregarEventListeners: function() {
+    agregarEventListeners: function () {
         const botones = document.querySelectorAll('.btn-agregar-carrito');
-        console.log(`🔗 Agregando listeners a ${botones.length} botones`);
-        
+        console.log(` Agregando listeners a ${botones.length} botones`);
+
         botones.forEach(boton => {
             boton.addEventListener('click', (e) => {
                 e.preventDefault();
                 const productoId = boton.getAttribute('data-id');
-                console.log(`🛒 Agregando producto ${productoId} al carrito`);
+                console.log(` Agregando producto ${productoId} al carrito`);
                 this.agregarAlCarrito(productoId);
             });
         });
     },
 
     // Agregar event listeners globales
-    agregarEventListenersGlobales: function() {
+    agregarEventListenersGlobales: function () {
         // Listeners para filtros de categoría si existen
         const filtrosCategoria = document.querySelectorAll('.filtro-categoria');
         if (filtrosCategoria.length > 0) {
@@ -163,11 +159,11 @@ container.innerHTML = productos.map(producto => `
     },
 
     // Filtrar productos por categoría
-    filtrarPorCategoria: function(categoriaId) {
-        console.log(`🔍 Filtrando por categoría: ${categoriaId}`);
-        
+    filtrarPorCategoria: function (categoriaId) {
+        console.log(` Filtrando por categoría: ${categoriaId}`);
+
         this.mostrarLoading();
-        
+
         fetch(`/api/productos/categoria/${categoriaId}`)
             .then(response => {
                 if (!response.ok) {
@@ -189,9 +185,9 @@ container.innerHTML = productos.map(producto => `
     },
 
     // Agregar producto al carrito
-    agregarAlCarrito: function(productoId) {
-        console.log(`🛒 Agregando producto ${productoId} al carrito`);
-        
+    agregarAlCarrito: function (productoId) {
+        console.log(` Agregando producto ${productoId} al carrito`);
+
         fetch('/api/carrito/agregar', {
             method: 'POST',
             headers: {
@@ -202,26 +198,26 @@ container.innerHTML = productos.map(producto => `
                 cantidad: 1
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('✅ Producto agregado al carrito:', data);
-                this.mostrarNotificacion('Producto agregado al carrito');
-                // Actualizar contador del carrito si existe
-                this.actualizarContadorCarrito(data.carrito_count);
-            } else {
-                console.error('❌ Error al agregar al carrito:', data.error);
-                this.mostrarError(data.error || 'Error al agregar al carrito');
-            }
-        })
-        .catch(error => {
-            console.error('💥 Error agregando al carrito:', error);
-            this.mostrarError('Error de conexión');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(' Producto agregado al carrito:', data);
+                    this.mostrarNotificacion('Producto agregado al carrito');
+                    // Actualizar contador del carrito si existe
+                    this.actualizarContadorCarrito(data.carrito_count);
+                } else {
+                    console.error(' Error al agregar al carrito:', data.error);
+                    this.mostrarError(data.error || 'Error al agregar al carrito');
+                }
+            })
+            .catch(error => {
+                console.error(' Error agregando al carrito:', error);
+                this.mostrarError('Error de conexión');
+            });
     },
 
     // Actualizar contador del carrito
-    actualizarContadorCarrito: function(count) {
+    actualizarContadorCarrito: function (count) {
         const contador = document.getElementById('carrito-count');
         if (contador) {
             contador.textContent = count;
@@ -230,7 +226,7 @@ container.innerHTML = productos.map(producto => `
     },
 
     // Mostrar notificación
-    mostrarNotificacion: function(mensaje) {
+    mostrarNotificacion: function (mensaje) {
         // Crear notificación temporal
         const notificacion = document.createElement('div');
         notificacion.className = 'notificacion';
@@ -239,7 +235,7 @@ container.innerHTML = productos.map(producto => `
                 <span>${mensaje}</span>
             </div>
         `;
-        
+
         // Estilos básicos para la notificación
         notificacion.style.cssText = `
             position: fixed;
@@ -252,9 +248,9 @@ container.innerHTML = productos.map(producto => `
             z-index: 1000;
             animation: fadeIn 0.3s;
         `;
-        
+
         document.body.appendChild(notificacion);
-        
+
         // Remover después de 3 segundos
         setTimeout(() => {
             notificacion.remove();
@@ -262,7 +258,7 @@ container.innerHTML = productos.map(producto => `
     },
 
     // Mostrar estado de loading
-    mostrarLoading: function() {
+    mostrarLoading: function () {
         const container = document.getElementById('products-container');
         if (container) {
             container.innerHTML = `
@@ -275,13 +271,13 @@ container.innerHTML = productos.map(producto => `
     },
 
     // Mostrar mensaje de error
-    mostrarError: function(mensaje) {
-        console.error('🚨 Mostrando error:', mensaje);
+    mostrarError: function (mensaje) {
+        console.error(' Mostrando error:', mensaje);
         const container = document.getElementById('products-container');
         if (container) {
             container.innerHTML = `
                 <div class="error">
-                    <h3>😕 Ocurrió un error</h3>
+                    <h3> Ocurrió un error</h3>
                     <p>${mensaje}</p>
                     <button onclick="ProductosController.cargarProductos()" class="btn-reintentar">
                         Reintentar
@@ -292,13 +288,13 @@ container.innerHTML = productos.map(producto => `
     },
 
     // Mostrar mensaje informativo
-    mostrarMensaje: function(mensaje) {
-        console.log('💡 Mostrando mensaje:', mensaje);
+    mostrarMensaje: function (mensaje) {
+        console.log(' Mostrando mensaje:', mensaje);
         const container = document.getElementById('products-container');
         if (container) {
             container.innerHTML = `
                 <div class="info-message">
-                    <h3>ℹ️ Información</h3>
+                    <h3>Información</h3>
                     <p>${mensaje}</p>
                 </div>
             `;
@@ -307,14 +303,14 @@ container.innerHTML = productos.map(producto => `
 };
 
 // Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM cargado, inicializando ProductosController...');
+document.addEventListener('DOMContentLoaded', function () {
+    console.log(' DOM cargado, inicializando ProductosController...');
     ProductosController.init();
 });
 
 // También inicializar si el DOM ya está listo (para cargas posteriores)
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         ProductosController.init();
     });
 } else {
@@ -323,4 +319,4 @@ if (document.readyState === 'loading') {
 
 // Hacer disponible globalmente para debugging
 window.ProductosController = ProductosController;
-console.log('✅ productos-dinamicos.js cargado correctamente');
+console.log(' productos-dinamicos.js cargado correctamente');

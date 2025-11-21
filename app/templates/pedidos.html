@@ -29,7 +29,7 @@
             <li><a class="enlace_barra_lateral_fijo" href="/pedidos"><i class="fa-solid fa-box"></i>
                     Pedidos</a></li>
             <li>
-                <h3>Categorías</h3>
+                <h3 style="color: white;">Categorías</h3>
             </li>
             <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i>
                     Juegos</a></li>
@@ -60,32 +60,18 @@
                     <i class="fa-solid fa-cart-shopping"></i>
                 </a>
 
-                <!-- Menu usuario -->
-                <div class="user-menu-container">
+                 <!-- Menu usuario -->
+                <div class="user-menu-container" >
                     <button class="user-menu-btn" id="userMenuBtn">
                         <i class="fa-solid fa-circle-user"></i>
                         <i class="fa-solid fa-chevron-down"></i>
                     </button>
-
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-content">
-                            <a href="/login" class="dropdown-item">
-                                <i class="fa-solid fa-right-to-bracket"></i>
-                                <span>Iniciar Sesión</span>
-                            </a>
-                            <a href="/registro" class="dropdown-item">
-                                <i class="fa-solid fa-user-plus"></i>
-                                <span>Registrarse</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="/perfil" class="dropdown-item">
-                                <i class="fa-solid fa-user"></i>
-                                <span>Mi Perfil</span>
-                            </a>
-                            <a href="/carrito" class="dropdown-item">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                <span>Carrito</span>
-                            </a>
+                            <!-- El contenido se cargará dinámicamente -->
+                            <div class="loading-menu">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,7 +81,7 @@
 
 
         <!-- Contenido Principal -->
-        <div class="principal">
+        <div class="principal" style="color: white;">
             <h1>Mis Pedidos</h1>
             <p class="header-subtitle">Revisa el estado de tus compras</p>
 
@@ -204,6 +190,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
     <script src="/static/js/models/carrito.js"></script>
     <script src="/static/js/views/carrito-view.js"></script>
+    <script src="/static/js/carrito-dinamico.js"></script>
     <script src="/static/js/app-carrito.js"></script>
 
 </body>
