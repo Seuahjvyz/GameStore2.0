@@ -642,3 +642,11 @@ def eliminar_item_carrito(item_id):
         db.session.rollback()
         print(f"Error eliminando item: {e}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
+    
+    
+    
+
+
+
+
+
