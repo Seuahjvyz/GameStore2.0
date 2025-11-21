@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameStore - Método de Pago</title>
+    <link rel="stylesheet" href="../Static/css/stylepay.css">
+</head>
+<body>
+      <!-- Barra Lateral Moderna -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-container">
+                    <img src="../Static/img/Icon_GS.png" alt="GameStore Logo" class="logo-image" onerror="this.style.display='none'; document.getElementById('logo-emoji').style.display='block';">
+                    <span id="logo-emoji" class="logo-emoji" style="display: none;">🎮</span>
+                </div>
+            </div>
+        </div>
+
+       <nav class="barra_lateral">
+        <a class="logo_link" href="index.html"><img class="logo" src="app/static/img/Icon_GS.png" alt="Logo"></a>
+
+        <ul>
+            <li><a class="enlace_barra_lateral_fijo" href="index.html"><i class="fa-solid fa-house"></i> Inicio</a></li>
+
+            <li><a class="enlace_barra_lateral" href="app/templates/perfiluser.html"><i
+                    class="fa-solid fa-circle-user"></i> Perfil</a></li>
+
+            <li><a class="enlace_barra_lateral" href="index.html"><i class="fa-solid fa-magnifying-glass"></i> Buscar</a>
+            </li>
+            <li><a class="enlace_barra_lateral" href="app/templates/favoritos.html"><i class="fa-solid fa-heart"></i>
+                    Favoritos</a></li>
+
+            <li><a class="enlace_barra_lateral" href="app/templates/pedidos.html"><i class="fa-solid fa-box"></i>
+                    Pedidos</a></li>
+            <li>
+                <h3>Categorías</h3>
+            </li>
+            <li><a class="enlace_barra_lateral" href="app/templates/juegos.html"><i class="fa-solid fa-ghost"></i>
+                    Juegos</a></li>
+            <li><a class="enlace_barra_lateral" href="app/templates/accesorios.html"><i
+                        class="fa-solid fa-headset"></i> Accesorios</a></li>
+            <li><a class="enlace_barra_lateral" href="app/templates/consolas.html"><i class="fa-solid fa-tv"></i>
+                    Consolas</a></li>
+            <li><a class="enlace_barra_lateral" href="app/templates/controles.html"><i class="fa-solid fa-gamepad"></i>
+                    Controles</a></li>
+            <li><a class="enlace_barra_lateral" href="app/templates/Carrito.html"><i
+                        class="fa-solid fa-cart-shopping"></i> Carrito</a></li>
+            <li><a class="enlace_barra_lateral" href="app/templates/registro.html"><i class="fa-solid fa-users"></i>
+                    Registrarse</a></li>
+            <li><a class="enlace_barra_lateral" href="app/admin_templates/admin.html"><i class="fa-solid fa-user"></i>
+                    Admin</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <header class="encabezado">
+            <section class="buscador">
+                <input type="text" id="buscar" placeholder="Buscar producto">
+                <button class="btn_buscar" id="buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </section>
+
+            <section class="iconos">
+                <button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i></button>
+                <a class="icon" href="app/templates/Carrito.html"><i class="fa-solid fa-cart-shopping"></i></a>
+                <a class="icon" href="app/templates/perfiluser.html"><i class="fa-solid fa-circle-user"></i></a>
+            </section>
+        </header>
+
+
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+        <header class="header">
+            <h1>Productos en Carrito</h1>
+            <p class="header-subtitle">Revisa y confirma tu compra</p>
+        </header>
+
+        <main class="payment-container">
+            <!-- Productos en el carrito -->
+            <div class="cart-section">
+                <div class="cart-item">
+                    <div class="cart-image-container">
+                        <img src="../Static/img/Imagenes/Nintendo_Switch_2.jpeg" alt="Nintendo Switch OLED" class="cart-image">
+                    </div>
+                    <div class="cart-item-info">
+                        <h3 class="product-title">Nintendo Switch OLED</h3>
+                        <p class="item-price">$8,620.88</p>
+                    </div>
+                    <button class="delete-btn">
+                        <span class="btn-icon">🗑️</span>
+                        ELIMINAR
+                    </button>
+                </div>
+
+                <div class="cart-item">
+                    <div class="cart-image-container">
+                        <img src="../Static/img/Imagenes/Audifonos_Gamer.jpg" alt="Audífonos Gamer" class="cart-image">
+                    </div>
+                    <div class="cart-item-info">
+                        <h3 class="product-title">Audífonos Gamer</h3>
+                        <p class="item-price">$821.00</p>
+                    </div>
+                    <button class="delete-btn">
+                        <span class="btn-icon">🗑️</span>
+                        ELIMINAR
+                    </button>
+                </div>
+
+                <div class="cart-item">
+                    <div class="cart-image-container">
+                        <img src="../Static/img/Imagenes/FC26.jpeg" alt="FC 26 Xbox" class="cart-image">
+                    </div>
+                    <div class="cart-item-info">
+                        <h3 class="product-title">FC 26 Xbox Series X|S</h3>
+                        <p class="item-price">$1,923.69</p>
+                    </div>
+                    <button class="delete-btn">
+                        <span class="btn-icon">🗑️</span>
+                        ELIMINAR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Total -->
+            <div class="total-section">
+                <h2>Total</h2>
+                <p class="total-amount">$ 10,961.00</p>
+            </div>
+
+            <!-- Métodos de Pago -->
+            <div class="payment-methods">
+                <h2>Método de Pago</h2>
+                
+                <div class="payment-options">
+                    <div class="payment-option">
+                        <input type="radio" id="credit-card" name="payment-method" value="credit-card" checked>
+                        <label for="credit-card" class="payment-label">
+                            <span class="payment-icon">💳</span>
+                            Tarjeta de Crédito/Débito
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos Bancarios -->
+            <div class="payment-section credit-card-section">
+                <h2>Datos de Tarjeta</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Nombre del Titular de la tarjeta</label>
+                    <input type="text" class="input-field" placeholder="Ingresa el nombre completo">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Número de tarjeta</label>
+                    <input type="text" class="input-field" placeholder="1234 5678 9012 3456" maxlength="19">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Fecha de vencimiento</label>
+                        <input type="text" class="input-field" placeholder="MM/AA" maxlength="5">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">CVV</label>
+                        <input type="text" class="input-field" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <button class="back-btn">
+                    <span class="btn-icon">←</span>
+                    Volver
+                </button>
+                <button class="confirm-btn">
+                    <span class="btn-icon">✓</span>
+                    Finalizar Compra
+                </button>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

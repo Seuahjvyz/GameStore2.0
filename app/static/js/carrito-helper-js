@@ -1,0 +1,31 @@
+// static/js/carrito-helper.js
+function agregarAlCarrito(productoData) {
+    const carrito = new Carrito();
+    carrito.agregarProducto(productoData);
+    
+    // Mostrar notificación
+    mostrarNotificacion('Producto agregado al carrito');
+}
+
+function mostrarNotificacion(mensaje) {
+    // Crear notificación toast
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #8b5cf6;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    toast.textContent = mensaje;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}

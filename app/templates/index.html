@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Store Web</title>
+    <link rel="stylesheet" href="/static/css/stylee.css">
+    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- BACKBONE Y DEPENDENCIAS -->
+    <script src="/static/js/libs/jquery.min.js"></script>
+    <script src="/static/js/libs/underscore.min.js"></script>
+    <script src="/static/js/libs/backbone.min.js"></script>
+</head>
+
+<body>
+
+    <nav class="barra_lateral">
+        <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        <ul>
+            <li><a class="enlace_barra_lateral_fijo" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
+
+            <li><a class="enlace_barra_lateral" href="/perfil"><i class="fa-solid fa-circle-user"></i> Perfil</a></li>
+
+            <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i>
+                    Buscar</a>
+            </li>
+            <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i>
+                    Favoritos</a></li>
+
+            <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i>
+                    Pedidos</a></li>
+            <li>
+                <h3>Categorías</h3>
+            </li>
+            <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i>
+                    Juegos</a></li>
+            <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i>
+                    Accesorios</a></li>
+            <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i>
+                    Consolas</a></li>
+            <li><a class="enlace_barra_lateral" href="/controles"><i class="fa-solid fa-gamepad"></i>
+                    Controles</a></li>
+            <li><a class="enlace_barra_lateral" href="/carrito"><i class="fa-solid fa-cart-shopping"></i> Carrito</a>
+            </li>
+            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-user"></i>
+                    Admin</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <header class="encabezado">
+            <section class="buscador">
+                <input type="text" id="buscar" placeholder="Buscar producto">
+                <button class="btn_buscar" id="buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </section>
+
+            <section class="iconos">
+                <button class="btn_notificaciones" id="mostrarNotificaciones">
+                    <i class="fa-solid fa-bell"></i>
+                </button>
+                <a class="icon" href="/carrito">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </a>
+
+                <!-- Menu usuario -->
+                <div class="user-menu-container">
+                    <button class="user-menu-btn" id="userMenuBtn"><i class="fa-solid fa-circle-user"></i><i
+                            class="fa-solid fa-chevron-down dropdown-arrow"></i></button>
+
+                    <div class="user-dropdown-menu" id="userDropdown">
+
+                        <div class="dropdown-content" id="dropdownContent">
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+        </header>
+
+
+        <div class="principal">
+
+            <div class="carousel-container">
+                <div class="carousel-slide slide-purple active">
+                    <div class="slide-content">
+                        <h2>PLay Station VR2</h2>
+                        <p>Vive el futuro del gaming con la realidad virtual más avanzada. Sumérgete en mundos
+                            increíbles con la tecnología de PS VR2 y experimenta PlayStation®5.</p>
+                        <button class="btn-comprar">Comprar ahora</button>
+                    </div>
+                    <div class="slide-image">
+                        <img src="/static/img/playvr22.png" alt="PlayStation VR2">
+                    </div>
+                </div>
+
+                <div class="carousel-slide slide-red">
+                    <div class="slide-content">
+                        <h2>Nintendo Switch 2</h2>
+                        <p>La nueva generación de Nintendo Switch está aquí. Disfruta de tus juegos favoritos en
+                            cualquier lugar con mejor rendimiento y gráficos mejorados.</p>
+                        <button class="btn-comprar">Comprar ahora</button>
+                    </div>
+                    <div class="slide-image">
+                        <img src="/static/img/Switch2.png" alt="Nintendo Switch 2">
+                    </div>
+                </div>
+
+                <div class="carousel-slide slide-blue">
+                    <div class="slide-content">
+                        <h2>Xbox Series X</h2>
+                        <p>La consola más potente del mercado. Experimenta juegos en 4K a 120fps y disfruta de Game Pass
+                            con cientos de títulos incluidos.</p>
+                        <button class="btn-comprar">Comprar ahora</button>
+                    </div>
+                    <div class="slide-image">
+                        <img src="/static/img/XboxSX.png" alt="Xbox Series X">
+                    </div>
+                </div>
+
+                <div class="carousel-dots">
+                    <span class="dot active" data-slide="0"></span>
+                    <span class="dot" data-slide="1"></span>
+                    <span class="dot" data-slide="2"></span>
+                </div>
+            </div>
+
+            <section class="productos-section">
+                <div class="productos-header">
+                    <h3>Productos</h3>
+                    <div class="filtros">
+                        <button class="filtro-btn active">Todos</button>
+                        <button class="filtro-btn">Populares</button>
+                        <button class="filtro-btn">Nuevos</button>
+                        <button class="filtro-btn">Ofertas</button>
+                    </div>
+                </div>
+
+                <section class="productos">
+
+                    <!-- Producto 1 -->
+                    <div class="producto">
+                        <div class="imagenes_producto">
+                            <img class="imagen_producto" src="/static/img/Imagenes/series x especial.png"
+                                alt="Xbox Series X">
+                        </div>
+                        <h3 class="product-title">XBOX SERIES X 2TB GALAXY BLACK LIMITED EDITION</h3>
+                        <p class="product-category">Hardware</p>
+                        <div class="product-price-section">
+                            <span class="product-price">$17,000.00</span>
+                        </div>
+                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
+                    </div>
+                    <!-- Producto 2 -->
+
+                    <div class="producto">
+                        <div class="imagenes_producto">
+                            <img class="imagen_producto" src="/static/img/Imagenes/zombies_xbox.png" alt="Zombies Xbox">
+                        </div>
+                        <h3 class="product-title">ZOMBIES GAME</h3>
+                        <p class="product-category">Juego Digital para Xbox</p>
+                        <div class="product-price-section">
+                            <span class="product-price">$450.00</span>
+                        </div>
+                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
+                    </div>
+
+                    <div class="producto">
+                        <div class="imagenes_producto">
+                            <img class="imagen_producto" src="/static/img/Imagenes/controlxboxwhite.png"
+                                alt="Control Xbox White">
+                        </div>
+                        <h3 class="product-title">CONTROL XBOX INALÁMBRICO WHITE PARA XBOX SERIES X Y S</h3>
+                        <p class="product-category">Controles</p>
+                        <div class="product-price-section">
+                            <span class="product-price">$1,496.99</span>
+                        </div>
+                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
+                    </div>
+
+                    <div class="producto">
+                        <div class="imagenes_producto">
+                            <img class="imagen_producto" src="/static/img/Audifonos_Gamer.jpg" alt="Audífonos Gamer">
+                        </div>
+                        <h3 class="product-title">AUDÍFONOS GAMER</h3>
+                        <p class="product-category">Accesorios de Consola</p>
+                        <div class="product-price-section">
+                            <span class="product-price">$760.00</span>
+                        </div>
+                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
+                    </div>
+
+                    <div class="producto">
+                        <div class="imagenes_producto">
+                            <img class="imagen_producto" src="/static/img/Imagenes/controlxboxblack.png"
+                                alt="Control Xbox Carbon Black">
+                        </div>
+                        <h3 class="product-title">CONTROL XBOX INALÁMBRICO CARBON BLACK</h3>
+                        <p class="product-category">Controles</p>
+                        <div class="product-price-section">
+                            <span class="product-price">$1,096.99</span>
+                        </div>
+                        <button class="btn_carrito"><i class="fa-solid fa-cart-shopping"></i> Añadir al Carrito</button>
+                    </div>
+
+
+                </section>
+
+            </section>
+        </div>
+    </main>
+
+    <script src="/static/js/funciones.js"></script>
+
+        <!-- BACKBONE MODULES -->
+    <script src="/static/js/models/producto.model.js"></script>
+    <script src="/static/js/collections/productos.collection.js"></script>
+    <script src="/static/js/views/producto.view.js"></script>
+    <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/agregar-carrito.js"></script>
+
+
+    <!-- En la sección de scripts, después de user-menu.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
+    <script src="/static/js/models/carrito.js"></script>
+    <script src="/static/js/views/carrito-view.js"></script>
+    <script src="/static/js/app-carrito.js"></script>
+
+</body>
+
+</html>

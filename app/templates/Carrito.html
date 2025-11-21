@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito</title>
+    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
+    <link rel="stylesheet" href="/static/css/stylee.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+</head>
+
+<body>
+
+    <nav class="barra_lateral">
+        <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        <ul>
+            <li><a class="enlace_barra_lateral" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
+
+            <li><a class="enlace_barra_lateral" href="/perfil"><i class="fa-solid fa-circle-user"></i> Perfil</a></li>
+
+            <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i>
+                    Buscar</a>
+            </li>
+            <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i>
+                    Favoritos</a></li>
+
+            <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i>
+                    Pedidos</a></li>
+            <li>
+                <h3>Categorías</h3>
+            </li>
+            <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i>
+                    Juegos</a></li>
+            <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i>
+                    Accesorios</a></li>
+            <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i>
+                    Consolas</a></li>
+            <li><a class="enlace_barra_lateral" href="/controles"><i class="fa-solid fa-gamepad"></i>
+                    Controles</a></li>
+            <li><a class="enlace_barra_lateral_fijo" href="/carrito"><i class="fa-solid fa-cart-shopping"></i>
+                    Carrito</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-user"></i>
+                    Admin</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <header class="encabezado">
+            <section class="buscador">
+                <input type="text" id="buscar" placeholder="Buscar producto">
+                <button class="btn_buscar" id="buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </section>
+
+            <section class="iconos">
+                <button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i>
+                </button>
+                <a class="icon" href="/carrito">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </a>
+
+                <!-- Menu usuario -->
+                <div class="user-menu-container">
+                    <button class="user-menu-btn" id="userMenuBtn">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-content">
+                            <a href="/login" class="dropdown-item">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                <span>Iniciar Sesión</span>
+                            </a>
+                            <a href="/registro" class="dropdown-item">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Registrarse</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/perfil" class="dropdown-item">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                            <a href="/carrito" class="dropdown-item">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span>Carrito</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+        </header>
+
+
+        <div class="principal">
+             <div class="carrito-page">
+
+            <div class="carrito">
+
+                 <h1>Carrito de Compras</h1>
+
+                <p class="subtitulo">Los productos que has añadido a tu carrito</p>
+
+              
+           
+               
+                
+                <!-- Container para el carrito dinámico -->
+                <div id="carrito-container">
+                    <div class="loading-carrito">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Cargando carrito...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            </div>
+        </div>
+    </main>
+
+<script src="/static/js/user-menu.js"></script>
+<script src="/static/js/agregar-carrito.js"></script>
+<script src="/static/js/carrito-dinamico.js"></script>
+
+
+</body>
+
+</html>
