@@ -40,7 +40,6 @@ body {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
-    color: white;
     background-color: #2d2d2d;
 }
 
@@ -431,6 +430,258 @@ i {
 
 .suma_producto {
     text-align: right;
+}
+
+/* Estilos para la sección de pago integrada */
+.pago-contenedor {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pago-header {
+    background: #2c5530;
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-volver-carrito {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.3s;
+}
+
+.btn-volver-carrito:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.pago-contenido {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.resumen-pedido-pago {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.productos-pago {
+    margin: 1rem 0;
+}
+
+.producto-pago {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.producto-pago:last-child {
+    border-bottom: none;
+}
+
+.producto-pago img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.info-producto-pago h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.info-producto-pago p {
+    margin: 0;
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.subtotal-producto {
+    font-weight: bold;
+    color: #2c5530;
+    margin-left: auto;
+}
+
+.total-pago {
+    border-top: 2px solid #dee2e6;
+    padding-top: 1rem;
+}
+
+.linea-total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.linea-total.total-final {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #2c5530;
+    border-top: 1px solid #dee2e6;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.metodo-pago-seccion {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.opciones-pago {
+    margin: 1rem 0;
+}
+
+.opcion-pago {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.opcion-pago:hover {
+    border-color: #2c5530;
+}
+
+.datos-tarjeta {
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-fila {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.btn-confirmar-pago {
+    width: 100%;
+    padding: 1rem;
+    background: #2c5530;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-confirmar-pago:hover {
+    background: #244326;
+}
+
+/* Compra exitosa */
+.compra-exitosa {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icono-exito {
+    font-size: 4rem;
+    color: #28a745;
+    margin-bottom: 1rem;
+}
+
+.acciones-compra {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.btn-ver-pedidos, .btn-seguir-comprando {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-ver-pedidos {
+    background: #2c5530;
+    color: white;
+}
+
+.btn-ver-pedidos:hover {
+    background: #244326;
+}
+
+.btn-seguir-comprando {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-seguir-comprando:hover {
+    background: #545b62;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pago-contenido {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .pago-header {
+        padding: 1rem;
+    }
+    
+    .form-fila {
+        grid-template-columns: 1fr;
+    }
+    
+    .acciones-compra {
+        flex-direction: column;
+    }
 }
 
 

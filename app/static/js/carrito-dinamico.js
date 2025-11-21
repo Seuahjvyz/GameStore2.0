@@ -125,10 +125,6 @@ class CarritoDinamico {
                     <span>Gratis</span>
                 </div>
                 
-                <div class="resumen-linea total">
-                    <span>Total:</span>
-                    <span>$${this.carritoData.total.toFixed(2)}</span>
-                </div>
                 
                 <button class="btn-pagar" id="btnPagar">
                     Proceder al Pago
@@ -244,8 +240,187 @@ class CarritoDinamico {
             this.mostrarNotificacion('Tu carrito está vacío', 'error');
             return;
         }
-        window.location.href = '/pagar';
+        this.mostrarSeccionPago();
+}
+
+mostrarSeccionPago() {
+    const container = document.getElementById('carrito-container');
+    
+    // Ocultar el carrito y mostrar la sección de pago
+    container.innerHTML = this.crearSeccionPagoHTML();
+    
+    // Agregar event listeners para los botones de la sección de pago
+    this.initEventListenersPago();
+}
+
+crearSeccionPagoHTML() {
+    return `
+        <div class="pago-contenedor">
+            <div class="pago-header">
+                <button class="btn-volver-carrito" id="btnVolverCarrito">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al Carrito
+                </button>
+                <h2>Finalizar Compra</h2>
+            </div>
+            
+            <div class="pago-contenido">
+                <div class="resumen-pedido-pago">
+                    <h3>Resumen de tu Pedido</h3>
+                    <div class="productos-pago">
+                        ${this.carritoData.items.map(item => this.crearProductoPagoHTML(item)).join('')}
+                    </div>
+                    <div class="total-pago">
+                        <div class="linea-total">
+                            <span>Subtotal:</span>
+                            <span>$${this.carritoData.subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="linea-total">
+                            <span>Envío:</span>
+                            <span>Gratis</span>
+                        </div>
+                        <div class="linea-total total-final">
+                            <span>Total:</span>
+                            <span>$${this.carritoData.total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metodo-pago-seccion">
+                    <h3>Método de Pago</h3>
+                    <div class="opciones-pago">
+                        <label class="opcion-pago">
+                            <input type="radio" name="metodo-pago" value="paypal" checked>
+                            <i class="fa-brands fa-paypal"></i>
+                            <span>PayPal</span>
+                        </label>
+                    </div>
+                    
+                    <div class="datos-tarjeta">
+                        <h4>Datos de Pago</h4>
+                        <form id="formPago">
+                            <div class="form-group">
+                                <label for="titular-tarjeta">Titular de la tarjeta</label>
+                                <input type="text" id="titular-tarjeta" placeholder="Nombre del titular" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="numero-tarjeta">Número de tarjeta</label>
+                                <input type="text" id="numero-tarjeta" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                            </div>
+                            
+                            <div class="form-fila">
+                                <div class="form-group">
+                                    <label for="fecha-vencimiento">Fecha de vencimiento</label>
+                                    <input type="text" id="fecha-vencimiento" placeholder="MM/AA" maxlength="5" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" placeholder="123" maxlength="3" required>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn-confirmar-pago">
+                                <i class="fa-solid fa-lock"></i>
+                                Confirmar Pago
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+crearProductoPagoHTML(item) {
+    return `
+        <div class="producto-pago">
+            <img src="${item.imagen || '/static/img/placeholder.jpg'}" alt="${item.nombre}">
+            <div class="info-producto-pago">
+                <h4>${item.nombre}</h4>
+                <p>$${item.precio_unitario.toFixed(2)} x ${item.cantidad}</p>
+            </div>
+            <span class="subtotal-producto">$${item.total.toFixed(2)}</span>
+        </div>
+    `;
+}
+
+initEventListenersPago() {
+    // Botón volver al carrito
+    document.getElementById('btnVolverCarrito').addEventListener('click', () => {
+        this.actualizarVistaCarrito();
+    });
+    
+    // Formulario de pago
+    document.getElementById('formPago').addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.procesarPago();
+    });
+    
+    // Formatear número de tarjeta
+    document.getElementById('numero-tarjeta').addEventListener('input', (e) => {
+        e.target.value = this.formatearNumeroTarjeta(e.target.value);
+    });
+    
+    // Formatear fecha de vencimiento
+    document.getElementById('fecha-vencimiento').addEventListener('input', (e) => {
+        e.target.value = this.formatearFechaVencimiento(e.target.value);
+    });
+}
+
+formatearNumeroTarjeta(valor) {
+    return valor.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+}
+
+formatearFechaVencimiento(valor) {
+    return valor.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2');
+}
+
+async procesarPago() {
+    try {
+        // Aquí iría la lógica para procesar el pago con tu backend
+        const response = await fetch('/api/pagos/procesar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                carrito_id: this.carritoData.id,
+                metodo_pago: document.querySelector('input[name="metodo-pago"]:checked').value,
+                // otros datos del formulario...
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.mostrarConfirmacionCompra();
+        } else {
+            this.mostrarNotificacion(data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error procesando pago:', error);
+        this.mostrarNotificacion('Error al procesar el pago', 'error');
     }
+}
+
+mostrarConfirmacionCompra() {
+    const container = document.getElementById('carrito-container');
+    container.innerHTML = `
+        <div class="compra-exitosa">
+            <div class="icono-exito">
+                <i class="fa-solid fa-check-circle"></i>
+            </div>
+            <h2>¡Compra Exitosa!</h2>
+            <p>Tu pedido ha sido procesado correctamente</p>
+            <p>Número de orden: #${Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+            <div class="acciones-compra">
+                <a href="/pedidos" class="btn-ver-pedidos">Ver mis pedidos</a>
+                <a href="/" class="btn-seguir-comprando">Seguir comprando</a>
+            </div>
+        </div>
+    `;
+}
 
     mostrarNotificacion(mensaje, tipo) {
         // Reutilizar el sistema de notificaciones del carrito simple
