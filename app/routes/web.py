@@ -4,9 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
 from app import db
 from app.models.usuario import Usuario
-from app.models.models import Carrito, CarritoItem
-from app.models.models import Producto
-from app.models.models import Categoria
+from app.models.models import Carrito, CarritoItem, Producto, Categoria
+from app.models.role import Role
 
 web_bp = Blueprint('web', __name__)
 
@@ -56,6 +55,77 @@ def registro():
 @web_bp.route('/registro-admin')
 def registro_admin():
     return render_template('admin_templates/RegistroAdmin.html')
+
+# ----------------------------------------- RUTAS FALTANTES ---------------------------------------- #
+
+@web_bp.route('/api/carrito/cantidad')
+def api_carrito_cantidad():
+    """Obtener cantidad de items en el carrito"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'count': 0})
+        
+        carrito = Carrito.query.filter_by(
+            usuario_id=session['user_id'], 
+            activo=True
+        ).first()
+        
+        count = len(carrito.items) if carrito else 0
+        return jsonify({'count': count})
+        
+    except Exception as e:
+        print(f"Error obteniendo cantidad del carrito: {e}")
+        return jsonify({'count': 0})
+
+@web_bp.route('/api/usuario/actual')
+def api_usuario_actual():
+    """Obtener información del usuario actual"""
+    if 'user_id' in session:
+        usuario = Usuario.query.get(session['user_id'])
+        return jsonify({
+            'id': usuario.id_usuario,
+            'username': usuario.nombre_usuario,
+            'email': usuario.correo,
+            'role': usuario.rol_id
+        })
+    else:
+        return jsonify({'error': 'No autenticado'}), 401
+
+# ----------------------------------------- RUTAS DE DEBUG ---------------------------------------- #
+
+@web_bp.route('/debug/database')
+def debug_database():
+    """Ruta para debuggear el estado de la base de datos"""
+    try:
+        categorias = Categoria.query.all()
+        productos = Producto.query.all()
+        usuarios = Usuario.query.all()
+        roles = Role.query.all()
+        
+        debug_info = {
+            'categorias_count': len(categorias),
+            'categorias': [{'id': c.id_categoria, 'nombre': c.nombre} for c in categorias],
+            'productos_count': len(productos),
+            'productos': [{'id': p.id_producto, 'nombre': p.nombre, 'categoria_id': p.categoria_id} for p in productos],
+            'usuarios_count': len(usuarios),
+            'usuarios': [{'id': u.id_usuario, 'username': u.nombre_usuario, 'rol_id': u.rol_id} for u in usuarios],
+            'roles_count': len(roles),
+            'roles': [{'id': r.id_rol, 'nombre': r.nombre} for r in roles]
+        }
+        
+        return jsonify(debug_info)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@web_bp.route('/debug/session')
+def debug_session():
+    """Ruta para debuggear la sesión"""
+    return jsonify({
+        'session_data': dict(session),
+        'user_id_in_session': 'user_id' in session,
+        'user_role_in_session': 'user_role' in session
+    })
 
 # ----------------------------------------- API LOGIN (ÚNICO) ---------------------------------------- #
 
@@ -314,8 +384,20 @@ def carrito():
 @web_bp.route('/api/productos')
 def api_productos():
     try:
-        from app.models import Producto, Categoria
-        productos = Producto.query.filter_by(activo=True).all()
+        # Obtener parámetro de categoría si existe
+        categoria_nombre = request.args.get('categoria')
+        
+        if categoria_nombre:
+            # Filtrar por nombre de categoría
+            productos = Producto.query.join(Categoria).filter(
+                Categoria.nombre == categoria_nombre,
+                Producto.activo == True
+            ).all()
+            print(f"🔍 Filtrando por categoría: {categoria_nombre}, encontrados: {len(productos)} productos")
+        else:
+            # Todos los productos
+            productos = Producto.query.filter_by(activo=True).all()
+            print(f"🔍 Todos los productos, encontrados: {len(productos)} productos")
         
         productos_data = []
         for producto in productos:
@@ -332,17 +414,19 @@ def api_productos():
         
         return jsonify({
             'success': True,
-            'productos': productos_data
+            'productos': productos_data,
+            'filtro_aplicado': categoria_nombre if categoria_nombre else 'todos'
         })
         
     except Exception as e:
-        print(f"Error obteniendo productos: {e}")
+        print(f"❌ Error obteniendo productos: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al obtener productos'}), 500
 
 @web_bp.route('/api/productos/categoria/<int:categoria_id>')
 def api_productos_por_categoria(categoria_id):
     try:
-        from app.models import Producto
         productos = Producto.query.filter_by(
             categoria_id=categoria_id, 
             activo=True
@@ -387,7 +471,6 @@ def agregar_al_carrito():
         if not producto_id:
             return jsonify({'success': False, 'error': 'ID de producto no proporcionado'}), 400
 
-        from app.models import Producto, Carrito, CarritoItem
         producto = Producto.query.filter_by(id_producto=producto_id, activo=True).first()
         
         if not producto:
@@ -444,7 +527,6 @@ def api_carrito_detalles():
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'No autenticado'}), 401
 
-        from app.models import Carrito, CarritoItem, Producto
         carrito = Carrito.query.filter_by(
             usuario_id=session['user_id'], 
             activo=True
@@ -502,7 +584,6 @@ def actualizar_cantidad_carrito(item_id):
         data = request.get_json()
         nueva_cantidad = data.get('cantidad', 1)
 
-        from app.models import CarritoItem, Producto, Carrito
         item = CarritoItem.query.get(item_id)
         
         if not item:
@@ -539,7 +620,6 @@ def eliminar_item_carrito(item_id):
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'No autenticado'}), 401
 
-        from app.models import CarritoItem, Carrito
         item = CarritoItem.query.get(item_id)
         
         if not item:
