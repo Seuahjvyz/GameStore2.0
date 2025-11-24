@@ -30,7 +30,6 @@ const ProductosController = {
             .then(data => {
                 console.log('Datos completos recibidos:', data);
 
-                // VERIFICACIÓN CRÍTICA - Debug detallado
                 if (!data) {
                     console.error(' data es null o undefined');
                     this.mostrarError('No se recibieron datos del servidor');
@@ -65,7 +64,6 @@ const ProductosController = {
                     return;
                 }
 
-                // Si llegamos aquí, todo está bien
                 this.mostrarProductos(productos);
             })
             .catch(error => {
@@ -84,14 +82,13 @@ const ProductosController = {
         return null;
     },
 
-    // Mostrar productos en el contenedor
     mostrarProductos: function (productos) {
         try {
             console.log('🎨 Mostrando productos...');
             const container = document.getElementById('productos-container');
 
             if (!container) {
-                console.error(' No se encontró el container con id "products-container"');
+                console.error(' No se encontró el container con id "productos-container"');
                 return;
             }
 
@@ -100,28 +97,37 @@ const ProductosController = {
                 return;
             }
 
-            // Generar HTML para cada producto
-
+            // Generar HTML para cada producto CON BOTÓN DE FAVORITOS
             container.innerHTML = productos.map(producto => `
-    <div class="producto" data-id="${producto.id}">
-        <img src="${producto.imagen}" alt="${producto.nombre}" 
-             onerror="this.src='/static/img/placeholder.jpg'">
-        <h3>${producto.nombre}</h3>
-        <p class="categoria">${producto.categoria}</p>
-        <p class="descripcion">${producto.descripcion}</p>
-        <p class="precio">$${typeof producto.precio === 'number' ? producto.precio.toFixed(2) : '0.00'}</p>
-        <button class="btn-agregar-carrito" 
-                data-id="${producto.id}"
-                ${producto.stock === 0 ? 'disabled' : ''}>
-            ${producto.stock === 0 ? 'Sin Stock' : '<i class="fa-solid fa-cart-shopping"></i>Agregar al Carrito'}
-        </button>
-    </div>
-`).join('');
+                <div class="producto" data-id="${producto.id}">
+                    <button class="favorito-btn" 
+                            data-product-id="${producto.id}">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                    
+                    <img src="${producto.imagen}" alt="${producto.nombre}" 
+                         onerror="this.src='/static/img/placeholder.jpg'">
+                    <h3>${producto.nombre}</h3>
+                    <p class="categoria">${producto.categoria}</p>
+                    <p class="descripcion">${producto.descripcion}</p>
+                    <p class="precio">$${typeof producto.precio === 'number' ? producto.precio.toFixed(2) : '0.00'}</p>
+                    <button class="btn-agregar-carrito" 
+                            data-id="${producto.id}"
+                            ${producto.stock === 0 ? 'disabled' : ''}>
+                        ${producto.stock === 0 ? 'Sin Stock' : '<i class="fa-solid fa-cart-shopping"></i>Agregar al Carrito'}
+                    </button>
+                </div>
+            `).join('');
 
             console.log('Productos renderizados correctamente');
-
-            // Agregar event listeners a los botones
             this.agregarEventListeners();
+
+            // Sincronizar favoritos después de renderizar
+            setTimeout(() => {
+                if (window.favoritosManager) {
+                    window.favoritosManager.marcarFavoritosExistentes();
+                }
+            }, 500);
 
         } catch (error) {
             console.error(' Error en mostrarProductos:', error);
@@ -130,19 +136,19 @@ const ProductosController = {
     },
 
     // Agregar event listeners a los botones
-    agregarEventListeners: function () {
-        const botones = document.querySelectorAll('.btn-agregar-carrito');
-        console.log(` Agregando listeners a ${botones.length} botones`);
+agregarEventListeners: function () {
+    const botones = document.querySelectorAll('.btn-agregar-carrito');
+    console.log(`🔘 Agregando listeners a ${botones.length} botones`);
 
-        botones.forEach(boton => {
-            boton.addEventListener('click', (e) => {
-                e.preventDefault();
-                const productoId = boton.getAttribute('data-id');
-                console.log(` Agregando producto ${productoId} al carrito`);
-                this.agregarAlCarrito(productoId);
-            });
+    botones.forEach(boton => {
+        boton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const productoId = boton.getAttribute('data-id');
+            console.log(`🖱️ Click en botón para producto ${productoId}`);
+            this.agregarAlCarrito(productoId, boton); // Pasar el botón como parámetro
         });
-    },
+    });
+},
 
     // Agregar event listeners globales
     agregarEventListenersGlobales: function () {
@@ -185,46 +191,84 @@ const ProductosController = {
             });
     },
 
-    // Agregar producto al carrito
-    agregarAlCarrito: function (productoId) {
-        console.log(` Agregando producto ${productoId} al carrito`);
 
-        fetch('/api/carrito/agregar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                producto_id: parseInt(productoId),
-                cantidad: 1
-            })
+    // Agregar producto al carrito
+agregarAlCarrito: function (productoId, button) {
+    // Si se pasa el botón, prevenir múltiples clicks
+    if (button && button.disabled) {
+        console.log('⏳ Botón ya en proceso, ignorando click');
+        return;
+    }
+    
+    console.log(`🛒 Agregando producto ${productoId} al carrito`);
+
+    // Guardar el texto original del botón
+    let originalText = '';
+    if (button) {
+        originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AGREGANDO...';
+    }
+
+    fetch('/api/carrito/agregar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            producto_id: parseInt(productoId),
+            cantidad: 1
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log(' Producto agregado al carrito:', data);
-                    this.mostrarNotificacion('Producto agregado al carrito');
-                    // Actualizar contador del carrito si existe
-                    this.actualizarContadorCarrito(data.carrito_count);
-                } else {
-                    console.error(' Error al agregar al carrito:', data.error);
-                    this.mostrarError(data.error || 'Error al agregar al carrito');
-                }
-            })
-            .catch(error => {
-                console.error(' Error agregando al carrito:', error);
-                this.mostrarError('Error de conexión');
-            });
-    },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('📨 Respuesta del servidor:', data);
+        
+        // ✅ IMPORTANTE: Restaurar el botón independientemente del resultado
+        if (button) {
+            button.disabled = false;
+            // Verificar si el producto sigue teniendo stock
+            const tieneStock = data.success && !data.error?.includes('Stock insuficiente');
+            if (tieneStock) {
+                button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
+            } else {
+                button.innerHTML = 'SIN STOCK';
+                button.disabled = true;
+            }
+        }
+        
+        if (data.success) {
+            this.mostrarNotificacion(data.message);
+            this.actualizarContadorCarrito(data.carrito_count);
+        } else {
+            this.mostrarError(data.error || 'Error al agregar al carrito');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error agregando al carrito:', error);
+        this.mostrarError('Error de conexión');
+        
+        // ✅ RESTAURAR BOTÓN EN CASO DE ERROR TAMBIÉN
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
+        }
+    });
+},
 
     // Actualizar contador del carrito
-    actualizarContadorCarrito: function (count) {
-        const contador = document.getElementById('carrito-count');
+actualizarContadorCarrito: function (count) {
+    if (window.actualizarContadorCarrito) {
+        window.actualizarContadorCarrito(count);
+    } else {
+        // Fallback
+        const contador = document.querySelector('.carrito-count');
         if (contador) {
             contador.textContent = count;
             contador.style.display = count > 0 ? 'inline' : 'none';
         }
-    },
+    }
+},
 
     // Mostrar notificación
     mostrarNotificacion: function (mensaje) {
@@ -260,11 +304,11 @@ const ProductosController = {
 
     // Mostrar estado de loading
     mostrarLoading: function () {
-        const container = document.getElementById('products-container');
+        const container = document.getElementById('productos-container');
         if (container) {
             container.innerHTML = `
                 <div class="loading">
-                    <div class="spinner"></div>
+                    <i class="fa-solid fa-spinner fa-spin"></i>
                     <p>Cargando productos...</p>
                 </div>
             `;
@@ -274,7 +318,7 @@ const ProductosController = {
     // Mostrar mensaje de error
     mostrarError: function (mensaje) {
         console.error(' Mostrando error:', mensaje);
-        const container = document.getElementById('products-container');
+        const container = document.getElementById('productos-container');
         if (container) {
             container.innerHTML = `
                 <div class="error">
@@ -291,7 +335,7 @@ const ProductosController = {
     // Mostrar mensaje informativo
     mostrarMensaje: function (mensaje) {
         console.log(' Mostrando mensaje:', mensaje);
-        const container = document.getElementById('products-container');
+        const container = document.getElementById('productos-container');
         if (container) {
             container.innerHTML = `
                 <div class="info-message">

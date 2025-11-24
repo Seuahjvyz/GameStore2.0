@@ -6,6 +6,8 @@ from app import db
 from app.models.usuario import Usuario
 from app.models.models import Carrito, CarritoItem, Producto, Categoria
 from app.models.role import Role
+from app.models.favorito import Favorito
+
 
 web_bp = Blueprint('web', __name__)
 
@@ -459,10 +461,14 @@ def api_productos_por_categoria(categoria_id):
 @web_bp.route('/api/carrito/agregar', methods=['POST'])
 def agregar_al_carrito():
     try:
+        print(f"🎯 INICIANDO agregar_al_carrito - User: {session.get('user_id')}")
+        
         if 'user_id' not in session:
-            return jsonify({'success': False, 'error': 'Debes iniciar sesión para agregar productos al carrito'}), 401
+            return jsonify({'success': False, 'error': 'Inicia sesion para poder agregar productos al carrito'}), 401
 
         data = request.get_json()
+        print(f"📦 Datos recibidos: {data}")
+        
         if not data:
             return jsonify({'success': False, 'error': 'Datos no proporcionados'}), 400
 
@@ -472,35 +478,53 @@ def agregar_al_carrito():
         if not producto_id:
             return jsonify({'success': False, 'error': 'ID de producto no proporcionado'}), 400
 
+        # Convertir a entero para evitar problemas de tipo
+        producto_id = int(producto_id)
+        cantidad = int(cantidad)
+
+        print(f"🔍 Buscando producto {producto_id}")
         producto = Producto.query.filter_by(id_producto=producto_id, activo=True).first()
         
         if not producto:
             return jsonify({'success': False, 'error': 'Producto no encontrado'}), 404
 
-        if producto.stock < cantidad:
-            return jsonify({'success': False, 'error': 'Stock insuficiente'}), 400
-
+        # Buscar carrito activo del usuario
         carrito = Carrito.query.filter_by(
             usuario_id=session['user_id'], 
             activo=True
         ).first()
 
+        print(f"🛒 Carrito encontrado: {carrito.id_carrito if carrito else 'NONE'}")
+
         if not carrito:
             carrito = Carrito(usuario_id=session['user_id'])
             db.session.add(carrito)
             db.session.flush()
+            print(f"🆕 Nuevo carrito creado: {carrito.id_carrito}")
 
+        # ✅ VERIFICACIÓN MÁS ROBUSTA: Buscar item existente
         item_existente = CarritoItem.query.filter_by(
             carrito_id=carrito.id_carrito,
             producto_id=producto_id
         ).first()
 
+        print(f"🔍 Item existente: {item_existente.id_item if item_existente else 'NONE'}")
+
         if item_existente:
+            # Si ya existe, aumentar la cantidad
             nueva_cantidad = item_existente.cantidad + cantidad
+            print(f"📈 Actualizando cantidad: {item_existente.cantidad} + {cantidad} = {nueva_cantidad}")
+            
+            # Verificar stock disponible
             if nueva_cantidad > producto.stock:
-                return jsonify({'success': False, 'error': 'Stock insuficiente'}), 400
+                return jsonify({'success': False, 'error': f'Stock insuficiente. Solo quedan {producto.stock} unidades'}), 400
+            
             item_existente.cantidad = nueva_cantidad
+            mensaje = f'Cantidad actualizada: ahora tienes {nueva_cantidad} unidades'
+            accion = 'actualizado'
         else:
+            # Si no existe, crear nuevo item
+            print(f"🆕 Creando nuevo item para producto {producto_id}")
             nuevo_item = CarritoItem(
                 carrito_id=carrito.id_carrito,
                 producto_id=producto_id,
@@ -508,19 +532,37 @@ def agregar_al_carrito():
                 precio_unitario=producto.precio
             )
             db.session.add(nuevo_item)
+            mensaje = 'Producto agregado al carrito'
+            accion = 'agregado'
 
         db.session.commit()
+        print(f"✅ Commit exitoso - {accion}")
+        
+        # Obtener el conteo actualizado
+        carrito_actualizado = Carrito.query.filter_by(
+            usuario_id=session['user_id'], 
+            activo=True
+        ).first()
+        
+        count = len(carrito_actualizado.items) if carrito_actualizado else 0
+        
+        print(f"🎉 Carrito {accion} exitosamente. Total items: {count}")
         
         return jsonify({
             'success': True, 
-            'message': 'Producto agregado al carrito',
-            'carrito_count': len(carrito.items)
+            'message': mensaje,
+            'carrito_count': count,
+            'accion': accion
         })
 
     except Exception as e:
         db.session.rollback()
-        print(f"Error agregando al carrito: {e}")
+        print(f"❌ ERROR en agregar_al_carrito: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
+    
+    
 
 @web_bp.route('/api/carrito/detalles')
 def api_carrito_detalles():
@@ -646,8 +688,225 @@ def eliminar_item_carrito(item_id):
     
     
     
+# ----------------------------------------- API FAVORITOS ---------------------------------------- #
+
+@web_bp.route('/api/favoritos')
+@login_required
+def api_favoritos():
+    try:
+
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'error': 'Debes iniciar sesión para ver favoritos'}), 401
+        
+        usuario_id = session['user_id']
+        
+        # Obtener favoritos con información del producto y categoría
+        favoritos = Favorito.query.filter_by(usuario_id=usuario_id)\
+            .join(Producto)\
+            .join(Categoria)\
+            .all()
+        
+        favoritos_data = []
+        for favorito in favoritos:
+            producto = favorito.producto
+            favoritos_data.append({
+                'id': favorito.id_favorito,
+                'fecha_agregado': favorito.fecha_agregado.isoformat() if favorito.fecha_agregado else None,
+                'producto': {
+                    'id': producto.id_producto,
+                    'nombre': producto.nombre,
+                    'descripcion': producto.descripcion,
+                    'precio': float(producto.precio) if producto.precio else 0,
+                    'stock': producto.stock,
+                    'imagen': producto.imagen,
+                    'categoria': producto.categoria.nombre if producto.categoria else 'Sin categoría',
+                    'categoria_id': producto.categoria_id
+                }
+            })
+        
+        return jsonify({
+            'success': True,
+            'favoritos': favoritos_data,
+            'count': len(favoritos)
+        })
+        
+    except Exception as e:
+        print(f"Error obteniendo favoritos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': 'Error al obtener favoritos'}), 500
+
+# En la ruta /api/favoritos/agregar - CORREGIDA
+@web_bp.route('/api/favoritos/agregar', methods=['POST'])
+@login_required
+def api_agregar_favorito():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Datos no proporcionados'}), 400
+
+        producto_id = data.get('producto_id')
+        if not producto_id:
+            return jsonify({'success': False, 'error': 'ID de producto no proporcionado'}), 400
+
+        # Verificar si el producto existe
+        producto = Producto.query.filter_by(id_producto=producto_id, activo=True).first()
+        if not producto:
+            return jsonify({'success': False, 'error': 'Producto no encontrado'}), 404
+
+        # Verificar si ya está en favoritos
+        favorito_existente = Favorito.query.filter_by(
+            usuario_id=session['user_id'],
+            producto_id=producto_id
+        ).first()
+
+        if favorito_existente:
+            return jsonify({'success': False, 'error': 'El producto ya está en favoritos'}), 400
+
+        # Agregar a favoritos
+        nuevo_favorito = Favorito(
+            usuario_id=session['user_id'],
+            producto_id=producto_id
+        )
+
+        db.session.add(nuevo_favorito)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Producto agregado a favoritos'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error agregando favorito: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
+
+@web_bp.route('/api/favoritos/eliminar/<int:producto_id>', methods=['DELETE'])
+@login_required
+def api_eliminar_favorito(producto_id):
+    try:
+        favorito = Favorito.query.filter_by(
+            usuario_id=session['user_id'],
+            producto_id=producto_id
+        ).first()
+
+        if not favorito:
+            return jsonify({'success': False, 'error': 'Favorito no encontrado'}), 404
+
+        db.session.delete(favorito)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Producto eliminado de favoritos'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error eliminando favorito: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
+
+@web_bp.route('/api/favoritos/verificar/<int:producto_id>')
+@login_required
+def api_verificar_favorito(producto_id):
+    try:
+        favorito = Favorito.query.filter_by(
+            usuario_id=session['user_id'],
+            producto_id=producto_id
+        ).first()
+
+        return jsonify({
+            'success': True,
+            'es_favorito': favorito is not None
+        })
+
+    except Exception as e:
+        print(f"Error verificando favorito: {e}")
+        return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
+
+# Ruta de debug para favoritos
+@web_bp.route('/debug/favoritos')
+@login_required
+def debug_favoritos():
+    """Ruta para debuggear favoritos"""
+    try:
+        usuario_id = session['user_id']
+        
+        # Contar favoritos del usuario
+        count = Favorito.query.filter_by(usuario_id=usuario_id).count()
+        
+        # Obtener algunos favoritos de ejemplo
+        favoritos = Favorito.query.filter_by(usuario_id=usuario_id).limit(5).all()
+        
+        favoritos_data = []
+        for fav in favoritos:
+            favoritos_data.append({
+                'id_favorito': fav.id_favorito,
+                'usuario_id': fav.usuario_id,
+                'producto_id': fav.producto_id,
+                'fecha_agregado': fav.fecha_agregado.isoformat() if fav.fecha_agregado else None
+            })
+        
+        return jsonify({
+            'usuario_actual': usuario_id,
+            'total_favoritos': count,
+            'favoritos_ejemplo': favoritos_data,
+            'tabla_existe': True,
+            'estructura': 'id_favorito, usuario_id, producto_id, fecha_agregado'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 
 
+@web_bp.route('/api/carrito/limpiar-duplicados', methods=['POST'])
+@login_required
+def limpiar_duplicados_carrito():
+    """Limpiar productos duplicados del carrito"""
+    try:
+        carrito = Carrito.query.filter_by(
+            usuario_id=session['user_id'], 
+            activo=True
+        ).first()
 
+        if not carrito:
+            return jsonify({'success': True, 'message': 'No hay carrito'})
+
+        # Encontrar duplicados
+        items_por_producto = {}
+        items_a_eliminar = []
+        
+        for item in carrito.items:
+            if item.producto_id in items_por_producto:
+                # Ya existe un item para este producto, marcar para eliminar
+                items_a_eliminar.append(item)
+                # Sumar la cantidad al item existente
+                items_por_producto[item.producto_id].cantidad += item.cantidad
+            else:
+                items_por_producto[item.producto_id] = item
+
+        # Eliminar duplicados
+        for item in items_a_eliminar:
+            db.session.delete(item)
+
+        if items_a_eliminar:
+            db.session.commit()
+            return jsonify({
+                'success': True, 
+                'message': f'Se limpiaron {len(items_a_eliminar)} productos duplicados',
+                'duplicados_eliminados': len(items_a_eliminar)
+            })
+        else:
+            return jsonify({'success': True, 'message': 'No se encontraron duplicados'})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error limpiando duplicados: {e}")
+        return jsonify({'success': False, 'error': 'Error interno'}), 500

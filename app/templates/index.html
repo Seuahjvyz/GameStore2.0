@@ -16,17 +16,19 @@
         <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
         <ul>
             <li><a class="enlace_barra_lateral_fijo" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
-            <li><a class="enlace_barra_lateral" href="/perfil"><i class="fa-solid fa-circle-user"></i> Perfil</a></li>
-            <li><a class="enlace_barra_lateral" href="#buscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar</a></li>
+            <li>
+                <h3>Mis compras y deseos</h3>
+            </li>
             <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
             <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
-            <li><h3 style="color: white;">Categorías</h3></li>
+            <li>
+                <h3>Categorías</h3>
+            </li>
             <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
-            <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a></li>
+            <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a>
+            </li>
             <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
             <li><a class="enlace_barra_lateral" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
-            <li><a class="enlace_barra_lateral" href="/carrito"><i class="fa-solid fa-cart-shopping"></i> Carrito</a></li>
-            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-user"></i> Admin</a></li>
         </ul>
     </nav>
 
@@ -39,11 +41,11 @@
 
             <section class="iconos">
                 <button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i></button>
-                <a class="icon" href="/carrito">
+                <a class="icon carrito-link" href="/carrito">
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span class="carrito-count">0</span>
                 </a>
- <!-- Menu usuario -->
+                <!-- Menu usuario -->
                 <div class="user-menu-container">
                     <button class="user-menu-btn" id="userMenuBtn">
                         <i class="fa-solid fa-circle-user"></i>
@@ -66,7 +68,8 @@
                 <div class="carousel-slide slide-purple active">
                     <div class="slide-content">
                         <h2>PLay Station VR2</h2>
-                        <p>Vive el futuro del gaming con la realidad virtual más avanzada. Sumérgete en mundos increíbles con la tecnología de PS VR2 y experimenta PlayStation®5.</p>
+                        <p>Vive el futuro del gaming con la realidad virtual más avanzada. Sumérgete en mundos
+                            increíbles con la tecnología de PS VR2 y experimenta PlayStation®5.</p>
                         <button class="btn-comprar">Comprar ahora</button>
                     </div>
                     <div class="slide-image">
@@ -77,7 +80,8 @@
                 <div class="carousel-slide slide-red">
                     <div class="slide-content">
                         <h2>Nintendo Switch 2</h2>
-                        <p>La nueva generación de Nintendo Switch está aquí. Disfruta de tus juegos favoritos en cualquier lugar con mejor rendimiento y gráficos mejorados.</p>
+                        <p>La nueva generación de Nintendo Switch está aquí. Disfruta de tus juegos favoritos en
+                            cualquier lugar con mejor rendimiento y gráficos mejorados.</p>
                         <button class="btn-comprar">Comprar ahora</button>
                     </div>
                     <div class="slide-image">
@@ -88,7 +92,8 @@
                 <div class="carousel-slide slide-blue">
                     <div class="slide-content">
                         <h2>Xbox Series X</h2>
-                        <p>La consola más potente del mercado. Experimenta juegos en 4K a 120fps y disfruta de Game Pass con cientos de títulos incluidos.</p>
+                        <p>La consola más potente del mercado. Experimenta juegos en 4K a 120fps y disfruta de Game Pass
+                            con cientos de títulos incluidos.</p>
                         <button class="btn-comprar">Comprar ahora</button>
                     </div>
                     <div class="slide-image">
@@ -104,7 +109,7 @@
             </div>
 
             <section class="productos-section">
-                
+
 
                 <section class="productos" id="productos-container">
                     <div class="loading">
@@ -116,10 +121,15 @@
     </main>
 
     <!-- Scripts -->
-    <script src="/static/js/funciones.js"></script>
     <script src="/static/js/user-menu.js"></script>
     <script src="/static/js/productos-dinamicos.js"></script>
     <script src="/static/js/carrito-dinamico.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
+    <script src="/static/js/favoritos-backbone.js"></script>
+    <script src="/static/js/carrito-sync.js"></script>
+
 </body>
 
 </html>

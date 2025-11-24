@@ -41,3 +41,4 @@ class CarritoItem(db.Model):
     fecha_agregado = db.Column(db.DateTime, default=datetime.utcnow)
     
     producto = db.relationship('Producto', backref='carrito_items')
+    

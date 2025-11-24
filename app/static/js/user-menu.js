@@ -54,18 +54,10 @@ function actualizarMenuUsuario(usuario, estaLogueado) {
     if (estaLogueado && usuario) {
         // Menú para usuarios logueados
         dropdownContent.innerHTML = `
-            <div class="dropdown-user-info">
-                <i class="fa-solid fa-user"></i>
-                <span>Hola, ${usuario.username || 'Usuario'}</span>
-            </div>
-            <div class="dropdown-divider"></div>
+
             <a href="/perfil" class="dropdown-item">
                 <i class="fa-solid fa-user"></i>
                 <span>Mi Perfil</span>
-            </a>
-            <a href="/pedidos" class="dropdown-item">
-                <i class="fa-solid fa-box"></i>
-                <span>Mis Pedidos</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="/logout" class="dropdown-item">
