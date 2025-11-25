@@ -8,7 +8,6 @@ from app.models.models import Carrito, CarritoItem, Producto, Categoria
 from app.models.role import Role
 from app.models.favorito import Favorito
 
-
 web_bp = Blueprint('web', __name__)
 
 # ----------------------------------------- DECORATORS ---------------------------------------- #
@@ -58,41 +57,6 @@ def registro():
 def registro_admin():
     return render_template('admin_templates/RegistroAdmin.html')
 
-# ----------------------------------------- RUTAS FALTANTES ---------------------------------------- #
-
-@web_bp.route('/api/carrito/cantidad')
-def api_carrito_cantidad():
-    """Obtener cantidad de items en el carrito"""
-    try:
-        if 'user_id' not in session:
-            return jsonify({'count': 0})
-        
-        carrito = Carrito.query.filter_by(
-            usuario_id=session['user_id'], 
-            activo=True
-        ).first()
-        
-        count = len(carrito.items) if carrito else 0
-        return jsonify({'count': count})
-        
-    except Exception as e:
-        print(f"Error obteniendo cantidad del carrito: {e}")
-        return jsonify({'count': 0})
-
-@web_bp.route('/api/usuario/actual')
-def api_usuario_actual():
-    """Obtener información del usuario actual"""
-    if 'user_id' in session:
-        usuario = Usuario.query.get(session['user_id'])
-        return jsonify({
-            'id': usuario.id_usuario,
-            'username': usuario.nombre_usuario,
-            'email': usuario.correo,
-            'role': usuario.rol_id
-        })
-    else:
-        return jsonify({'error': 'No autenticado'}), 401
-
 # ----------------------------------------- RUTAS DE DEBUG ---------------------------------------- #
 
 @web_bp.route('/debug/database')
@@ -129,7 +93,7 @@ def debug_session():
         'user_role_in_session': 'user_role' in session
     })
 
-# ----------------------------------------- API LOGIN (ÚNICO) ---------------------------------------- #
+# ----------------------------------------- API LOGIN ---------------------------------------- #
 
 @web_bp.route('/api/login', methods=['POST'])
 def api_login():
@@ -214,6 +178,20 @@ def user_info():
         })
     else:
         return jsonify({'logged_in': False})
+
+@web_bp.route('/api/usuario/actual')
+def api_usuario_actual():
+    """Obtener información del usuario actual"""
+    if 'user_id' in session:
+        usuario = Usuario.query.get(session['user_id'])
+        return jsonify({
+            'id': usuario.id_usuario,
+            'username': usuario.nombre_usuario,
+            'email': usuario.correo,
+            'role': usuario.rol_id
+        })
+    else:
+        return jsonify({'error': 'No autenticado'}), 401
 
 # ----------------------------------------- REGISTROS ---------------------------------------- #
 
@@ -375,6 +353,7 @@ def compra_finalizada():
 @web_bp.route('/admin')
 @admin_required
 def admin():
+    """Ruta principal del administrador - SOLO accesible para rol 1"""
     return render_template('admin_templates/admin.html')
 
 @web_bp.route('/carrito')
@@ -457,6 +436,25 @@ def api_productos_por_categoria(categoria_id):
         return jsonify({'success': False, 'error': 'Error al obtener productos'}), 500
 
 # ----------------------------------------- CARRITO API ---------------------------------------- #
+
+@web_bp.route('/api/carrito/cantidad')
+def api_carrito_cantidad():
+    """Obtener cantidad de items en el carrito"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'count': 0})
+        
+        carrito = Carrito.query.filter_by(
+            usuario_id=session['user_id'], 
+            activo=True
+        ).first()
+        
+        count = len(carrito.items) if carrito else 0
+        return jsonify({'count': count})
+        
+    except Exception as e:
+        print(f"Error obteniendo cantidad del carrito: {e}")
+        return jsonify({'count': 0})
 
 @web_bp.route('/api/carrito/agregar', methods=['POST'])
 def agregar_al_carrito():
@@ -561,8 +559,6 @@ def agregar_al_carrito():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
-    
-    
 
 @web_bp.route('/api/carrito/detalles')
 def api_carrito_detalles():
@@ -685,16 +681,58 @@ def eliminar_item_carrito(item_id):
         db.session.rollback()
         print(f"Error eliminando item: {e}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
-    
-    
-    
+
+@web_bp.route('/api/carrito/limpiar-duplicados', methods=['POST'])
+@login_required
+def limpiar_duplicados_carrito():
+    """Limpiar productos duplicados del carrito"""
+    try:
+        carrito = Carrito.query.filter_by(
+            usuario_id=session['user_id'], 
+            activo=True
+        ).first()
+
+        if not carrito:
+            return jsonify({'success': True, 'message': 'No hay carrito'})
+
+        # Encontrar duplicados
+        items_por_producto = {}
+        items_a_eliminar = []
+        
+        for item in carrito.items:
+            if item.producto_id in items_por_producto:
+                # Ya existe un item para este producto, marcar para eliminar
+                items_a_eliminar.append(item)
+                # Sumar la cantidad al item existente
+                items_por_producto[item.producto_id].cantidad += item.cantidad
+            else:
+                items_por_producto[item.producto_id] = item
+
+        # Eliminar duplicados
+        for item in items_a_eliminar:
+            db.session.delete(item)
+
+        if items_a_eliminar:
+            db.session.commit()
+            return jsonify({
+                'success': True, 
+                'message': f'Se limpiaron {len(items_a_eliminar)} productos duplicados',
+                'duplicados_eliminados': len(items_a_eliminar)
+            })
+        else:
+            return jsonify({'success': True, 'message': 'No se encontraron duplicados'})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error limpiando duplicados: {e}")
+        return jsonify({'success': False, 'error': 'Error interno'}), 500
+
 # ----------------------------------------- API FAVORITOS ---------------------------------------- #
 
 @web_bp.route('/api/favoritos')
 @login_required
 def api_favoritos():
     try:
-
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'Debes iniciar sesión para ver favoritos'}), 401
         
@@ -736,7 +774,6 @@ def api_favoritos():
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al obtener favoritos'}), 500
 
-# En la ruta /api/favoritos/agregar - CORREGIDA
 @web_bp.route('/api/favoritos/agregar', methods=['POST'])
 @login_required
 def api_agregar_favorito():
@@ -862,51 +899,3 @@ def debug_favoritos():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-
-
-@web_bp.route('/api/carrito/limpiar-duplicados', methods=['POST'])
-@login_required
-def limpiar_duplicados_carrito():
-    """Limpiar productos duplicados del carrito"""
-    try:
-        carrito = Carrito.query.filter_by(
-            usuario_id=session['user_id'], 
-            activo=True
-        ).first()
-
-        if not carrito:
-            return jsonify({'success': True, 'message': 'No hay carrito'})
-
-        # Encontrar duplicados
-        items_por_producto = {}
-        items_a_eliminar = []
-        
-        for item in carrito.items:
-            if item.producto_id in items_por_producto:
-                # Ya existe un item para este producto, marcar para eliminar
-                items_a_eliminar.append(item)
-                # Sumar la cantidad al item existente
-                items_por_producto[item.producto_id].cantidad += item.cantidad
-            else:
-                items_por_producto[item.producto_id] = item
-
-        # Eliminar duplicados
-        for item in items_a_eliminar:
-            db.session.delete(item)
-
-        if items_a_eliminar:
-            db.session.commit()
-            return jsonify({
-                'success': True, 
-                'message': f'Se limpiaron {len(items_a_eliminar)} productos duplicados',
-                'duplicados_eliminados': len(items_a_eliminar)
-            })
-        else:
-            return jsonify({'success': True, 'message': 'No se encontraron duplicados'})
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error limpiando duplicados: {e}")
-        return jsonify({'success': False, 'error': 'Error interno'}), 500

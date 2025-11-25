@@ -194,6 +194,13 @@ agregarEventListeners: function () {
 
     // Agregar producto al carrito
 agregarAlCarrito: function (productoId, button) {
+
+    if (!this.estaAutenticado()) {
+        this.mostrarNotificacion('Inicia sesión para poder agregar productos al carrito', 'error');
+        return;
+    }
+
+
     // Si se pasa el botón, prevenir múltiples clicks
     if (button && button.disabled) {
         console.log('⏳ Botón ya en proceso, ignorando click');

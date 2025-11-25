@@ -2881,10 +2881,7 @@ main .encabezado .carrito-count {
     z-index: 10;
     line-height: 1;
 }
-.carrito-count :hover{
-    box-shadow: 0 10px 20px rgba(54, 0, 0, 0.3);
-    background: rgb(160, 17, 17);
-}
+
 /* Contenedor del icono del carrito */
 .carrito-icon-container {
     position: relative;

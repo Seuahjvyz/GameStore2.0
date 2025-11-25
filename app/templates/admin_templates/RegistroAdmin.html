@@ -15,13 +15,6 @@
             <div class="main-content-auth">
                 <div class="container-auth">
                     <h1 class="titulo-auth">Crear Cuenta de Administrador</h1>
-                    <p class="descripcion-auth">
-                        <i class="fa-solid fa-shield-alt"></i> Registro exclusivo para administradores del sistema!
-                    </p>
-
-                    <div class="admin-badge">
-                        <i class="fa-solid fa-shield-alt"></i> <strong>Acceso de Administrador</strong>
-                    </div>
 
                     <form id="registro-form" class="form-section-auth">
                         <div class="form-line-auth">
@@ -61,33 +54,21 @@
 
                     <div class="sidebar-auth-section">
                         <p class="texto-auth">¿Ya tienes cuenta?</p>
-                        <a class="btn-sidebar-auth" href="/login" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">Iniciar Sesión</a>
+                        <a class="btn-sidebar-auth" href="/login">Iniciar Sesión</a>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-    <!-- BACKBONE MODULES -->
-    <script src="/static/js/models/producto.model.js"></script>
-    <script src="/static/js/collections/productos.collection.js"></script>
-    <script src="/static/js/views/producto.view.js"></script>
+    <!-- Scripts -->
     <script src="/static/js/user-menu.js"></script>
-    <script src="/static/js/main.js"></script>
-    <script src="/static/js/agregar-carrito.js"></script>
-
-    <!-- En la sección de scripts, después de user-menu.js -->
+    <script src="/static/js/productos-dinamicos.js"></script>
+    <script src="/static/js/carrito-sync.js"></script>
+    <script src="/static/js/carrito-dinamico.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="/static/js/models/carrito.js"></script>
-    <script src="/static/js/views/carrito-view.js"></script>
-    <script src="/static/js/app-carrito.js"></script>
-
-    <!-- jQuery y dependencias -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.1/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"></script>
-    
-    <!-- Script de registro admin CORREGIDO -->
+    <script src="/static/js/favoritos-backbone.js"></script>
     <script src="/static/js/registro-admin.js"></script>
 
 </body>
