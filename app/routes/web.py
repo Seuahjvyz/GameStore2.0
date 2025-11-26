@@ -2,7 +2,11 @@ from flask import Blueprint, render_template, jsonify, request, redirect, url_fo
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
+
 from app import db
+
+import datetime
+from flask import Flask, request, jsonify
 from app.models.usuario import Usuario
 from app.models.models import Carrito, CarritoItem, Producto, Categoria
 from app.models.role import Role
@@ -52,10 +56,60 @@ def login():
 @web_bp.route('/registro')
 def registro():
     return render_template('registro.html')
+ 
 
-@web_bp.route('/registro-admin')
-def registro_admin():
-    return render_template('admin_templates/RegistroAdmin.html')
+# ----------------------------------------- RUTAS ADMINISTRADOR ---------------------------------------- #
+
+@web_bp.route('/admin/inventario')
+@admin_required
+def admin_inventario():
+    return render_template('admin_templates/inventario.html')
+
+@web_bp.route('/admin/usuarios')
+@admin_required
+def admin_usuarios():
+    return render_template('admin_templates/usuarios.html')
+
+@web_bp.route('/admin/reportes')
+@admin_required
+def admin_reportes():
+    return render_template('admin_templates/reportes.html')
+
+@web_bp.route('/admin/reporte-detalle')
+@admin_required
+def admin_reporte_detalle():
+    return render_template('admin_templates/reporte-detalle.html')
+
+@web_bp.route('/admin/pedidos')
+@admin_required
+def admin_pedidos():
+    return render_template('admin_templates/pedidos.html')
+
+@web_bp.route('/admin/juegos')
+@admin_required
+def admin_juegos():
+    return render_template('admin_templates/juegos.html')
+
+@web_bp.route('/admin/consolas')
+@admin_required
+def admin_consolas():
+    return render_template('admin_templates/consolas.html')
+
+@web_bp.route('/admin/controles')
+@admin_required
+def admin_controles():
+    return render_template('admin_templates/controles.html')
+
+@web_bp.route('/admin/accesorios')
+@admin_required
+def admin_accesorios():
+    return render_template('admin_templates/accesorios.html')
+
+@web_bp.route('/admin/perfil')
+@admin_required
+def admin_perfil():
+    usuario = Usuario.query.get(session['user_id'])
+    return render_template('admin_templates/perfil.html', usuario=usuario)
 
 # ----------------------------------------- RUTAS DE DEBUG ---------------------------------------- #
 
@@ -899,3 +953,376 @@ def debug_favoritos():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+    
+# ----------------------------------------- API ADMIN PRODUCTOS ---------------------------------------- #
+
+@web_bp.route('/api/admin/productos')
+@admin_required
+def api_admin_productos():
+    try:
+        # Obtener parámetros de filtro
+        search = request.args.get('search', '')
+        categoria_id = request.args.get('categoria', '')
+        estado = request.args.get('estado', '')
+
+        # Consulta base
+        query = Producto.query.join(Categoria)
+
+        # Aplicar filtros
+        if search:
+            query = query.filter(Producto.nombre.ilike(f'%{search}%'))
+        
+        if categoria_id:
+            query = query.filter(Producto.categoria_id == categoria_id)
+        
+        if estado:
+            if estado == 'activo':
+                query = query.filter(Producto.activo == True)
+            elif estado == 'inactivo':
+                query = query.filter(Producto.activo == False)
+
+        productos = query.order_by(Producto.fecha_creacion.desc()).all()
+
+        productos_data = []
+        for producto in productos:
+            productos_data.append({
+                'id': producto.id_producto,
+                'nombre': producto.nombre,
+                'descripcion': producto.descripcion,
+                'precio': float(producto.precio) if producto.precio else 0,
+                'stock': producto.stock,
+                'imagen': producto.imagen,
+                'categoria': producto.categoria.nombre if producto.categoria else 'Sin categoría',
+                'categoria_id': producto.categoria_id,
+                'activo': producto.activo,
+                'fecha_creacion': producto.fecha_creacion.isoformat() if producto.fecha_creacion else None
+            })
+
+        return jsonify({
+            'success': True,
+            'productos': productos_data
+        })
+        
+    except Exception as e:
+        print(f"Error obteniendo productos admin: {e}")
+        return jsonify({'success': False, 'error': 'Error al obtener productos'}), 500
+
+@web_bp.route('/api/categorias')
+@admin_required
+def api_categorias():
+    try:
+        categorias = Categoria.query.all()
+        
+        categorias_data = [{
+            'id': cat.id_categoria,
+            'nombre': cat.nombre,
+            'descripcion': cat.descripcion
+        } for cat in categorias]
+
+        return jsonify({
+            'success': True,
+            'categorias': categorias_data
+        })
+        
+    except Exception as e:
+        print(f"Error obteniendo categorías: {e}")
+        return jsonify({'success': False, 'error': 'Error al obtener categorías'}), 500
+
+@web_bp.route('/api/admin/productos/agregar', methods=['POST'])
+@admin_required
+def api_admin_agregar_producto():
+    try:
+        data = request.get_json()
+        
+        # Validaciones básicas
+        if not data.get('nombre'):
+            return jsonify({'success': False, 'error': 'El nombre es requerido'}), 400
+        
+        if not data.get('precio') or float(data.get('precio')) <= 0:
+            return jsonify({'success': False, 'error': 'El precio debe ser mayor a 0'}), 400
+        
+        if data.get('stock') is None or int(data.get('stock')) < 0:
+            return jsonify({'success': False, 'error': 'El stock no puede ser negativo'}), 400
+
+        if not data.get('categoria_id'):
+            return jsonify({'success': False, 'error': 'La categoría es requerida'}), 400
+
+        # Crear nuevo producto
+        nuevo_producto = Producto(
+            nombre=data.get('nombre'),
+            descripcion=data.get('descripcion', ''),
+            precio=float(data.get('precio')),
+            stock=int(data.get('stock')),
+            imagen=data.get('imagen', ''),
+            categoria_id=data.get('categoria_id'),
+            activo=data.get('activo', True)
+        )
+
+        db.session.add(nuevo_producto)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Producto agregado correctamente',
+            'producto_id': nuevo_producto.id_producto
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error agregando producto: {e}")
+        return jsonify({'success': False, 'error': 'Error al agregar producto'}), 500
+
+@web_bp.route('/api/admin/productos/editar', methods=['PUT'])
+@admin_required
+def api_admin_editar_producto():
+    try:
+        data = request.get_json()
+        producto_id = data.get('id')
+        
+        if not producto_id:
+            return jsonify({'success': False, 'error': 'ID de producto requerido'}), 400
+
+        producto = Producto.query.get(producto_id)
+        if not producto:
+            return jsonify({'success': False, 'error': 'Producto no encontrado'}), 404
+
+        # Actualizar campos
+        stock_anterior = producto.stock
+        if 'nombre' in data:
+            producto.nombre = data['nombre']
+        if 'descripcion' in data:
+            producto.descripcion = data['descripcion']
+        if 'precio' in data:
+            producto.precio = float(data['precio'])
+        if 'stock' in data:
+            nuevo_stock = int(data['stock'])
+            producto.stock = nuevo_stock
+            
+            # ✅ DESHABILITAR SI EL NUEVO STOCK ES 0
+            if nuevo_stock == 0:
+                producto.activo = False
+            # ✅ HABILITAR SI HABÍA STOCK 0 Y AHORA TIENE STOCK
+            elif nuevo_stock > 0 and stock_anterior == 0:
+                producto.activo = True
+                
+        if 'imagen' in data:
+            producto.imagen = data['imagen']
+        if 'categoria_id' in data:
+            producto.categoria_id = data['categoria_id']
+        if 'activo' in data:
+            # Si el admin manualmente activa un producto con stock 0, prevenir
+            if data['activo'] and producto.stock == 0:
+                return jsonify({
+                    'success': False, 
+                    'error': 'No se puede activar un producto con stock 0'
+                }), 400
+            producto.activo = data['activo']
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Producto actualizado correctamente'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error editando producto: {e}")
+        return jsonify({'success': False, 'error': 'Error al editar producto'}), 500
+    
+
+
+@web_bp.route('/api/admin/limpiar-stock-cero', methods=['POST'])
+@admin_required
+def api_limpiar_stock_cero():
+    """Endpoint para que el admin pueda limpiar manualmente productos sin stock"""
+    try:
+        cantidad_deshabilitados = deshabilitar_productos_sin_stock()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Se deshabilitaron {cantidad_deshabilitados} productos sin stock'
+        })
+        
+    except Exception as e:
+        print(f"Error en limpieza de stock: {e}")
+        return jsonify({'success': False, 'error': 'Error en limpieza de stock'}), 500
+
+
+
+@web_bp.route('/api/admin/productos/estado', methods=['PUT'])
+@admin_required
+def api_admin_cambiar_estado():
+    try:
+        data = request.get_json()
+        producto_id = data.get('id')
+        activo = data.get('activo')
+
+        producto = Producto.query.get(producto_id)
+        if not producto:
+            return jsonify({'success': False, 'error': 'Producto no encontrado'}), 404
+
+        # Cambiar estado sin restricciones
+        producto.activo = activo
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Estado del producto actualizado correctamente'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error cambiando estado: {e}")
+        return jsonify({'success': False, 'error': 'Error al cambiar estado'}), 500
+
+@web_bp.route('/api/admin/productos/eliminar/<int:producto_id>', methods=['DELETE'])
+@admin_required
+def api_admin_eliminar_producto(producto_id):
+    try:
+        producto = Producto.query.get(producto_id)
+        if not producto:
+            return jsonify({'success': False, 'error': 'Producto no encontrado'}), 404
+
+        # 1. Eliminar items del carrito relacionados
+        items_carrito = CarritoItem.query.filter_by(producto_id=producto_id).all()
+        for item in items_carrito:
+            db.session.delete(item)
+
+        # 2. Eliminar favoritos relacionados
+        from app.models.favorito import Favorito
+        favoritos = Favorito.query.filter_by(producto_id=producto_id).all()
+        for favorito in favoritos:
+            db.session.delete(favorito)
+
+        # 3. Finalmente eliminar el producto
+        db.session.delete(producto)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Producto eliminado correctamente'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error eliminando producto: {e}")
+        return jsonify({'success': False, 'error': 'Error al eliminar producto'}), 500
+
+#Ruta para procesar compras
+
+@web_bp.route('/api/pedidos/procesar', methods=['POST'])
+@login_required
+def api_procesar_pedido():
+    try:
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'error': 'No autenticado'}), 401
+
+        data = request.get_json()
+        carrito_id = data.get('carrito_id')
+
+        # Obtener el carrito activo del usuario
+        carrito = Carrito.query.filter_by(
+            usuario_id=session['user_id'], 
+            activo=True
+        ).first()
+
+        if not carrito or not carrito.items:
+            return jsonify({'success': False, 'error': 'Carrito vacío'}), 400
+
+        # Verificar stock y procesar compra
+        for item in carrito.items:
+            producto = Producto.query.get(item.producto_id)
+            
+            if not producto or not producto.activo:
+                return jsonify({
+                    'success': False, 
+                    'error': f'El producto {producto.nombre if producto else "desconocido"} no está disponible'
+                }), 400
+            
+            if producto.stock < item.cantidad:
+                return jsonify({
+                    'success': False, 
+                    'error': f'Stock insuficiente para {producto.nombre}. Disponible: {producto.stock}, Solicitado: {item.cantidad}'
+                }), 400
+
+        # Si todo está bien, procesar la compra y descontar stock
+        productos_afectados = []
+        for item in carrito.items:
+            producto = Producto.query.get(item.producto_id)
+            producto.stock -= item.cantidad  # ✅ Descontar del stock
+            productos_afectados.append(producto)
+
+        # ✅ DESHABILITAR PRODUCTOS QUE LLEGUEN A STOCK 0
+        for producto in productos_afectados:
+            if producto.stock == 0:
+                producto.activo = False
+                print(f"Producto deshabilitado automáticamente: {producto.nombre}")
+
+        # Crear registro de pedido
+        from app.models.pedido import Pedido, PedidoItem
+        
+        nuevo_pedido = Pedido(
+            usuario_id=session['user_id'],
+            total=sum(item.cantidad * float(item.precio_unitario) for item in carrito.items),
+            estado='completado'
+        )
+        
+        db.session.add(nuevo_pedido)
+        db.session.flush()
+
+        # Crear items del pedido
+        for item in carrito.items:
+            pedido_item = PedidoItem(
+                pedido_id=nuevo_pedido.id_pedido,
+                producto_id=item.producto_id,
+                cantidad=item.cantidad,
+                precio_unitario=item.precio_unitario
+            )
+            db.session.add(pedido_item)
+
+        # Limpiar el carrito
+        for item in carrito.items:
+            db.session.delete(item)
+        
+        carrito.activo = False
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Compra procesada correctamente',
+            'pedido_id': nuevo_pedido.id_pedido,
+            'total': float(nuevo_pedido.total)
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error procesando pedido: {e}")
+        return jsonify({'success': False, 'error': 'Error al procesar la compra'}), 500
+    
+    
+
+def deshabilitar_productos_sin_stock():
+    """Deshabilita automáticamente productos cuando el stock llega a 0"""
+    try:
+        productos_sin_stock = Producto.query.filter(
+            Producto.stock == 0,
+            Producto.activo == True
+        ).all()
+        
+        for producto in productos_sin_stock:
+            producto.activo = False
+            print(f"Producto deshabilitado por stock 0: {producto.nombre}")
+        
+        if productos_sin_stock:
+            db.session.commit()
+            print(f"Se deshabilitaron {len(productos_sin_stock)} productos sin stock")
+            
+        return len(productos_sin_stock)
+        
+    except Exception as e:
+        print(f"Error deshabilitando productos sin stock: {e}")
+        db.session.rollback()
+        return 0

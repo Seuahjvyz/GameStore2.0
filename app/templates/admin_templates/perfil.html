@@ -3,80 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil - Game Store Web</title>
-      <link rel="stylesheet" href="../static/css/style-provisional.css">
-    <!-- Added Font Awesome CDN -->
+    <title>Perfil Administrador - Game Store</title>
+    <link rel="stylesheet" href="/static/css/stylee.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <a class="logo_link" href="admin.html">
-                        <img src="../static/img/Icon_GS.png" alt="Game Store Logo">
-                    </a>
-                </div>
-            </div>
+    <nav class="barra_lateral">
+        <a href="/admin"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        <ul>
+            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-house"></i> Inicio </a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/pedidos"><i class="fa-solid fa-truck"></i> Gestión de pedidos</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/inventario"><i class="fa-solid fa-boxes-packing"></i> Gestión de productos</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/usuarios"><i class="fa-solid fa-users"></i> Gestión de usuarios</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i> Reportes</a></li>
+        </ul>
+    </nav>
 
-            <!-- Replaced button and nav-menu with new ul-based structure with Font Awesome icons -->
-            <nav class="nav-menu">
-                <ul>
-                    <li><a class="enlace_barra_lateral" href="admin.html"><i class="fa-solid fa-house"></i> <span>Inicio</span></a></li>
-                    <li><a class="enlace_barra_lateral active" href="perfil.html"><i class="fa-solid fa-circle-user"></i> <span>Perfil</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="inventario.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Buscar</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="pedidos.html"><i class="fa-solid fa-truck"></i> <span>Gestión de pedidos</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="inventario.html"><i class="fa-solid fa-boxes-packing"></i> <span>Inventario</span></a></li>
-                    
-                    <li>
-                        <h3>Categorías</h3>
-                    </li>
-                    
-                    <li><a class="enlace_barra_lateral" href="juegos.html"><i class="fa-solid fa-ghost"></i> <span>Juegos</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="accesorios.html"><i class="fa-solid fa-headset"></i> <span>Accesorios</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="consolas.html"><i class="fa-solid fa-tv"></i> <span>Consolas</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="controles.html"><i class="fa-solid fa-gamepad"></i> <span>Controles</span></a></li>
-                </ul>
-                
-                <ul style="margin-top: auto; padding-top: 1rem;">
-                    <li><a class="enlace_barra_lateral_fijo" href="reportes.html"><i class="fa-solid fa-chart-column"></i> <span>Reportes</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="usuarios.html"><i class="fa-solid fa-users"></i> <span>Usuarios</span></a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <main class="main-content">
-            <div class="profile-container-centered">
-                <div class="profile-card">
-                    <div class="profile-avatar-large">
-                        <img src="../static/img/perfil.jpg" alt="Avatar de Isaac Méndez">
+    <main>
+        <header class="encabezado">
+            <section class="iconos">
+                <div class="user-menu-container">
+                    <button class="user-menu-btn" id="userMenuBtn">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-content">
+                            <div class="loading-menu">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                        </div>
                     </div>
-                    <h1 class="profile-name">Isaac Méndez</h1>
-                    <span class="profile-badge">ADMINISTRADOR</span>
-                    <p class="profile-email-centered">isaacmdz@gamestore.com</p>
                 </div>
+            </section>
+        </header>
 
-                <div class="profile-actions">
-                    <button class="profile-action-btn" onclick="window.location.href='inventario.html'">
-                        <span class="action-icon">📦</span>
-                        <span>Inventario</span>
-                    </button>
-                    <button class="profile-action-btn" onclick="window.location.href='reportes.html'">
-                        <span class="action-icon">📊</span>
-                        <span>Reportes</span>
-                    </button>
-                    <button class="profile-action-btn" onclick="window.location.href='usuarios.html'">
-                        <span class="action-icon">👥</span>
-                        <span>Usuarios</span>
-                    </button>
-                    <button class="profile-action-btn" onclick="window.location.href='pedidos.html'">
-                        <span class="action-icon">📋</span>
-                        <span>Pedidos</span>
-                    </button>
+        <div class="principal">
+            <div class="contenido-centrado">
+                <div class="perfil-contenedor-centrado">
+                    <h1 class="titulo-centrado">Mi perfil</h1>
+                    
+                    <div class="perfil-card-centrado">
+                        <h2 class="nombre-usuario">{{ usuario.nombre_usuario }}</h2>
+                        <p class="numero-cliente">Administrador #{{ usuario.id_usuario }}</p>
+                        
+                        <div class="separador"></div>
+                        
+                        <div class="datos-usuario">
+                            <div class="dato-fila">
+                                <span class="dato-label">Email:</span>
+                                <span class="dato-valor">{{ usuario.correo }}</span>
+                            </div>
+                            <div class="dato-fila">
+                                <span class="dato-label">Rol:</span>
+                                <span class="dato-valor">Administrador</span>
+                            </div>
+                            <div class="dato-fila">
+                                <span class="dato-label">ID de Usuario:</span>
+                                <span class="dato-valor">{{ usuario.id_usuario }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="separador"></div>
+                        
+                    </div>
                 </div>
             </div>
-        </main>
-    </div>
-    <script src="../static/js/script.js"></script>
+        </div>
+    </main>
+
+    <script src="/static/js/user-menu.js"></script>
 </body>
 </html>

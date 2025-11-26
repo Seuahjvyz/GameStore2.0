@@ -439,32 +439,35 @@ actualizarContadorCarrito(count) {
     }
 
     async procesarPago() {
-        try {
-            // Aquí iría la lógica para procesar el pago con tu backend
-            const response = await fetch('/api/pagos/procesar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    carrito_id: this.carritoData.id,
-                    metodo_pago: document.querySelector('input[name="metodo-pago"]:checked').value,
-                    // otros datos del formulario...
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                this.mostrarConfirmacionCompra();
-            } else {
-                this.mostrarNotificacion(data.error, 'error');
-            }
-        } catch (error) {
-            console.error('Error procesando pago:', error);
-            this.mostrarNotificacion('Error al procesar el pago', 'error');
+    try {
+        // Obtener el ID del carrito
+        const carrito_id = this.carritoData.id;
+
+        // Procesar el pedido
+        const response = await fetch('/api/pedidos/procesar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                carrito_id: carrito_id,
+                metodo_pago: document.querySelector('input[name="metodo-pago"]:checked').value,
+                // otros datos del formulario...
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.mostrarConfirmacionCompra(data.pedido_id);
+        } else {
+            this.mostrarNotificacion(data.error, 'error');
         }
+    } catch (error) {
+        console.error('Error procesando pago:', error);
+        this.mostrarNotificacion('Error al procesar el pago', 'error');
     }
+}
 
     mostrarConfirmacionCompra() {
         const container = document.getElementById('carrito-container');
@@ -546,3 +549,4 @@ document.addEventListener('DOMContentLoaded', () => {
         window.carritoDinamico = new CarritoDinamico();
     }
 });
+

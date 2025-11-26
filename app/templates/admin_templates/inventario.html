@@ -1,203 +1,212 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario - Game Store Web</title>
-   <link rel="stylesheet" href="../static/css/style-provisional.css">
-    <!-- Added Font Awesome CDN -->
+    <title>Gestión de Productos - Admin</title>
+    <link rel="stylesheet" href="/static/css/stylee.css">
+    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <a class="logo_link" href="admin.html">
-                        <img src="../static/img/Icon_GS.png" alt="Game Store Logo">
-                    </a>
+    <nav class="barra_lateral">
+        <a href="/admin"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        <ul>
+            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/pedidos"><i class="fa-solid fa-truck"></i> Gestión de
+                    pedidos</a></li>
+            <li><a class="enlace_barra_lateral_fijo" href="/admin/inventario"><i class="fa-solid fa-boxes-packing"></i>
+                    Gestión de productos</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/usuarios"><i class="fa-solid fa-users"></i> Gestión de
+                    usuarios</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i>
+                    Reportes</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <header class="encabezado">
+
+            <section class="iconos">
+                <div class="user-menu-container">
+                    <button class="user-menu-btn" id="userMenuBtn">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-content">
+                            <div class="loading-menu">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
+        </header>
 
-            <!-- Replaced button and nav-menu with new ul-based structure -->
-            <nav class="nav-menu">
-                <ul>
-                    <li><a class="enlace_barra_lateral" href="admin.html"><i class="fa-solid fa-house"></i> <span>Inicio</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="perfil.html"><i class="fa-solid fa-circle-user"></i> <span>Perfil</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="inventario.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Buscar</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="pedidos.html"><i class="fa-solid fa-truck"></i> <span>Gestión de pedidos</span></a></li>
-                    <li><a class="enlace_barra_lateral active" href="inventario.html"><i class="fa-solid fa-boxes-packing"></i> <span>Inventario</span></a></li>
-                    
-                    <li>
-                        <h3>Categorías</h3>
-                    </li>
-                    
-                    <li><a class="enlace_barra_lateral" href="juegos.html"><i class="fa-solid fa-ghost"></i> <span>Juegos</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="accesorios.html"><i class="fa-solid fa-headset"></i> <span>Accesorios</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="consolas.html"><i class="fa-solid fa-tv"></i> <span>Consolas</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="controles.html"><i class="fa-solid fa-gamepad"></i> <span>Controles</span></a></li>
-                </ul>
-                
-                <ul style="margin-top: auto; padding-top: 1rem;">
-                    <li><a class="enlace_barra_lateral_fijo" href="reportes.html"><i class="fa-solid fa-chart-column"></i> <span>Reportes</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="usuarios.html"><i class="fa-solid fa-users"></i> <span>Usuarios</span></a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <main class="main-content">
-            <div class="content-header">
-                <h1>Inventario</h1>
+        <div class="principal">
+            <h1>Gestión de Productos</h1>
+            <!--LIMPIAR STOCK-->
+            <!--
+                <button class="btn-limpiar-stock" id="btn-limpiar-stock">
+        <i class="fa-solid fa-broom"></i> Limpiar Stock Cero
+    </button>
+-->
+            <!-- Filtros -->
+            <div class="filtros-container">
                 <div class="search-container">
-                    <input type="text" class="search-input" placeholder="Buscar productos...">
-                    <button class="search-button">🔍</button>
+                    <input type="text" class="search-input" id="search-admin" placeholder="Buscar productos...">
+                    <button class="search-button" id="search-btn-admin">🔍</button>
+                </div>
+
+                <div class="filtros-categorias">
+                    <select id="filtro-categoria" class="filtro-select">
+                        <option value="">Todas las categorías</option>
+                    </select>
+
+                    <select id="filtro-estado" class="filtro-select">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </div>
+
+                <!-- ✅ ESTE ES EL BOTÓN IMPORTANTE -->
+                <button class="btn-primary" id="btn-agregar-producto">
+                    <i class="fa-solid fa-plus"></i> Agregar Producto
+                </button>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-boxes"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="total-productos">0</span>
+                        <span class="stat-label">Total Productos</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="productos-activos">0</span>
+                        <span class="stat-label">Productos Activos</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="productos-inactivos">0</span>
+                        <span class="stat-label">Productos Inactivos</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stock-bajo">0</span>
+                        <span class="stat-label">Stock Bajo &lt 10</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="section-header">
-                <div>
-                    <h2>Todos los Productos</h2>
-                    <span class="badge">1,234 productos</span>
-                </div>
-                <button class="btn-primary" onclick="openAddProductModal()">+ Agregar Producto</button>
-            </div>
-
-            <div class="products-grid">
-                <div class="product-card">
-                    <img src="../static/img/Play5.png" alt="PlayStation 5" class="product-image">
-                    <h3 class="product-title">PlayStation 5</h3>
-                    <p class="product-price">$499.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(1)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(1)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/XboxSX.png" alt="Xbox Series X" class="product-image">
-                    <h3 class="product-title">Xbox Series X</h3>
-                    <p class="product-price">$449.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(2)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(2)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/Switch2.png" alt="Nintendo Switch" class="product-image">
-                    <h3 class="product-title">Nintendo Switch OLED</h3>
-                    <p class="product-price">$349.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(3)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(3)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/thelast.jpg" alt="The Last of Us Part II" class="product-image">
-                    <h3 class="product-title">The Last of Us Part II PS5</h3>
-                    <p class="product-price">$59.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(4)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(4)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/GOFR.JPG" alt="God of War Ragnarök" class="product-image">
-                    <h3 class="product-title">God of War Ragnarök</h3>
-                    <p class="product-price">$69.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(5)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(5)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/Zelda.jpg" alt="Zelda: Tears of the Kingdom" class="product-image">
-                    <h3 class="product-title">Zelda: Tears of the Kingdom</h3>
-                    <p class="product-price">$59.99</p>
-                    <span class="product-stock out-of-stock">Agotado</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(6)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(6)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/FC26.jpeg" alt="EA FC26" class="product-image">
-                    <h3 class="product-title">EA FC26 PlayStation 5</h3>
-                    <p class="product-price">$69.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(7)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(7)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/Imagenes/xboxcontrol.png" alt="Xbox Controller" class="product-image">
-                    <h3 class="product-title">Xbox Wireless Controller</h3>
-                    <p class="product-price">$59.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(8)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(8)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/Audifonos_Gamer.jpg" alt="Gaming Headset" class="product-image">
-                    <h3 class="product-title">Gaming Headset Pro</h3>
-                    <p class="product-price">$89.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(9)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(9)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/Imagenes/gta6.png" alt="GTA VI" class="product-image">
-                    <h3 class="product-title">GTA VI</h3>
-                    <p class="product-price">$129.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(10)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(10)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/Imagenes/consolaseries.png" alt="Xbox Series S" class="product-image">
-                    <h3 class="product-title">Xbox Series S</h3>
-                    <p class="product-price">$299.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(11)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(11)">🗑️ Eliminar</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="../static/img/Imagenes/CODBO6.png" alt="Call of Duty Black Ops 6" class="product-image">
-                    <h3 class="product-title">Call of Duty Black Ops 6</h3>
-                    <p class="product-price">$79.99</p>
-                    <span class="product-stock">En stock</span>
-                    <div class="product-actions">
-                        <button class="btn-edit" onclick="editProduct(12)">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(12)">🗑️ Eliminar</button>
-                    </div>
+            <!-- Lista de productos -->
+            <div class="productos-admin-container">
+                <div class="table-container">
+                    <table id="tabla-productos">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productos-body">
+                            <!-- Los productos se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </main>
+        </div>
+    </main>
+
+    <!-- Modal para agregar/editar producto -->
+    <div id="modal-producto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-titulo">Agregar Producto</h2>
+                <button class="modal-close" id="modal-cerrar">&times;</button>
+            </div>
+            <form id="form-producto">
+                <input type="hidden" id="producto-id">
+
+                <div class="form-group">
+                    <label for="producto-nombre" class="required">Nombre del Producto</label>
+                    <input type="text" id="producto-nombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="producto-descripcion">Descripción</label>
+                    <textarea id="producto-descripcion" rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="producto-precio" class="required">Precio</label>
+                        <input type="number" id="producto-precio" step="0.01" min="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="producto-stock" class="required">Stock</label>
+                        <input type="number" id="producto-stock" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="producto-categoria" class="required">Categoría</label>
+                        <select id="producto-categoria" required>
+                            <option value="">Seleccionar categoría</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="producto-imagen" class="required">URL de la Imagen</label>
+                        <input type="text" id="producto-imagen" placeholder="https://ejemplo.com/imagen.jpg" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="producto-activo">
+                        <input type="checkbox" id="producto-activo" checked>
+                        Producto Activo
+                    </label>
+                </div>
+
+                <div class="modal-actions">
+                    <!--<button type="button" class="btn-secondary" id="btn-cancelar">Cancelar</button> -->
+                    <button type="submit" class="btn-primary" id="btn-guardar">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <script src="../static/js/script.js"></script>
+    <!-- Scripts -->
+    <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/admin-inventario.js"></script>
 </body>
+
 </html>

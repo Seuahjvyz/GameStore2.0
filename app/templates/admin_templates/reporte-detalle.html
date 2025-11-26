@@ -3,47 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de Reporte - Game Store Web</title>
-    <link rel="stylesheet" href="../static/css/style-provisional.css">
-    <!-- Added Font Awesome CDN -->
+    <title>Game Store</title>
+    <link rel="stylesheet" href="/static/css/stylee.css">
+    <link rel="stylesheet" href="/static/css/style-provisional.css">
+    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <a class="logo_link" href="admin.html">
-                        <img src="../static/img/Icon_GS.png" alt="Game Store Logo">
-                    </a>
-                </div>
-            </div>
+    <nav class="barra_lateral">
+        <a href="/admin"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        <ul>
+            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-house"></i> Inicio </a></li>
+            <li><a class="enlace_barra_lateral_fijo" href="/admin/pedidos"><i class="fa-solid fa-truck"></i> Gestión de pedidos</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/inventario"><i class="fa-solid fa-boxes-packing"></i> Gestión de productos</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/usuarios"><i class="fa-solid fa-users"></i> Gestión de usuarios</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i> Reportes</a></li>
+        </ul>
+    </nav>
 
-            <!-- Replaced button and nav-menu with new ul-based structure with Font Awesome icons -->
-            <nav class="nav-menu">
-                <ul>
-                    <li><a class="enlace_barra_lateral" href="admin.html"><i class="fa-solid fa-house"></i> <span>Inicio</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="perfil.html"><i class="fa-solid fa-circle-user"></i> <span>Perfil</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="inventario.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Buscar</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="pedidos.html"><i class="fa-solid fa-truck"></i> <span>Gestión de pedidos</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="inventario.html"><i class="fa-solid fa-boxes-packing"></i> <span>Inventario</span></a></li>
-                    
-                    <li>
-                        <h3>Categorías</h3>
-                    </li>
-                    
-                    <li><a class="enlace_barra_lateral" href="juegos.html"><i class="fa-solid fa-ghost"></i> <span>Juegos</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="accesorios.html"><i class="fa-solid fa-headset"></i> <span>Accesorios</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="consolas.html"><i class="fa-solid fa-tv"></i> <span>Consolas</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="controles.html"><i class="fa-solid fa-gamepad"></i> <span>Controles</span></a></li>
-                </ul>
-                
-                <ul style="margin-top: auto; padding-top: 1rem;">
-                    <li><a class="enlace_barra_lateral_fijo active" href="reportes.html"><i class="fa-solid fa-chart-column"></i> <span>Reportes</span></a></li>
-                    <li><a class="enlace_barra_lateral" href="usuarios.html"><i class="fa-solid fa-users"></i> <span>Usuarios</span></a></li>
-                </ul>
-            </nav>
-        </aside>
+    <main>
+        <header class="encabezado">
+            <section class="iconos">
+                <div class="user-menu-container">
+                    <button class="user-menu-btn" id="userMenuBtn">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-content">
+                            <div class="loading-menu">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </header>
 
         <main class="main-content">
             <div class="page-header">

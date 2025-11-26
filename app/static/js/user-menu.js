@@ -1,4 +1,4 @@
-// User menu functionality
+// User menu functionality - ADMIN VERSION
 document.addEventListener('DOMContentLoaded', function() {
     const userMenuBtn = document.getElementById('userMenuBtn');
     const userDropdown = document.getElementById('userDropdown');
@@ -31,20 +31,22 @@ async function cargarUsuarioActual() {
         if (response.ok) {
             const usuario = await response.json();
             if (usuario && usuario.id) {
-                actualizarMenuUsuario(usuario, true); // Usuario logueado
+                // Verificar si es administrador (role = 1)
+                const esAdmin = usuario.role === 1;
+                actualizarMenuUsuario(usuario, true, esAdmin);
             } else {
-                actualizarMenuUsuario(null, false); // Usuario NO logueado
+                actualizarMenuUsuario(null, false, false);
             }
         } else {
-            actualizarMenuUsuario(null, false); // Usuario NO logueado
+            actualizarMenuUsuario(null, false, false);
         }
     } catch (error) {
         console.error('Error al cargar usuario:', error);
-        actualizarMenuUsuario(null, false); // Usuario NO logueado en caso de error
+        actualizarMenuUsuario(null, false, false);
     }
 }
 
-function actualizarMenuUsuario(usuario, estaLogueado) {
+function actualizarMenuUsuario(usuario, estaLogueado, esAdmin) {
     const dropdownContent = document.querySelector('.dropdown-content');
     if (!dropdownContent) {
         console.error('No se encontró el elemento dropdown-content');
@@ -52,19 +54,33 @@ function actualizarMenuUsuario(usuario, estaLogueado) {
     }
 
     if (estaLogueado && usuario) {
-        // Menú para usuarios logueados
-        dropdownContent.innerHTML = `
-
-            <a href="/perfil" class="dropdown-item">
-                <i class="fa-solid fa-user"></i>
-                <span>Mi Perfil</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="/logout" class="dropdown-item">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Cerrar Sesión</span>
-            </a>
-        `;
+        if (esAdmin) {
+            // Menú para ADMINISTRADORES
+            dropdownContent.innerHTML = `
+                <a href="/admin/perfil" class="dropdown-item">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span>Perfil</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/logout" class="dropdown-item">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            `;
+        } else {
+            // Menú para USUARIOS NORMALES
+            dropdownContent.innerHTML = `
+                <a href="/perfil" class="dropdown-item">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/logout" class="dropdown-item">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            `;
+        }
     } else {
         // Menú para usuarios NO logueados
         dropdownContent.innerHTML = `
