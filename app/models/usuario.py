@@ -13,6 +13,7 @@ class Usuario(UserMixin, db.Model):
     ultimo_acceso = db.Column(db.TIMESTAMP, nullable=True)
     telefono = db.Column(db.String(15))
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id_rol'), nullable=False)
+    activo = db.Column(db.Boolean, default=True)  # Este campo ya existe en tu BD
     
     # Para Flask-Login
     def get_id(self):

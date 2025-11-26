@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Store</title>
+    <title>Gestión de Usuarios</title>
     <link rel="stylesheet" href="/static/css/stylee.css">
-    <link rel="stylesheet" href="/static/css/style-provisional.css">
     <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <nav class="barra_lateral">
         <a href="/admin"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
         <ul>
-            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-house"></i> Inicio </a></li>
-            <li><a class="enlace_barra_lateral_fijo" href="/admin/pedidos"><i class="fa-solid fa-truck"></i> Gestión de pedidos</a></li>
-            <li><a class="enlace_barra_lateral" href="/admin/inventario"><i class="fa-solid fa-boxes-packing"></i> Gestión de productos</a></li>
-            <li><a class="enlace_barra_lateral" href="/admin/usuarios"><i class="fa-solid fa-users"></i> Gestión de usuarios</a></li>
-            <li><a class="enlace_barra_lateral" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i> Reportes</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/pedidos"><i class="fa-solid fa-truck"></i> Gestión de
+                    pedidos</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/inventario"><i class="fa-solid fa-boxes-packing"></i>
+                    Gestión de productos</a></li>
+            <li><a class="enlace_barra_lateral_fijo" href="/admin/usuarios"><i class="fa-solid fa-users"></i> Gestión de
+                    usuarios</a></li>
+            <li><a class="enlace_barra_lateral" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i>
+                    Reportes</a></li>
         </ul>
     </nav>
 
@@ -40,130 +45,151 @@
             </section>
         </header>
 
-        <main class="main-content">
-            <div class="content-header">
-                <h1 style="font-size: 36px; font-weight: 700; margin-bottom: 16px; color: #fff;">Gestión de Usuarios</h1>
+        <div class="principal">
+            <h1>Gestión de Usuarios</h1>
+
+            <!-- Filtros -->
+            <div class="filtros-container">
                 <div class="search-container">
-                    <input type="text" class="search-input" placeholder="Buscar usuarios...">
-                    <button class="search-button">🔍</button>
+                    <input type="text" class="search-input" id="search-usuarios" placeholder="Buscar usuarios...">
+                    <button class="search-button" id="search-btn-usuarios"><i
+                            class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+
+                <div class="filtros-categorias">
+                    <select id="filtro-rol" class="filtro-select">
+                        <option value="">Todos los roles</option>
+                    </select>
+
+                    <select id="filtro-estado" class="filtro-select">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary" id="btn-agregar-usuario">
+                    <i class="fa-solid fa-user-plus"></i> Agregar Usuario
+                </button>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="total-usuarios">0</span>
+                        <span class="stat-label">Total Usuarios</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="usuarios-activos">0</span>
+                        <span class="stat-label">Usuarios Activos</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-user-slash"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="usuarios-inactivos">0</span>
+                        <span class="stat-label">Usuarios Inactivos</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="total-admins">0</span>
+                        <span class="stat-label">Administradores</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="section-header">
-                <h2>Lista de Usuarios</h2>
-                <span class="badge">892 usuarios</span>
+            <!-- Lista de usuarios -->
+            <div class="productos-admin-container">
+                <div class="table-container">
+                    <table id="tabla-usuarios">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Fecha Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuarios-body">
+                            <!-- Los usuarios se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+    </main>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Rol</th>
-                            <th>Estado</th>
-                            <th>Fecha Registro</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#USR-001</td>
-                            <td>Juan Pérez</td>
-                            <td>juan.perez@email.com</td>
-                            <td><span class="status-badge processing">Admin</span></td>
-                            <td><span class="status-badge completed">Activo</span></td>
-                            <td>2024-01-10</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="Ver">👁️</button>
-                                    <button class="btn-icon" title="Editar">✏️</button>
-                                    <button class="btn-icon delete" title="Eliminar">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#USR-002</td>
-                            <td>María García</td>
-                            <td>maria.garcia@email.com</td>
-                            <td><span class="status-badge pending">Cliente</span></td>
-                            <td><span class="status-badge completed">Activo</span></td>
-                            <td>2024-01-12</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="Ver">👁️</button>
-                                    <button class="btn-icon" title="Editar">✏️</button>
-                                    <button class="btn-icon delete" title="Eliminar">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#USR-003</td>
-                            <td>Carlos López</td>
-                            <td>carlos.lopez@email.com</td>
-                            <td><span class="status-badge pending">Cliente</span></td>
-                            <td><span class="status-badge completed">Activo</span></td>
-                            <td>2024-01-13</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="Ver">👁️</button>
-                                    <button class="btn-icon" title="Editar">✏️</button>
-                                    <button class="btn-icon delete" title="Eliminar">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#USR-004</td>
-                            <td>Ana Martínez</td>
-                            <td>ana.martinez@email.com</td>
-                            <td><span class="status-badge processing">Moderador</span></td>
-                            <td><span class="status-badge completed">Activo</span></td>
-                            <td>2024-01-14</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="Ver">👁️</button>
-                                    <button class="btn-icon" title="Editar">✏️</button>
-                                    <button class="btn-icon delete" title="Eliminar">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#USR-005</td>
-                            <td>Luis Rodríguez</td>
-                            <td>luis.rodriguez@email.com</td>
-                            <td><span class="status-badge pending">Cliente</span></td>
-                            <td><span class="status-badge cancelled">Inactivo</span></td>
-                            <td>2024-01-08</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="Ver">👁️</button>
-                                    <button class="btn-icon" title="Editar">✏️</button>
-                                    <button class="btn-icon delete" title="Eliminar">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#USR-006</td>
-                            <td>Sofia Hernández</td>
-                            <td>sofia.hernandez@email.com</td>
-                            <td><span class="status-badge pending">Cliente</span></td>
-                            <td><span class="status-badge completed">Activo</span></td>
-                            <td>2024-01-15</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="Ver">👁️</button>
-                                    <button class="btn-icon" title="Editar">✏️</button>
-                                    <button class="btn-icon delete" title="Eliminar">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <!-- Modal para agregar/editar usuario -->
+    <div id="modal-usuario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-titulo">Agregar Usuario</h2>
+                <button class="modal-close" id="modal-cerrar">&times;</button>
             </div>
-        </main>
+            <form id="form-usuario">
+                <input type="hidden" id="usuario-id">
+
+                <div class="form-group">
+                    <label for="usuario-username" class="required">Nombre de Usuario</label>
+                    <input type="text" id="usuario-username" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="usuario-email" class="required">Email</label>
+                    <input type="email" id="usuario-email" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="usuario-password" id="label-password" class="required">Contraseña</label>
+                        <input type="password" id="usuario-password" minlength="8">
+                        <small style="color: #a0a0a0; font-size: 12px;">Mínimo 8 caracteres (solo para nuevos
+                            usuarios)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuario-rol" class="required">Rol</label>
+                        <select id="usuario-rol" required>
+                            <option value="">Seleccionar rol</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="usuario-activo">
+                        <input type="checkbox" id="usuario-activo" checked>
+                        Usuario Activo
+                    </label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary" id="btn-guardar-usuario">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <script src="../static/js/script.js"></script>
-    <script src="../static/js/Clientes.js"></script>
+
+    <!-- Scripts -->
+    <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/admin-usuarios.js"></script>
 </body>
+
 </html>
