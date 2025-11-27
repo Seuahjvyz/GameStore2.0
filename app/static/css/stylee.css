@@ -4385,3 +4385,159 @@ tr:last-child td {
         justify-self: end;
     }
 }
+
+
+/* Estilos para PayPal */
+.paypal-buttons-container {
+    margin: 2rem 0;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-paypal {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
+    border: 1px solid #8b5cf6;
+    margin-top: 1rem;
+}
+
+.info-paypal p {
+    margin: 0.5rem 0;
+    color: #a0a0a0;
+    font-size: 0.9rem;
+}
+
+.info-paypal i {
+    color: #8b5cf6;
+    margin-right: 0.5rem;
+}
+
+/* Ocultar formulario de tarjeta cuando se selecciona PayPal */
+.metodo-pago-seccion .datos-tarjeta {
+    display: none;
+}
+
+/* Estilos para PayPal */
+.paypal-only-message {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.paypal-only-message i {
+    font-size: 3rem;
+    color: #0070ba;
+    margin-bottom: 10px;
+}
+
+.paypal-only-message p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.paypal-buttons-container {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-paypal {
+    text-align: center;
+    color: #6c757d;
+}
+
+.loading-paypal i {
+    margin-right: 10px;
+}
+
+.processing-payment {
+    text-align: center;
+    color: #0070ba;
+    font-weight: bold;
+}
+
+.paypal-error {
+    text-align: center;
+    padding: 30px;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    color: #721c24;
+}
+
+.paypal-error .error-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #dc3545;
+}
+
+.paypal-error h4 {
+    margin-bottom: 10px;
+}
+
+.paypal-error p {
+    margin-bottom: 20px;
+}
+
+.error-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-reintentar, .btn-volver {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-reintentar {
+    background: #0070ba;
+    color: white;
+}
+
+.btn-volver {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-reintentar:hover {
+    background: #005ea6;
+}
+
+.btn-volver:hover {
+    background: #5a6268;
+}
+
+/* Botón de pagar mejorado */
+.btn-pagar {
+    background: #0070ba;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+
+.btn-pagar:hover {
+    background: #005ea6;
+}
+
+.btn-pagar i {
+    margin-right: 10px;
+}

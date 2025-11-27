@@ -63,43 +63,72 @@
             </section>
         </header>
 
-        <div class="principal" style="color: white;">
-            <div class="carrito-page">
-                <div class="carrito">
-                    <h1>Carrito de Compras</h1>
-                    <p class="subtitulo">Los productos que has añadido a tu carrito</p>
-
-                    <!-- Container para el carrito dinámico -->
-                    <div id="carrito-container">
-                        <div class="loading-carrito">
-                            <i class="fa-solid fa-spinner fa-spin"></i> Cargando carrito...
-                        </div>
-                    </div>
+    <div class="container">
+        <div class="compra-exitosa">
+            <div class="icono-exito">
+                <i class="fa-solid fa-check-circle"></i>
+            </div>
+            <h2>¡Pago Exitoso!</h2>
+            <p>Tu pago ha sido procesado correctamente</p>
+            
+            <div class="detalles-pedido" id="detallesPedido">
+                <div class="loading-pedido">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando detalles del pedido...
                 </div>
             </div>
+            
+            <div class="detalles-compra">
+                <p><i class="fa-solid fa-check"></i> Pago confirmado por PayPal</p>
+                <p><i class="fa-solid fa-check"></i> Pedido procesado</p>
+                <p><i class="fa-solid fa-check"></i> Recibirás un email de confirmación</p>
+            </div>
+            <div class="acciones-compra">
+                <a href="/pedidos" class="btn-ver-pedidos">
+                    <i class="fa-solid fa-list"></i> Ver mis pedidos
+                </a>
+                <a href="/" class="btn-seguir-comprando">
+                    <i class="fa-solid fa-shopping-cart"></i> Seguir comprando
+                </a>
+            </div>
         </div>
-    </main>
-
-    <!-- Scripts -->
-    <script src="/static/js/user-menu.js"></script>
-    <script src="/static/js/carrito-dinamico.js"></script>
-    <script src="/static/js/productos-dinamicos.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="/static/js/favoritos-backbone.js"></script>
-    <script src="/static/js/carrito-sync.js"></script>
+    </div>
 
     <script>
-        // Escuchar actualizaciones de productos
-        document.addEventListener('productosActualizados', function () {
-            console.log('🔄 Recargando productos por actualización...');
-            if (window.ProductosController) {
-                ProductosController.cargarProductos();
+        // Cargar detalles del pedido desde la URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pedidoId = urlParams.get('pedido_id');
+            
+            if (pedidoId) {
+                cargarDetallesPedido(pedidoId);
             }
         });
+
+        async function cargarDetallesPedido(pedidoId) {
+            try {
+                const response = await fetch(`/api/pedidos/detalles/${pedidoId}`);
+                const data = await response.json();
+                
+                const container = document.getElementById('detallesPedido');
+                
+                if (data.success) {
+                    container.innerHTML = `
+                        <div class="info-pedido">
+                            <p><strong>Número de pedido:</strong> #${data.pedido.id_pedido}</p>
+                            <p><strong>Total:</strong> $${parseFloat(data.pedido.total).toFixed(2)}</p>
+                            <p><strong>Fecha:</strong> ${new Date(data.pedido.fecha_pedido).toLocaleDateString()}</p>
+                            <p><strong>Estado:</strong> <span class="estado-pedido">${data.pedido.estado}</span></p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<p class="error">No se pudieron cargar los detalles del pedido</p>`;
+                }
+            } catch (error) {
+                console.error('Error cargando detalles del pedido:', error);
+                document.getElementById('detallesPedido').innerHTML = 
+                    `<p class="error">Error al cargar detalles del pedido</p>`;
+            }
+        }
     </script>
-
 </body>
-
 </html>

@@ -3,6 +3,12 @@ import re
 from urllib.parse import urlparse
 
 class Config:
+    
+    # PayPal Configuration
+    PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', 'AYTSE0ArUGWvO29fpicACxOAmMPpVmlF30LzJg7dptoX6DDySJJ_CrFlnOdhqmcFT7modd8eTVydWZvb')
+    PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', 'EMA2vOKqstAjAZSzTU7V_mFOywC0iePTzVGUFd07pExHKyGBm_pmYe159R1oOg2THCCxPf-LMHZ9gQni')
+    PAYPAL_MODE = 'sandbox'
+    
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-super-secreta-para-flask'
     
     DATABASE_URL = os.environ.get('DATABASE_URL')
