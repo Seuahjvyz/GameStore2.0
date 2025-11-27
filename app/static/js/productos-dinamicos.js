@@ -247,7 +247,6 @@ const ProductosController = {
         this.verificarAutenticacion()
             .then(autenticado => {
                 if (!autenticado) {
-                    this.mostrarNotificacion('Inicia sesión para poder agregar productos al carrito', 'error');
                     return;
                 }
 
