@@ -4295,8 +4295,8 @@ tr:last-child td {
     padding: 3rem;
     background: #3a3a3a;
     border-radius: 12px;
+    margin: 50px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: 2px solid #8b5cf6;
     color: white;
 }
 

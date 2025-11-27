@@ -71,64 +71,22 @@
             <h2>¡Pago Exitoso!</h2>
             <p>Tu pago ha sido procesado correctamente</p>
             
-            <div class="detalles-pedido" id="detallesPedido">
-                <div class="loading-pedido">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando detalles del pedido...
-                </div>
-            </div>
             
-            <div class="detalles-compra">
-                <p><i class="fa-solid fa-check"></i> Pago confirmado por PayPal</p>
-                <p><i class="fa-solid fa-check"></i> Pedido procesado</p>
-                <p><i class="fa-solid fa-check"></i> Recibirás un email de confirmación</p>
-            </div>
+            
+            
             <div class="acciones-compra">
                 <a href="/pedidos" class="btn-ver-pedidos">
-                    <i class="fa-solid fa-list"></i> Ver mis pedidos
+                    <i class="fa-solid fa-box"></i> Ver mis pedidos
                 </a>
                 <a href="/" class="btn-seguir-comprando">
-                    <i class="fa-solid fa-shopping-cart"></i> Seguir comprando
+                    <i class="fa-solid fa-house"></i> Seguir comprando
                 </a>
             </div>
         </div>
     </div>
 
-    <script>
-        // Cargar detalles del pedido desde la URL
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const pedidoId = urlParams.get('pedido_id');
-            
-            if (pedidoId) {
-                cargarDetallesPedido(pedidoId);
-            }
-        });
+    <script src="/static/js/user-menu.js"></script>
 
-        async function cargarDetallesPedido(pedidoId) {
-            try {
-                const response = await fetch(`/api/pedidos/detalles/${pedidoId}`);
-                const data = await response.json();
-                
-                const container = document.getElementById('detallesPedido');
-                
-                if (data.success) {
-                    container.innerHTML = `
-                        <div class="info-pedido">
-                            <p><strong>Número de pedido:</strong> #${data.pedido.id_pedido}</p>
-                            <p><strong>Total:</strong> $${parseFloat(data.pedido.total).toFixed(2)}</p>
-                            <p><strong>Fecha:</strong> ${new Date(data.pedido.fecha_pedido).toLocaleDateString()}</p>
-                            <p><strong>Estado:</strong> <span class="estado-pedido">${data.pedido.estado}</span></p>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = `<p class="error">No se pudieron cargar los detalles del pedido</p>`;
-                }
-            } catch (error) {
-                console.error('Error cargando detalles del pedido:', error);
-                document.getElementById('detallesPedido').innerHTML = 
-                    `<p class="error">Error al cargar detalles del pedido</p>`;
-            }
-        }
-    </script>
+    
 </body>
 </html>

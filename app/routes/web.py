@@ -1800,61 +1800,129 @@ def debug_favoritos():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@web_bp.route('/api/admin/pedidos/crear-prueba', methods=['POST'])
-@admin_required
-def api_crear_pedidos_prueba():
-    """Crear pedidos de prueba (eliminar en producción)"""
+@web_bp.route('/api/pedidos/crear-paypal', methods=['POST'])
+@login_required
+def crear_pedido_paypal():
     try:
-        from app.models.pedido import Pedido, PedidoItem
-        from app.models.usuario import Usuario
-        from app.models.models import Producto
+        # Obtener el usuario actual
+        usuario_id = session.get('user_id')
         
-        # Crear algunos pedidos de prueba
-        usuarios = Usuario.query.limit(3).all()
-        productos = Producto.query.limit(5).all()
+        # Obtener el carrito del usuario
+        carrito = Carrito.query.filter_by(usuario_id=usuario_id).first()
+        if not carrito or not carrito.items:
+            return jsonify({'success': False, 'error': 'Carrito vacío'})
         
-        if not usuarios or not productos:
-            return jsonify({'success': False, 'error': 'Necesitas usuarios y productos para crear pedidos de prueba'}), 400
+        # Calcular total
+        total = sum(item.cantidad * item.producto.precio for item in carrito.items)
         
-        estados = ['pendiente', 'procesando', 'completado', 'cancelado']
+        # Crear pedido en la base de datos
+        nuevo_pedido = Pedido(
+            usuario_id=usuario_id,
+            total=total,
+            estado='pendiente',
+            metodo_pago='paypal'
+        )
         
-        for i in range(5):
-            usuario = usuarios[i % len(usuarios)]
-            pedido = Pedido(
-                usuario_id=usuario.id_usuario,
-                total=0,
-                estado=estados[i % len(estados)],
-                direccion_envio=f"Dirección de prueba {i+1}"
+        db.session.add(nuevo_pedido)
+        db.session.flush()  # Para obtener el ID
+        
+        # Crear items del pedido
+        for item in carrito.items:
+            pedido_item = PedidoItem(
+                pedido_id=nuevo_pedido.id_pedido,
+                producto_id=item.producto_id,
+                cantidad=item.cantidad,
+                precio_unitario=item.producto.precio
             )
-            db.session.add(pedido)
-            db.session.flush()
-            
-            # Agregar items al pedido
-            total_pedido = 0
-            for j in range(2):
-                producto = productos[(i + j) % len(productos)]
-                cantidad = (i + j + 1) % 3 + 1
-                precio = float(producto.precio) if producto.precio else 50.00
-                total_item = precio * cantidad
-                total_pedido += total_item
-                
-                item = PedidoItem(
-                    pedido_id=pedido.id_pedido,
-                    producto_id=producto.id_producto,
-                    cantidad=cantidad,
-                    precio_unitario=precio
-                )
-                db.session.add(item)
-            
-            pedido.total = total_pedido
-            db.session.commit()
+            db.session.add(pedido_item)
+        
+        db.session.commit()
         
         return jsonify({
-            'success': True,
-            'message': '5 pedidos de prueba creados exitosamente'
+            'success': True, 
+            'pedido_id': nuevo_pedido.id_pedido,
+            'total': float(total)
         })
         
     except Exception as e:
         db.session.rollback()
-        print(f"Error creando pedidos de prueba: {e}")
-        return jsonify({'success': False, 'error': 'Error al crear pedidos de prueba'}), 500
+        return jsonify({'success': False, 'error': str(e)})
+    
+@web_bp.route('/api/pedidos/confirmar-paypal', methods=['POST'])
+@login_required
+def confirmar_pedido_paypal():
+    try:
+        data = request.get_json()
+        pedido_id = data.get('pedido_id')
+        detalles_paypal = data.get('detalles_paypal', {})
+        
+        # Buscar el pedido
+        pedido = Pedido.query.get(pedido_id)
+        if not pedido:
+            return jsonify({'success': False, 'error': 'Pedido no encontrado'})
+        
+        # Actualizar pedido
+        pedido.estado = 'completado'
+        pedido.id_transaccion_paypal = detalles_paypal.get('id', '')
+        
+        # Limpiar carrito
+        carrito = Carrito.query.filter_by(usuario_id=pedido.usuario_id).first()
+        if carrito:
+            # Eliminar items del carrito
+            CarritoItem.query.filter_by(carrito_id=carrito.id_carrito).delete()
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Pedido confirmado exitosamente'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+    
+    
+@web_bp.route('/api/pedidos/detalles/<int:pedido_id>')
+@login_required
+def obtener_detalles_pedido(pedido_id):
+    try:
+        usuario_id = session.get('user_id')
+        
+        # Buscar pedido (solo del usuario actual)
+        pedido = Pedido.query.filter_by(
+            id_pedido=pedido_id, 
+            usuario_id=usuario_id
+        ).first()
+        
+        if not pedido:
+            return jsonify({'success': False, 'error': 'Pedido no encontrado'})
+        
+        # Obtener items del pedido
+        items = PedidoItem.query.filter_by(pedido_id=pedido_id).all()
+        
+        pedido_data = {
+            'id_pedido': pedido.id_pedido,
+            'fecha_pedido': pedido.fecha_pedido.isoformat(),
+            'total': float(pedido.total),
+            'estado': pedido.estado,
+            'metodo_pago': pedido.metodo_pago,
+            'items': []
+        }
+        
+        for item in items:
+            producto = Producto.query.get(item.producto_id)
+            pedido_data['items'].append({
+                'nombre': producto.nombre,
+                'cantidad': item.cantidad,
+                'precio_unitario': float(item.precio_unitario),
+                'subtotal': float(item.cantidad * item.precio_unitario)
+            })
+        
+        return jsonify({
+            'success': True,
+            'pedido': pedido_data
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})

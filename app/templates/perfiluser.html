@@ -68,50 +68,34 @@
 
 
         <!-- Contenido del Perfil Centrado -->
-        <div class="principal" style="align-items: center; justify-content: center; display: flex;">
-            <div class="perfil-contenedor-centrado">
-                <h1 class="titulo-centrado">Mi Cuenta</h1>
+        <div class="principal">
+            <div class="contenido-centrado">
+                <div class="perfil-contenedor-centrado">
+                    <h1 class="titulo-centrado">Mi perfil</h1>
 
-                <div class="perfil-card-centrado">
-                    <h2 class="nombre-usuario">Aidee Martinez</h2>
-                    <p class="numero-cliente">No. Cliente #2176328</p>
+                    <div class="perfil-card-centrado">
+                        <h2 class="nombre-usuario">{{ usuario.nombre_usuario }}</h2>
+                        <p class="numero-cliente">Usuario #{{ usuario.id_usuario }}</p>
 
-                    <div class="separador"></div>
+                        <div class="separador"></div>
 
-                    <div class="datos-usuario">
-                        <div class="dato-fila">
-                            <span class="dato-label">Miembro desde:</span>
-                            <span class="dato-valor">Enero 2023</span>
-                        </div>
-                        <div class="dato-fila">
-                            <span class="dato-label">Último acceso:</span>
-                            <span class="dato-valor">Hoy</span>
-                        </div>
-                        <div class="dato-fila">
-                            <span class="dato-label">Pedidos realizados:</span>
-                            <span class="dato-valor">15</span>
-                        </div>
-                    </div>
-
-                    <div class="separador"></div>
-
-                    <div class="acciones-grid">
-                        <div class="accion-par">
-                            <div class="accion-item-simple" onclick="window.location.href='perfiluser/mis-datos.html'">
-                                <span class="accion-texto">Mis Datos</span>
+                        <div class="datos-usuario">
+                            <div class="dato-fila">
+                                <span class="dato-label">Email:</span>
+                                <span class="dato-valor">{{ usuario.correo }}</span>
                             </div>
-                            <div class="accion-item-simple" onclick="window.location.href='pedidos.html'">
-                                <span class="accion-texto">Historial de Compras</span>
+                            <div class="dato-fila">
+                                <span class="dato-label">Rol:</span>
+                                <span class="dato-valor">cliente</span>
+                            </div>
+                            <div class="dato-fila">
+                                <span class="dato-label">ID de Usuario:</span>
+                                <span class="dato-valor">{{ usuario.id_usuario }}</span>
                             </div>
                         </div>
-                        <div class="accion-par">
-                            <div class="accion-item-simple" onclick="window.location.href='favoritos.html'">
-                                <span class="accion-texto">Mis Favoritos</span>
-                            </div>
-                            <div class="accion-item-simple" onclick="window.location.href='perfiluser/direccion.html'">
-                                <span class="accion-texto">Dirección de Envío</span>
-                            </div>
-                        </div>
+
+                        <div class="separador"></div>
+
                     </div>
                 </div>
             </div>
