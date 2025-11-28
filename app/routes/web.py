@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
 from app import db
 import datetime
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,  current_app
 from app.models.pedido import Pedido, PedidoItem
 from app.models.usuario import Usuario
 from app.models.models import Carrito, CarritoItem, Producto, Categoria
@@ -1926,3 +1926,30 @@ def obtener_detalles_pedido(pedido_id):
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+    
+@web_bp.route('/api/paypal/config')
+def api_paypal_config():
+    """Endpoint seguro para obtener configuración de PayPal"""
+    try:
+        # Obtener del archivo de configuración (.env)
+        client_id = current_app.config.get('PAYPAL_CLIENT_ID')
+        mode = current_app.config.get('PAYPAL_MODE', 'sandbox')
+        
+        if not client_id:
+            return jsonify({
+                'success': False, 
+                'error': 'Configuración de PayPal no encontrada'
+            }), 500
+        
+        return jsonify({
+            'success': True,
+            'client_id': client_id,
+            'mode': mode
+        })
+        
+    except Exception as e:
+        print(f"Error en api_paypal_config: {e}")
+        return jsonify({
+            'success': False, 
+            'error': 'Error interno del servidor'
+        }), 500

@@ -374,32 +374,84 @@ class CarritoDinamico {
     }
 
     // Precargar PayPal SDK al inicio - CONFIGURADO PARA SANDBOX
-    preloadPayPalSDK() {
-        if (window.paypal || this.paypalSDKCargado) {
-            return;
+preloadPayPalSDK() {
+    if (window.paypal || this.paypalSDKCargado) {
+        return;
+    }
+
+    console.log('📥 Precargando PayPal SDK de forma segura...');
+    
+    this.cargarPayPalDeFormaSegura();
+}
+
+async cargarPayPalDeFormaSegura() {
+    try {
+        // 1. Obtener configuración del backend
+        const config = await this.obtenerConfiguracionPayPal();
+        
+        if (!config || !config.client_id) {
+            throw new Error('Configuración de PayPal no disponible');
         }
 
-        console.log('📥 Precargando PayPal SDK (Sandbox)...');
-        
-        // ✅ CLIENT ID COMPLETO DE SANDBOX
-        const CLIENT_ID_SANDBOX = 'AYTSE0ArUGWvO29fpicACxOAmMPpVmlF30LzJg7dptoX6DDySJJ_CrFlnOdhqmcFT7modd8eTVydWZvb';
-        
+        console.log('🔐 Configuración PayPal obtenida:', { 
+            client_id: config.client_id.substring(0, 10) + '...', 
+            mode: config.mode 
+        });
+
+        // 2. Determinar la URL correcta (sandbox vs live)
+        const baseUrl = config.mode === 'live' 
+            ? 'https://www.paypal.com' 
+            : 'https://www.sandbox.paypal.com';
+
+        // 3. Cargar SDK
         const script = document.createElement('script');
-        // ✅ URL CORRECTA DE SANDBOX
-        script.src = `https://www.sandbox.paypal.com/sdk/js?client-id=${CLIENT_ID_SANDBOX}&currency=USD&intent=capture`;
+        script.src = `${baseUrl}/sdk/js?client-id=${config.client_id}&currency=USD&intent=capture`;
         
         script.onload = () => {
-            console.log('✅ PayPal SDK (Sandbox) precargado exitosamente');
+            console.log('✅ PayPal SDK cargado exitosamente');
             this.paypalSDKCargado = true;
         };
         
         script.onerror = (error) => {
-            console.error('❌ Error precargando PayPal SDK (Sandbox):', error);
-            this.mostrarNotificacion('Error al cargar PayPal. Verifica tu conexión.', 'error');
+            console.error('❌ Error cargando PayPal SDK:', error);
+            this.mostrarErrorPayPal('No se pudo cargar PayPal. Verifica tu conexión.');
         };
         
         document.body.appendChild(script);
+
+    } catch (error) {
+        console.error('❌ Error en carga segura de PayPal:', error);
+        this.mostrarErrorPayPal('Error de configuración: ' + error.message);
     }
+}
+
+async obtenerConfiguracionPayPal() {
+    try {
+        const response = await fetch('/api/paypal/config');
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            return data;
+        } else {
+            throw new Error(data.error || 'Error del servidor');
+        }
+    } catch (error) {
+        console.error('Error obteniendo configuración PayPal:', error);
+        return null;
+    }
+}
+
+mostrarErrorPayPal(mensaje) {
+    this.mostrarNotificacion(mensaje, 'error');
+    
+    // También mostrar en la consola para debugging
+    console.error('🔴 Error PayPal:', mensaje);
+}
 
     async inicializarPayPal() {
         console.log('🔄 Inicializando PayPal (Sandbox)...');

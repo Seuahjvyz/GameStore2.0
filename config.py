@@ -1,13 +1,20 @@
 import os
 import re
 from urllib.parse import urlparse
+from dotenv import load_dotenv
+
 
 class Config:
     
-    # PayPal Configuration
-    PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', 'AYTSE0ArUGWvO29fpicACxOAmMPpVmlF30LzJg7dptoX6DDySJJ_CrFlnOdhqmcFT7modd8eTVydWZvb')
-    PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', 'EMA2vOKqstAjAZSzTU7V_mFOywC0iePTzVGUFd07pExHKyGBm_pmYe159R1oOg2THCCxPf-LMHZ9gQni')
-    PAYPAL_MODE = 'sandbox'
+    # PayPal Configuration - SIN CREDENCIALES HARDCODEADAS
+    PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
+    PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET') 
+    PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')
+    
+    
+    # Validar que existan las variables de entorno
+    if not PAYPAL_CLIENT_ID or not PAYPAL_CLIENT_SECRET:
+        raise ValueError("ERROR: PayPal credentials not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET environment variables.")
     
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-super-secreta-para-flask'
     

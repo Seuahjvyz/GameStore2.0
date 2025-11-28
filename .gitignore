@@ -47,3 +47,27 @@ docker-compose.override.yml
 *.tmp
 *.bak
 *.swp
+
+
+# Credenciales y configuraciones sensibles
+.env
+.env.local
+.env.production
+*.env
+.env.*
+
+# Archivos de configuración con datos sensibles
+config.py
+*/config.py
+*config*.py
+
+# Claves y certificados
+*.key
+*.pem
+*.crt
+*.cer
+
+# Logs y archivos temporales
+*.log
+*.tmp
+*.temp
