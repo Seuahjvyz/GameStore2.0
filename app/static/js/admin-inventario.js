@@ -264,7 +264,6 @@ class AdminInventario {
         document.getElementById('producto-activo').checked = producto.activo;
     }
 
-    // En admin-inventario.js, modificar la función guardarProducto:
 // En admin-inventario.js, modificar la función guardarProducto:
 async guardarProducto() {
     const formData = {

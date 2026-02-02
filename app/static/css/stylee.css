@@ -74,6 +74,7 @@ nav i {
     align-items: center;
     padding: 1px 10px;
     transition: 0.3s;
+    justify-content: center;
 }
 
 .enlace_barra_lateral:hover {
