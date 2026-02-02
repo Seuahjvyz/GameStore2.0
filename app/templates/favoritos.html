@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Game Store</title>
-    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
-    <link rel="stylesheet" href="/static/css/stylee.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <script></script>
-</head>
+{% block title %}Favoritos{% endblock %}
+
+{% block content %}
 
 <nav class="barra_lateral">
     <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
@@ -99,6 +93,4 @@
     });
 </script>
 
-</body>
-
-</html>
+{% endblock %}

@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "layout.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Registro Admin - Game Store</title>
-    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-</head>
 
-<body class="pagina-auth">
+
+{% block content %}
+
     <main>
         <div class="principal-auth">
             <div class="main-content-auth">
@@ -67,6 +61,4 @@
     <script src="/static/js/favoritos-backbone.js"></script>
     <script src="/static/js/registro-admin.js"></script>
 
-</body>
-
-</html>
+{% endblock %}

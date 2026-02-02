@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "layout.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Iniciar Sesión - Game Store</title>
-    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-</head>
 
-<body>
+
+{% block content %}
         <!-- Contenido Principal -->
         <div class="main-content">
             <div class="container">
@@ -52,27 +45,10 @@
             </div>
         </div>
 
-
-        <!-- BACKBONE MODULES -->
-    <script src="/static/js/models/producto.model.js"></script>
-    <script src="/static/js/collections/productos.collection.js"></script>
-    <script src="/static/js/views/producto.view.js"></script>
-    <script src="/static/js/user-menu.js"></script>
-    <script src="/static/js/main.js"></script>
-    <script src="/static/js/agregar-carrito.js"></script>
-
-
     <!-- En la sección de scripts, después de user-menu.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="/static/js/models/carrito.js"></script>
-    <script src="/static/js/views/carrito-view.js"></script>
-    <script src="/static/js/app-carrito.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.1/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"></script>
     <script src="/static/js/login.js"></script>
-</body>
 
-</html>
+{% endblock %}

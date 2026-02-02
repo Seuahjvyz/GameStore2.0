@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "layout.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Carrito</title>
-    <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
-    <link rel="stylesheet" href="/static/css/stylee.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <!-- REMOVIDO: El SDK de PayPal ahora se carga dinámicamente -->
-</head>
 
-<body>
+
+{% block content %}
 
     <nav class="barra_lateral">
         <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
@@ -87,6 +79,4 @@
 
     <script src="/static/js/user-menu.js"></script>
 
-    
-</body>
-</html>
+{% endblock %}
