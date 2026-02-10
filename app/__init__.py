@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -49,6 +49,18 @@ def create_app():
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'web.login'
+
+    #Manejador de Errores 
+    @app.errorhandler(404)
+    def page_not_found(error):
+        if request.path.startswith('/api/'):
+            return jsonify({
+                'success':False,
+                'error': "Recurso no encontrado",
+                'path': request.path,
+                'code': 404
+            }), 404
+        return render_template('404.html'), 404
     
     # Registrar blueprints
     from app.routes.web import web_bp
