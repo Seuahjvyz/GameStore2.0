@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Poppins:wght@300;600&display=swap');
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background-color: #0a0514; 
+}
+
+.contenedor-error {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, #431d75 0%, #0a0514 100%);
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+}
+
+.mensaje-error h1 {
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 100px;
+    margin: 0;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 
+        4px 3px 1px #8a2be2, 
+        -3px -3px 1px #c8b6ff;
+    position: relative;
+    animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { 
+        filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.4)); 
+    }
+    to { 
+        filter: drop-shadow(0 0 30px rgba(200, 182, 255, 0.8)); 
+    }
+
+        0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+
+}
+
+.mensaje-error h2 {
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    letter-spacing: 12px; 
+    text-transform: uppercase;
+    color: #e0aaff;
+    margin: 5px 0 20px 0;
+    font-weight: 400;
+}
+
+.mensaje-error p {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 450px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+    font-weight: 300;
+}
+
+.boton-volver {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    /* Efecto cristal */
+    background: rgba(138, 43, 226, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(224, 170, 255, 0.3);
+    border-radius: 4px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    max-width: 50%;
+    margin-left: 20% ;
+}
+
+.boton-volver:hover {
+    background: #8a2be2;
+    border-color: #fff;
+    box-shadow: 0 0 40px rgba(138, 43, 226, 0.6);
+    transform: scale(1.05) translateY(-5px);
+}

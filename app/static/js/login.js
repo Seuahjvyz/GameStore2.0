@@ -1,4 +1,3 @@
-// Modelo de Login para Backbone
 var Login = Backbone.Model.extend({
     defaults: {
         login_input: '',

@@ -51,6 +51,7 @@ def create_app():
     login_manager.login_view = 'web.login'
 
     #Manejador de Errores 
+    #
     @app.errorhandler(404)
     def page_not_found(error):
         if request.path.startswith('/api/'):
@@ -60,13 +61,11 @@ def create_app():
                 'path': request.path,
                 'code': 404
             }), 404
-        return render_template('404.html'), 404
+        return render_template('/errores/404.html'), 404
     
     # Registrar blueprints
     from app.routes.web import web_bp
-    from app.carrito.routes import carrito_bp
-    
-    # Registrar nuevos blueprints para API
+    from app.carrito.routes import carrito_bp    
     from app.api.productos import bp as productos_bp
     from app.api.carrito import bp as carrito_api_bp
     from app.api.auth import bp as auth_bp

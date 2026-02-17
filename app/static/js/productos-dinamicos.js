@@ -83,7 +83,7 @@ const ProductosController = {
         if (path.includes('/accesorios')) return 'Accesorios';
         if (path.includes('/')) return null;
         
-        console.log('ℹ️ No se detectó categoría específica, cargando todos los productos');
+        console.log('No se detectó categoría específica, cargando todos los productos');
         return null;
     },
 
@@ -126,7 +126,7 @@ const ProductosController = {
                     ${producto.stock > 0 ? 
                         `<button class="btn-agregar-carrito" 
                                 data-id="${producto.id}">
-                            <i class="fa-solid fa-cart-shopping"></i>Agregar al Carrito
+                            <i class="fa-solid fa-cart-arrow-down"></i>Agregar al Carrito
                         </button>` :
                         `<button class="btn-sin-stock" disabled>
                             <i class="fa-solid fa-times"></i>Sin Stock

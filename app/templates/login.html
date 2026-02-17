@@ -1,56 +1,48 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/static/css/style.css">
-{% endblock %} 
+<link rel="stylesheet" href="/static/css/style.css">
+{% endblock %}
 
 {% block content %}
-        <!-- Contenido Principal -->
-        <div class="main-content">
-            <div class="container">
-                <h1>Iniciar Sesión</h1>
+<!-- Contenido Principal -->
+<div class="main-content">
+    <div class="container">
+        <h1>Iniciar Sesión</h1>
 
-                <p class="description">Ingresa el nombre o correo electrónico registrado.</p>
+        <p class="description">Ingresa el nombre o correo electrónico registrado.</p>
 
-                <!-- AGREGAR ID AL FORMULARIO Y CONVERTIRLO EN FORM -->
-                <form id="login-form" class="form-section">
-                    <div class="form-line">
-                        <span class="label">Nombre de usuario o Correo electrónico</span>
-                        <!-- AGREGAR ID Y NAME -->
-                        <input type="text" id="login-input" name="login_input" class="input-field" 
-                               placeholder="Ingresa tu usuario o correo" required>
-                        <!-- AGREGAR SPAN PARA ERRORES -->
-                        <span class="error-message" id="login-input-error"></span>
-                    </div>
-
-                    <div class="form-line">
-                        <span class="label">Contraseña</span>
-                        <!-- AGREGAR ID Y NAME -->
-                        <input type="password" id="login-password" name="password" class="input-field" 
-                               placeholder="Ingresa tu contraseña" required>
-                        <!-- AGREGAR SPAN PARA ERRORES -->
-                        <span class="error-message" id="password-error"></span>
-                    </div>
-
-                    <div class="register-section">
-                        <!-- AGREGAR ID Y CAMBIAR A type="submit" -->
-                        <button type="submit" class="register-btn" id="login-btn">
-                            <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
-                        </button>
-                    </div>
-                </form>
-
-                <div class="sidebar-register-section">
-                    <p class="preguntaxd">¿No tienes cuenta?</p>
-                    <a class="sidebar-register-btn" href="/registro">Crear cuenta</a>
-                </div>
+        <form id="login-form" class="form-section">
+            <div class="form-line">
+                <span class="label">Nombre de usuario o Correo electrónico</span>
+                <input type="text" id="login-input" name="login_input" class="input-field"
+                    placeholder="Ingresa tu usuario o correo" required>
+                <span class="error-message" id="login-input-error"></span>
             </div>
-        </div>
 
-    <!-- En la sección de scripts, después de user-menu.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/static/js/login.js"></script>
+            <div class="form-line">
+                <span class="label">Contraseña</span>
+                <input type="password" id="login-password" name="password" class="input-field"
+                    placeholder="Ingresa tu contraseña" required>
+                <span class="error-message" id="password-error"></span>
+            </div>
+
+            <div class="register-section">
+                <button type="submit" class="register-btn" id="login-btn">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+            </div>
+        </form>
+
+        <div class="sidebar-register-section">
+            <p class="preguntaxd">¿No tienes cuenta?</p>
+            <a class="sidebar-register-btn" href="/registro">Crear cuenta</a>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+
+<script src="/static/js/login.js"></script>
 
 {% endblock %}

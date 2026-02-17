@@ -1,7 +1,7 @@
 // User menu functionality - ADMIN VERSION
 document.addEventListener('DOMContentLoaded', function() {
-    const userMenuBtn = document.getElementById('userMenuBtn');
-    const userDropdown = document.getElementById('userDropdown');
+    const userMenuBtn = document.getElementById('btn-menu-user');
+    const userDropdown = document.getElementById('menu-user');
     
     if (userMenuBtn && userDropdown) {
         userMenuBtn.addEventListener('click', function(e) {
@@ -47,9 +47,9 @@ async function cargarUsuarioActual() {
 }
 
 function actualizarMenuUsuario(usuario, estaLogueado, esAdmin) {
-    const dropdownContent = document.querySelector('.dropdown-content');
+    const dropdownContent = document.querySelector('.contenido-menu-user');
     if (!dropdownContent) {
-        console.error('No se encontró el elemento dropdown-content');
+        console.error('No se encontró el elemento contenido-menu-user');
         return;
     }
 
