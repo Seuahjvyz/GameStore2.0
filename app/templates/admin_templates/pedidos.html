@@ -1,76 +1,87 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/prov.css">
+{% endblock %}
 
 {% block content %}
 
-    <nav class="barra_lateral">
-        <a href="/admin"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+<header class="barra-superior">
+    <div class="boton">
+        <button id="btn-menu" class="btn-menu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="marca">
+        <h1>Game Store</h1>
+    </div>
+
+    <section class="iconos">
+       
+        <!-- Menu usuario -->
+
+        <button class="btn-menu-user" id="btn-menu-user">
+            <i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="menu-user" id="menu-user">
+            <div class="contenido-menu-user">
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
+        </div>
+    </section>
+</header>
+
+<div class="contenedor-principal">
+
+    <nav class="barra-lateral">
+        <div class="contenedor-logo">
+            <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        </div>
+
         <ul>
-            <li><a class="enlace_barra_lateral" href="/admin"><i class="fa-solid fa-house"></i> Inicio</a></li>
-            <li><a class="enlace_barra_lateral_fijo" href="/admin/pedidos"><i class="fa-solid fa-truck"></i> Gestión de
+            <li><a class="barra-lateral-link" href="/admin"><i class="fa-solid fa-house"></i> Inicio </a></li>
+            <li><a class="barra-lateral-link" href="/admin/pedidos"><i class="fa-solid fa-truck"></i> Gestión de
                     pedidos</a></li>
-            <li><a class="enlace_barra_lateral" href="/admin/inventario"><i class="fa-solid fa-boxes-packing"></i>
+            <li><a class="barra-lateral-link" href="/admin/inventario"><i class="fa-solid fa-boxes-packing"></i>
                     Gestión de productos</a></li>
-            <li><a class="enlace_barra_lateral" href="/admin/usuarios"><i class="fa-solid fa-users"></i> Gestión de
+            <li><a class="barra-lateral-link" href="/admin/usuarios"><i class="fa-solid fa-users"></i> Gestión de
                     usuarios</a></li>
-            <!--<li><a class="enlace_barra_lateral_fijo" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i> Reportes</a></li>-->
-
+            <!--<li><a class="barra-lateral_fijo" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i> Reportes</a></li>-->
         </ul>
+
     </nav>
+    <div class="principal">
+        <h1>Gestión de Pedidos</h1>
 
-    <main>
-        <header class="encabezado">
-            <section class="iconos">
-                <div class="user-menu-container">
-                    <button class="user-menu-btn" id="userMenuBtn">
-                        <i class="fa-solid fa-circle-user"></i>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="dropdown-content">
-                            <div class="loading-menu">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </header>
-
-
-
-
-        <div class="principal">
-            <h1>Gestión de Pedidos</h1>
-
-            <!-- Filtros -->
-            <div class="filtros-pedidos">
-                <div class="search-container">
-                    <input type="text" class="search-input" id="searchInput"
-                        placeholder="Buscar pedidos por cliente, producto o ID...">
-                    <button class="search-button" id="searchButton">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </div>
-
-
-                <select class="filtro-select" id="filtroEstado">
-                    <option value="">Todos los estados</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="procesando">Procesando</option>
-                    <option value="completado">Completado</option>
-                    <option value="cancelado">Cancelado</option>
-                </select>
-
-                <input type="date" class="filtro-select" id="filtroFechaInicio" placeholder="Fecha inicio">
-                <input type="date" class="filtro-select" id="filtroFechaFin" placeholder="Fecha fin">
-
-                <!--<button class="btn-secondary" id="btnLimpiarFiltros">
-                    <i class="fa-solid fa-broom"></i> Limpiar filtros
-                </button>-->
+        <!-- Filtros -->
+        <div class="filtros-pedidos">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput"
+                    placeholder="Buscar pedidos por cliente, producto o ID...">
+                <button class="search-button" id="searchButton">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
             </div>
 
-            <!--<div class="section-header">
+
+            <select class="filtro-select" id="filtroEstado">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="procesando">Procesando</option>
+                <option value="completado">Completado</option>
+                <option value="cancelado">Cancelado</option>
+            </select>
+
+            <input type="date" class="filtro-select" id="filtroFechaInicio" placeholder="Fecha inicio">
+            <input type="date" class="filtro-select" id="filtroFechaFin" placeholder="Fecha fin">
+
+            <!--<button class="btn-secondary" id="btnLimpiarFiltros">
+                    <i class="fa-solid fa-broom"></i> Limpiar filtros
+                </button>-->
+        </div>
+
+        <!--<div class="section-header">
                 <h2>Todos los Pedidos</h2>
                 <span class="badge" id="contadorPedidos">0 pedidos</span>
             </div>-->
@@ -78,64 +89,63 @@
 
 
 
-            <!-- Loading -->
-            <div id="loadingPedidos" class="loading-container">
-                <i class="fa-solid fa-spinner fa-spin"></i> Cargando pedidos...
-            </div>
-
-
-
-
-            <!-- Tabla de pedidos -->
-            <div class="table-container" id="tablaPedidosContainer" style="display: none;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Pedido</th>
-                            <th>Cliente</th>
-                            <th>Producto(s)</th>
-                            <th>Cantidad</th>
-                            <th>Total</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyPedidos">
-                        <!-- Los pedidos se cargarán aquí dinámicamente -->
-                    </tbody>
-                </table>
-            </div>
-
-
-
-
-            <!-- Mensaje cuando no hay pedidos -->
-            <div id="noPedidos" class="no-data-message" style="display: none;">
-                <i class="fa-solid fa-box-open"></i>
-                <h3>No hay pedidos</h3>
-                <p>No se encontraron pedidos con los filtros aplicados.</p>
-            </div>
+        <!-- Loading -->
+        <div id="loadingPedidos" class="loading-container">
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando pedidos...
         </div>
-    </main>
 
 
 
 
-    <!-- Modal para detalles del pedido -->
-    <div id="modalDetallePedido" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Detalle del Pedido <span id="modalNumeroPedido"></span></h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body" id="modalBodyDetalle">
-                <!-- Contenido dinámico -->
-            </div>
+        <!-- Tabla de pedidos -->
+        <div class="table-container" id="tablaPedidosContainer" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Pedido</th>
+                        <th>Cliente</th>
+                        <th>Producto(s)</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyPedidos">
+                    <!-- Los pedidos se cargarán aquí dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mensaje cuando no hay pedidos -->
+        <div id="noPedidos" class="no-data-message" style="display: none;">
+            <i class="fa-solid fa-box-open"></i>
+            <h3>No hay pedidos</h3>
+            <p>No se encontraron pedidos con los filtros aplicados.</p>
         </div>
     </div>
-    <script src="/static/js/admin-pedidos"></script>
-    <script src="/static/js/user-menu.js"></script>
-    <script src="../static/js/script.js"></script>
+</div>
+
+
+
+
+<!-- Modal para detalles del pedido -->
+<div id="modalDetallePedido" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Detalle del Pedido <span id="modalNumeroPedido"></span></h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBodyDetalle">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+</div>
+<script src="/static/js/admin-pedidos"></script>
+<script src="/static/js/user-menu.js"></script>
+<script src="../static/js/script.js"></script>
+<script src="/static/js/barra-lateral.js"></script>
+
 
 {% endblock %}

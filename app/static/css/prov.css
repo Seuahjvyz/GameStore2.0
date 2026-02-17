@@ -12,7 +12,7 @@ body {
     margin: 0;
     padding: 0;
     flex-direction: column;
-    background-color: #437bb3;
+    background-color: #2c2b2b; 
     min-height: 100vh;
     color: white;
     display: flex;
@@ -263,7 +263,6 @@ body {
     position: relative;
     border-right: 1px solid rgba(0, 0, 0, 0.2);
     overflow-y: auto; 
-
 }
 
 .divisor{
@@ -275,7 +274,6 @@ body {
     padding: 20px;
     margin: 0;
     flex: 1; 
-    min-height: 0; 
 }
 
 .barra-lateral-link i{
