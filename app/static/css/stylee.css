@@ -1415,29 +1415,7 @@
     }
 }
 
-/* Estilos para productos */
-.producto {
-    position: relative;
-}
 
-.btn-agregar-carrito:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-}
-
-/* Asegurar que el contenedor de productos tenga grid */
-.productos {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    padding: 20px 0;
-    width: 100%;
-}
-
-/* Transición suave para productos que se eliminan */
-.producto {
-    transition: opacity 0.3s ease;
-}
 
 
 

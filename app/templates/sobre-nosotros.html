@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Sobre Nosotros - Game Store{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/prov.css">
+{% endblock %}
+
+{% block content %}
+
+<header class="barra-superior">
+    <div class="boton">
+        <button id="btn-menu" class="btn-menu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="marca">
+        <h1>Game Store</h1>
+    </div>
+
+    <section class="iconos">
+        <div class="contenedor-btn-carrito">
+            <a class="btn-carrito" href="/carrito"><i class="fa-solid fa-cart-shopping"></i><span
+                    class="carrito-count">0</span></a>
+        </div>
+        <button class="btn-menu-user" id="btn-menu-user">
+            <i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="menu-user" id="menu-user">
+            <div class="contenido-menu-user">
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
+        </div>
+    </section>
+</header>
+
+<div class="contenedor-principal">
+    <nav class="barra-lateral">
+        <div class="contenedor-logo">
+            <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        </div>
+        <ul>
+            <li><a class="barra-lateral-link" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li>
+                <div class="divisor"></div>
+            </li>
+            <li><a class="barra-lateral-link" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+            <li><a class="barra-lateral-link" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
+            <li>
+                <div class="divisor"></div>
+            </li>
+            <li><a class="barra-lateral-link" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
+            <li><a class="barra-lateral-link" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a></li>
+            <li><a class="barra-lateral-link" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
+            <li><a class="barra-lateral-link" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
+            <br>
+        </ul>
+    </nav>
+
+    <div class="principal">
+        <div class="contenido">
+
+            <!-- HERO SECTION - QUIÉNES SOMOS -->
+            <section class="hero-sobre-nosotros">
+                <div class="hero-content">
+                    <h1>Game Vault</h1>
+                    <p class="hero-subtitulo">Más que una tienda, una comunidad gamer</p>
+                </div>
+            </section>
+
+            <!-- HISTORIA -->
+            <section class="historia-section">
+                <div class="historia-container">
+                    <div class="historia-imagen">
+                        <img src="/static/img/GAmeVault.png" alt="Nuestra tienda física">
+                    </div>
+                    <div class="historia-texto">
+                        <h2>Nuestra Historia</h2>
+                        <p>Game Vault nació de la pasion por los videojuegos.</p>
+                        <p>Nos especializamos en ofrecer productos de calidad, desde las últimas consolas hasta los
+                            accesorios más difíciles de encontrar, siempre con un trato cercano y asesoramiento experto.
+                        </p>
+                        <div class="historia-features">
+                            <div class="feature">
+                                <i class="fa-solid fa-medal"></i>
+                                <span>Calidad Garantizada</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fa-solid fa-truck-fast"></i>
+                                <span>Envíos 24/48h</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fa-solid fa-headset"></i>
+                                <span>Soporte Experto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MISIÓN, VISIÓN, VALORES -->
+            <section class="mision-vision-section">
+                <div class="mision-card">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <h3>Misión</h3>
+                    <p>Proporcionar a nuestra comunidad los mejores productos gaming con asesoramiento experto y un
+                        servicio cercano, creando experiencias de juego inolvidables.</p>
+                </div>
+                <div class="vision-card">
+                    <i class="fa-solid fa-eye"></i>
+                    <h3>Visión</h3>
+                    <p>Ser la tienda de referencia para gamers en habla hispana, reconocida por nuestra calidad,
+                        variedad y pasión por los videojuegos.</p>
+                </div>
+                <div class="valores-card">
+                    <i class="fa-solid fa-heart"></i>
+                    <h3>Valores</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Pasi&oacute;n por los videojuegos</li>
+                        <li><i class="fa-solid fa-check"></i> Honestidad y transparencia</li>
+                        <li><i class="fa-solid fa-check"></i> Cercanía con el cliente</li>
+                        <li><i class="fa-solid fa-check"></i> Innovación constante</li>
+                    </ul>
+                </div>
+            </section>
+
+            <div class="contenedor-mapa">
+                <h3>Ubicacion</h3>
+                <iframe title="Ubicación de la tienda"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.822488632872!2d-99.0294149!3d19.3868479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fd27b2dd92b5%3A0xe3bc6e61e0ed6852!2sExconvento%20de%20Churubusco%207%2C%20Metropolitana%202da%20Secc%2C%2057740%20Cd%20Nezahualc%C3%B3yotl%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1700000000000!5m2!1ses!2smx"
+                    allowfullscreen="" loading="lazy">
+                </iframe>
+            </div>
+
+            <div class="contenedor-contacto-f">
+                <a href="/contacto">Contacto</a>
+            </div>
+        </div>
+        <footer class="contenedor-footer">
+                <div class="contenedor-redes-sociales">
+                    <h3>Redes Sociales</h3>
+                    <div class="iconos-redes-sociales">
+                        <a href="https://instagram.com/gamestore" target="_blank" class="instagram"
+                            aria-label="Instagram">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="https://facebook.com/gamestore" target="_blank" class="facebook" aria-label="Facebook">
+                            <i class="fa-brands fa-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com/gamestore" target="_blank" class="twitter" aria-label="Twitter/X">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </a>
+                        <a href="" target="_blank" class="whatsapp" aria-label="WhatsApp"><i
+                                class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="contenedor-sobre-nosotros">
+                    <h3>Sobre nosotros</h3>
+                    <a href="/sobre-nosotros">Sobre nosotros</a>
+                </div>
+                <div class="contenedor-contactanos">
+                    <h3>Contactanos</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-phone"></i>+52 55 3190 8274</li>
+                        <li><i class="fa-solid fa-envelope"></i>gamevaultcontacto@gmail.com</li>
+                    </ul>
+                </div>
+            </footer>
+    </div>
+
+    <div id="fondo"></div>
+
+    <!-- Scripts -->
+    <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/carrito-sync.js"></script>
+    <script src="/static/js/barra-lateral.js"></script>
+
+    {% endblock %}

@@ -56,6 +56,14 @@ def login():
 def registro():
     return render_template('registro.html')
 
+@web_bp.route('/sobre-nosotros')
+def sobre_nosotros():
+    return render_template('sobre-nosotros.html')
+
+@web_bp.route('/contacto')
+def contacto():
+    return render_template('contacto.html')
+
 # ----------------------------------------- RUTAS ADMINISTRADOR ---------------------------------------- #
 
 @web_bp.route('/admin/inventario')

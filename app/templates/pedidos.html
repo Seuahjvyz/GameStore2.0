@@ -39,111 +39,119 @@
 
 <div class="contenedor-principal">
 
+    <nav class="barra-lateral">
+        <div class="contenedor-logo">
+            <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        </div>
 
-<nav class="barra-lateral">
-    <div class="contenedor-logo">
-        <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        <ul>
+            <li><a class="barra-lateral-link" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li>
+                <div class="divisor"></div>
+            </li>
+            <li><a class="barra-lateral-link" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+            <li><a class="barra-lateral-link" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
+            <li>
+                <div class="divisor"></div>
+            </li>
+            <li><a class="barra-lateral-link" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
+            <li><a class="barra-lateral-link" href="/accesorios"><i class="fa-solid fa-headset"></i>
+                    Accesorios</a></li>
+            <li><a class="barra-lateral-link" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
+            <li><a class="barra-lateral-link" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
+        </ul>
+    </nav>
+
+    <div class="principal">
+        <div class="contenido">
+            <h1>Mis Pedidos</h1>
+            <p class="header-subtitle">Revisa el estado de tus compras</p>
+
+            <div class="lista-pedidos">
+                <!-- Pedido 1 -->
+                <div class="pedido-item">
+                    <div class="pedido-image-container">
+                        <img src="/static/img/Imagenes/grounded2.png" alt="Gears 5" class="pedido-imagen">
+                    </div>
+                    <div class="pedido-info">
+                        <h3 class="product-title">Grounded 2</h3>
+                        <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
+                        <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
+                        <p class="estado-pedido entregado">Entregado</p>
+                    </div>
+                </div>
+
+                <!-- Pedido 2 -->
+                <div class="pedido-item">
+                    <div class="pedido-image-container">
+                        <img src="/static/img/Imagenes/howards.png" alt="Star Wars" class="pedido-imagen">
+                    </div>
+                    <div class="pedido-info">
+                        <h3 class="product-title">Howards Legacy</h3>
+                        <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
+                        <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
+                        <p class="estado-pedido enviado">En camino</p>
+                    </div>
+                </div>
+
+                <!-- Pedido 3 -->
+                <div class="pedido-item">
+                    <div class="pedido-image-container">
+                        <img src="/static/img/Imagenes/series x especial.png" alt="Xbox Series X" class="pedido-imagen">
+                    </div>
+                    <div class="pedido-info">
+                        <h3 class="product-title">Xbox Series X 2TB Galaxy Black</h3>
+                        <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
+                        <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
+                        <p class="estado-pedido procesando">Procesando</p>
+                    </div>
+                </div>
+
+                <!-- Pedido 4 -->
+                <div class="pedido-item">
+                    <div class="pedido-image-container">
+                        <img src="/static/img/Imagenes/controlxboxblack.png" alt="Control Xbox" class="pedido-imagen">
+                    </div>
+                    <div class="pedido-info">
+                        <h3 class="product-title">Control Xbox Inalámbrico</h3>
+                        <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
+                        <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
+                        <p class="estado-pedido entregado">Entregado</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <footer class="contenedor-footer">
+            <div class="contenedor-redes-sociales">
+                <h3>Redes Sociales</h3>
+                <div class="iconos-redes-sociales">
+                    <a href="https://instagram.com/gamestore" target="_blank" class="instagram" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://facebook.com/gamestore" target="_blank" class="facebook" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com/gamestore" target="_blank" class="twitter" aria-label="Twitter/X">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="" target="_blank" class="whatsapp" aria-label="WhatsApp"><i
+                            class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="contenedor-sobre-nosotros">
+                <h3>Sobre nosotros</h3>
+                <a href="/sobre-nosotros">Sobre nosotros</a>
+            </div>
+            <div class="contenedor-contactanos">
+                <h3>Contactanos</h3>
+                <ul>
+                    <li><i class="fa-solid fa-phone"></i>+52 55 3190 8274</li>
+                    <li><i class="fa-solid fa-envelope"></i>gamevaultcontacto@gmail.com</li>
+                </ul>
+            </div>
+        </footer>
     </div>
-
-    <ul>
-        <li><a class="barra-lateral-link" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
-        <li>
-            <div class="divisor"></div>
-        </li>
-        <li><a class="barra-lateral-link" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
-        <li><a class="barra-lateral-link" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
-        <li>
-            <div class="divisor"></div>
-        </li>
-        <li><a class="barra-lateral-link" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
-        <li><a class="barra-lateral-link" href="/accesorios"><i class="fa-solid fa-headset"></i>
-                Accesorios</a></li>
-        <li><a class="barra-lateral-link" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
-        <li><a class="barra-lateral-link" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
-    </ul>
-</nav>
-
-<div class="principal">
-    <h1>Mis Pedidos</h1>
-    <p class="header-subtitle">Revisa el estado de tus compras</p>
-
-    <main class="pedidos-container">
-        <div class="pedidos-header">
-            <!--<button class="filtro-pedidos">
-                <i class="fa-solid fa-filter"></i>
-                Filtrar Pedidos
-            </button>-->
-        </div>
-
-        <div class="lista-pedidos">
-            <!-- Pedido 1 -->
-            <div class="pedido-item">
-                <div class="pedido-image-container">
-                    <img src="/static/img/Imagenes/grounded2.png" alt="Gears 5" class="pedido-imagen">
-                </div>
-                <div class="pedido-info">
-                    <h3 class="product-title">Grounded 2</h3>
-                    <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
-                    <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
-                    <p class="estado-pedido entregado">Entregado</p>
-                </div>
-            </div>
-
-            <!-- Pedido 2 -->
-            <div class="pedido-item">
-                <div class="pedido-image-container">
-                    <img src="/static/img/Imagenes/howards.png" alt="Star Wars" class="pedido-imagen">
-                </div>
-                <div class="pedido-info">
-                    <h3 class="product-title">Howards Legacy</h3>
-                    <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
-                    <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
-                    <p class="estado-pedido enviado">En camino</p>
-                </div>
-            </div>
-
-            <!-- Pedido 3 -->
-            <div class="pedido-item">
-                <div class="pedido-image-container">
-                    <img src="/static/img/Imagenes/series x especial.png" alt="Xbox Series X" class="pedido-imagen">
-                </div>
-                <div class="pedido-info">
-                    <h3 class="product-title">Xbox Series X 2TB Galaxy Black</h3>
-                    <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
-                    <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
-                    <p class="estado-pedido procesando">Procesando</p>
-                </div>
-            </div>
-
-            <!-- Pedido 4 -->
-            <div class="pedido-item">
-                <div class="pedido-image-container">
-                    <img src="/static/img/Imagenes/controlxboxblack.png" alt="Control Xbox" class="pedido-imagen">
-                </div>
-                <div class="pedido-info">
-                    <h3 class="product-title">Control Xbox Inalámbrico</h3>
-                    <p><strong>Fecha de Compra:</strong> 12/05/2025 15:13 hrs</p>
-                    <p><strong>Fecha de Entrega:</strong> 14/05/2025 8:00 a 20:00 hrs</p>
-                    <p class="estado-pedido entregado">Entregado</p>
-                </div>
-                <!--
-                <button class="pedido-detalles">
-                    <i class="fa-solid fa-eye"></i>
-                    Detalles
-                </button>
-                -->
-            </div>
-        </div>
-
-        <!--
-            <div class="no-pedidos">
-                <i class="fa-solid fa-box-open"></i>
-                <h2>No tienes pedidos aún</h2>
-                <p>Cuando realices una compra, tus pedidos aparecerán aquí</p>
-            </div>
-            -->
-
-    </main>
 </div>
 </div>
 

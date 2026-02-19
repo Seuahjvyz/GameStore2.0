@@ -22,17 +22,17 @@
                     class="carrito-count">0</span></a>
         </div>
         <!-- Menu usuario -->
-            <button class="btn-menu-user" id="btn-menu-user">
-                <i class="fa-solid fa-circle-user"></i>
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
-            <div class="menu-user" id="menu-user">
-                <div class="contenido-menu-user">
-                    <div class="loading">
-                        <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
-                    </div>
+        <button class="btn-menu-user" id="btn-menu-user">
+            <i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="menu-user" id="menu-user">
+            <div class="contenido-menu-user">
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
                 </div>
             </div>
+        </div>
     </section>
 </header>
 
@@ -61,21 +61,55 @@
     </nav>
 
     <div class="principal">
-            <section class="buscador">
+
+        <section class="contenido">
+            <div class="buscador">
                 <input type="text" id="buscar-input" placeholder="Buscar producto">
                 <button class="btn_buscar" id="btn-buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </section>
+            </div>
 
-            <section class="productos" id="productos-container">
+            <div class="productos" id="productos-container">
                 <div class="loading">
                     <i class="fa-solid fa-spinner fa-spin"></i> Cargando productos destacados...
                 </div>
-            </section>
+            </div>
+        </section>
+
+        <footer class="contenedor-footer">
+            <div class="contenedor-redes-sociales">
+                <h3>Redes Sociales</h3>
+                <div class="iconos-redes-sociales">
+                    <a href="https://instagram.com/gamestore" target="_blank" class="instagram"
+                        aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://facebook.com/gamestore" target="_blank" class="facebook"
+                        aria-label="Facebook">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com/gamestore" target="_blank" class="twitter"
+                        aria-label="Twitter/X">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="" target="_blank" class="whatsapp" aria-label="WhatsApp" ><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="contenedor-sobre-nosotros">
+                <h3>Sobre nosotros</h3>
+                <a href="/sobre-nosotros">Sobre nosotros</a>
+            </div>
+            <div class="contenedor-contactanos">
+                <h3>Contactanos</h3>
+                <ul>
+                    <li><i class="fa-solid fa-phone"></i>+52 55 3190 8274</li>
+                    <li><i class="fa-solid fa-envelope"></i>gamevaultcontacto@gmail.com</li>
+                </ul>
+            </div>
+        </footer>
     </div>
 </div>
 
 <div id="fondo"></div>
-
 
 <!-- Scripts -->
 <script src="/static/js/user-menu.js"></script>
