@@ -1969,3 +1969,9 @@ body {
 
 }
 
+@media (max-width: 350px) {
+    .productos {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
