@@ -57,7 +57,7 @@ function actualizarMenuUsuario(usuario, estaLogueado, esAdmin) {
         if (esAdmin) {
             // Menú para ADMINISTRADORES
             dropdownContent.innerHTML = `
-                <a href="/admin/perfil" class="dropdown-item">
+                <a href="/admin/perfil-admin" class="dropdown-item">
                     <i class="fa-solid fa-user-gear"></i>
                     <span>Perfil</span>
                 </a>
@@ -70,7 +70,7 @@ function actualizarMenuUsuario(usuario, estaLogueado, esAdmin) {
         } else {
             // Menú para USUARIOS NORMALES
             dropdownContent.innerHTML = `
-                <a href="/perfil" class="dropdown-item">
+                <a href="/perfil-usuario" class="dropdown-item">
                     <i class="fa-solid fa-user"></i>
                     <span>Mi Perfil</span>
                 </a>

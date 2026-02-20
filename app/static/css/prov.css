@@ -154,85 +154,127 @@ body {
 
 .menu-user {
     position: absolute;
-    top: 100%;
-    right: 0;
-    background: #2a2a2a;
-    border: 1px solid #8b5cf6;
+    top: calc(100% + 10px);
+    right: 20px;
+    background: linear-gradient(145deg, #2a2a2a, #343434);
+    border: 1px solid rgba(139, 92, 246, 0.3);
     border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-    min-width: 170px;
-    max-width: 220px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.2);
+    min-width: 220px;
     z-index: 1000;
     display: none;
-    margin-top: 5px;
-    transform: translateY(-15px) scale(0.95);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(0, 43, 128, 0.1);
+    overflow: hidden;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top right;
 }
 
-.menu-user.show {
-    display: block;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
-.contenido-menu-usuario {
+.contenido-menu-user {
     padding: 8px 0;
 }
 
-.menu-item {
+.dropdown-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    color: white;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #e0e0e0;
     text-decoration: none;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
     border: none;
     background: none;
     width: 100%;
     text-align: left;
     cursor: pointer;
-    font-size: 13px;
-    white-space: nowrap;
+    position: relative;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-
-.menu-item:hover {
-    background-color: #447e6d;
-    color: white;
+.dropdown-item:hover {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), transparent);
+    color: #8b5cf6;
+    padding-left: 25px;
 }
 
-.menu-item i {
-    width: 16px;
-    color: #a0a0a0;
-    font-size: 14px;
-    flex-shrink: 0;
+.dropdown-item i {
+    width: 20px;
+    font-size: 16px;
+    color: #8b5cf6;
+    transition: all 0.3s ease;
 }
 
-.menu-item:hover i {
-    color: white;
+.dropdown-item:hover i {
+    transform: scale(1.1);
+    color: #a100ed;
 }
 
-.menu-divider {
+.dropdown-divider {
     height: 1px;
-    background-color: #444;
-    margin: 6px 0;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+    margin: 8px 0;
 }
 
-.loading-menu {
-    padding: 12px 16px;
-    color: #a0a0a0;
-    font-size: 13px;
+/* Loading state */
+.loading {
+    padding: 20px;
     text-align: center;
+    color: #a0a0a0;
 }
 
-.loading-menu i {
+.loading i {
+    color: #8b5cf6;
     margin-right: 8px;
 }
 
-.dropdown-item{
-    
+/* Responsive para el menú */
+@media (max-width: 768px) {
+    .menu-user {
+        right: 10px;
+        min-width: 200px;
+    }
+
+    .btn-menu-user {
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+
+    .dropdown-item {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-user {
+        right: 5px;
+        min-width: 180px;
+    }
+
+    .btn-menu-user span {
+        display: none; /* Oculta el texto en móviles muy pequeños */
+    }
+
+    .btn-menu-user {
+        padding: 8px 12px;
+    }
+
+    .btn-menu-user i:first-child {
+        font-size: 20px;
+        margin-right: 0;
+    }
 }
 
 
@@ -906,6 +948,8 @@ body {
 }
 
 
+/*--------------------------- VISTA SOBRE NOSOTROS ---------------------------*/
+
 /* Hero Section */
 .hero-sobre-nosotros {
     background: linear-gradient(135deg, #58009A 0%, #8858f7 100%);
@@ -934,7 +978,57 @@ body {
     to { transform: rotate(360deg); }
 }
 
+.hero-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+    display: inline-block;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
 
+.hero-content h1 {
+    font-size: 48px;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+.hero-subtitulo {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 30px;
+}
+
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-numero {
+    font-size: 36px;
+    font-weight: 800;
+    font-family: 'Orbitron', sans-serif;
+    color: #FFD700;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.9;
+}
 
 /* Historia Section */
 .historia-section {
@@ -976,13 +1070,6 @@ body {
     font-family: 'Orbitron', sans-serif;
     margin-bottom: 15px;
     color: #8b5cf6;
-}
-
-.historia-destacado {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: #FFD700;
 }
 
 .historia-texto p {
@@ -1086,11 +1173,10 @@ body {
     margin: 0;
 }
 
-/*--------------------------- MAPA ---------------------------*/
-
+/* Mapa */
 .contenedor-mapa {
     margin: 40px 0;
-    padding: 20px;
+    padding: 30px;
     background: #343434;
     border-radius: 30px;
     border: 1px solid rgba(139, 92, 246, 0.2);
@@ -1098,10 +1184,14 @@ body {
     transition: all 0.3s ease;
 }
 
-.contenedor-mapa h3{
+.contenedor-mapa h3 {
     font-size: 24px;
     font-family: 'Orbitron', sans-serif;
     color: #8b5cf6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .contenedor-mapa:hover {
@@ -1124,7 +1214,29 @@ body {
     filter: grayscale(0%) contrast(100%);
 }
 
-/*--------------------------- ENLACE CONTACTO ---------------------------*/
+.direccion {
+    color: #b0b0b0;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+.mapa-info {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    color: #d1d1d1;
+    font-size: 16px;
+}
+
+.mapa-info i {
+    color: #8b5cf6;
+    margin-right: 8px;
+}
+
+/* Enlace a Contacto */
 .contenedor-contacto-f {
     text-align: center;
     margin: 30px 0 20px 0;
@@ -1177,8 +1289,57 @@ body {
     box-shadow: 0 4px 15px rgba(161, 0, 237, 0.4);
 }
 
-/* Responsive para el enlace */
+/* Responsive para la vista sobre nosotros */
+@media (max-width: 992px) {
+    .historia-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .mision-vision-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
+    .hero-sobre-nosotros {
+        padding: 40px 20px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .hero-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .historia-container {
+        padding: 30px 20px;
+    }
+
+    .historia-features {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .mision-vision-section {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .contenedor-mapa iframe {
+        height: 300px;
+    }
+
+    .mapa-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
     .contenedor-contacto-f a {
         padding: 12px 30px;
         font-size: 16px;
@@ -1186,6 +1347,49 @@ body {
 }
 
 @media (max-width: 480px) {
+    .hero-sobre-nosotros {
+        padding: 30px 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 28px;
+    }
+
+    .hero-subtitulo {
+        font-size: 16px;
+    }
+
+    .hero-badge {
+        font-size: 12px;
+        padding: 6px 15px;
+    }
+
+    .historia-texto h2 {
+        font-size: 26px;
+    }
+
+    .feature i {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .contenedor-mapa iframe {
+        height: 250px;
+    }
+
+    .contenedor-mapa h3 {
+        font-size: 20px;
+    }
+
+    .direccion {
+        font-size: 14px;
+    }
+
+    .mapa-info {
+        font-size: 14px;
+    }
+
     .contenedor-contacto-f {
         margin: 20px 0 15px 0;
     }

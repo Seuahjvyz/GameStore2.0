@@ -66,20 +66,20 @@ def contacto():
 
 # ----------------------------------------- RUTAS ADMINISTRADOR ---------------------------------------- #
 
-@web_bp.route('/admin/inventario')
+@web_bp.route('/admin/gestion-productos')
 @admin_required
-def admin_inventario():
-    return render_template('admin_templates/inventario.html')
+def admin_productos():
+    return render_template('admin_templates/gestion-productos.html')
 
-@web_bp.route('/admin/registro')
+@web_bp.route('/admin/registro-admin')
 @admin_required
 def admin_registro():
-    return render_template('admin_templates/RegistroAdmin.html')
+    return render_template('admin_templates/registro-admin.html')
 
-@web_bp.route('/admin/usuarios')
+@web_bp.route('/admin/gestion-usuarios')
 @admin_required
 def admin_usuarios():
-    return render_template('admin_templates/usuarios.html')
+    return render_template('admin_templates/gestion-usuarios.html')
 
 @web_bp.route('/admin/reportes')
 @admin_required
@@ -91,42 +91,22 @@ def admin_reportes():
 def admin_reporte_detalle():
     return render_template('admin_templates/reporte-detalle.html')
 
-@web_bp.route('/admin/pedidos')
+@web_bp.route('/admin/gestion-pedidos')
 @admin_required
 def admin_pedidos():
-    return render_template('admin_templates/pedidos.html')
+    return render_template('admin_templates/gestion-pedidos.html')
 
-@web_bp.route('/admin/juegos')
-@admin_required
-def admin_juegos():
-    return render_template('admin_templates/juegos.html')
-
-@web_bp.route('/admin/consolas')
-@admin_required
-def admin_consolas():
-    return render_template('admin_templates/consolas.html')
-
-@web_bp.route('/admin/controles')
-@admin_required
-def admin_controles():
-    return render_template('admin_templates/controles.html')
-
-@web_bp.route('/admin/accesorios')
-@admin_required
-def admin_accesorios():
-    return render_template('admin_templates/accesorios.html')
-
-@web_bp.route('/admin/perfil')
+@web_bp.route('/admin/perfil-admin')
 @admin_required
 def admin_perfil():
     usuario = Usuario.query.get(session['user_id'])
-    return render_template('admin_templates/perfil.html', usuario=usuario)
+    return render_template('admin_templates/perfil-admin.html', usuario=usuario)
 
-@web_bp.route('/admin')
+@web_bp.route('/dashboard')
 @admin_required
 def admin():
     """Ruta principal del administrador - SOLO accesible para rol 1"""
-    return render_template('admin_templates/admin.html')
+    return render_template('admin_templates/dashboard.html')
 
 # ----------------------------------------- RUTAS DE USUARIO ---------------------------------------- #
 
@@ -151,11 +131,11 @@ def accesorios():
 def favoritos():
     return render_template('favoritos.html')
 
-@web_bp.route('/perfil')
+@web_bp.route('/perfil-usuario')
 @login_required
 def perfil():
     usuario = Usuario.query.get(session['user_id'])
-    return render_template('perfiluser.html', usuario=usuario)
+    return render_template('perfil-usuario.html', usuario=usuario)
 
 @web_bp.route('/pedidos')
 @login_required
@@ -232,7 +212,7 @@ def api_login():
         
         # Redirigir según rol
         if usuario.rol_id == 1:  # Administrador
-            redirect_url = '/admin'
+            redirect_url = '/dashboard'
             message = 'Login de administrador exitoso'
         else:  # Usuario normal
             redirect_url = '/'

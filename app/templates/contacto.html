@@ -40,6 +40,7 @@
         <div class="contenedor-logo">
             <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
         </div>
+
         <ul>
             <li><a class="barra-lateral-link" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
             <li>
@@ -51,10 +52,13 @@
                 <div class="divisor"></div>
             </li>
             <li><a class="barra-lateral-link" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
-            <li><a class="barra-lateral-link" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a></li>
+            <li><a class="barra-lateral-link" href="/accesorios"><i class="fa-solid fa-headset"></i>
+                    Accesorios</a></li>
             <li><a class="barra-lateral-link" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
             <li><a class="barra-lateral-link" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
-            <br>
+            <div class="divisor"></div>
+            <li><a class="barra-lateral-link" href="/sobre-nosotros"><i class="fa-solid fa-circle-info"></i>¿Quienes somos?</a></li>
+            <li><a class="barra-lateral-link" href="/contacto"><i class="fa-solid fa-circle-question"></i>Contactanos</a></li>
         </ul>
     </nav>
 
@@ -63,24 +67,24 @@
 
             <!-- FORMULARIO DE CONTACTO -->
             <section class="contacto-section">
-                <h2>Contacta con nosotros</h2>
+                <h2>Contactate con nosotros</h2>
                 <p class="contacto-subtitulo">¿Tienes dudas? ¿Necesitas ayuda? Escríbenos</p>
 
                 <form id="formulario-contacto" class="contacto-form">
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="nombre">Nombre completo</label>
-                            <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
+                            <input type="text" id="nombre" name="nombre"  required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
+                            <input type="email" id="email" name="email"  required>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="telefono">Teléfono (opcional)</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="+34 600 123 456">
+                        <input type="tel" id="telefono" name="telefono">
                     </div>
 
                     <div class="form-group">
@@ -119,41 +123,40 @@
                 </div>
             </section>
 
-            
+
 
         </div>
         <footer class="contenedor-footer">
-                <div class="contenedor-redes-sociales">
-                    <h3>Redes Sociales</h3>
-                    <div class="iconos-redes-sociales">
-                        <a href="https://instagram.com/gamestore" target="_blank" class="instagram"
-                            aria-label="Instagram">
-                            <i class="fa-brands fa-instagram"></i>
-                        </a>
-                        <a href="https://facebook.com/gamestore" target="_blank" class="facebook" aria-label="Facebook">
-                            <i class="fa-brands fa-facebook"></i>
-                        </a>
-                        <a href="https://twitter.com/gamestore" target="_blank" class="twitter" aria-label="Twitter/X">
-                            <i class="fa-brands fa-x-twitter"></i>
-                        </a>
-                        <a href="" target="_blank" class="whatsapp" aria-label="WhatsApp"><i
-                                class="fa-brands fa-whatsapp"></i></a>
-                    </div>
+            <div class="contenedor-redes-sociales">
+                <h3>Redes Sociales</h3>
+                <div class="iconos-redes-sociales">
+                    <a href="https://instagram.com/gamestore" target="_blank" class="instagram" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://facebook.com/gamestore" target="_blank" class="facebook" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com/gamestore" target="_blank" class="twitter" aria-label="Twitter/X">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="" target="_blank" class="whatsapp" aria-label="WhatsApp"><i
+                            class="fa-brands fa-whatsapp"></i></a>
                 </div>
-                <div class="contenedor-sobre-nosotros">
-                    <h3>Sobre nosotros</h3>
-                    <a href="/sobre-nosotros">Sobre nosotros</a>
-                </div>
-                <div class="contenedor-contactanos">
-                    <h3>Contactanos</h3>
-                    <ul>
-                        <li><i class="fa-solid fa-phone"></i>+52 55 3190 8274</li>
-                        <li><i class="fa-solid fa-envelope"></i>gamevaultcontacto@gmail.com</li>
-                    </ul>
-                </div>
-            </footer>
-    </div> 
-</div> 
+            </div>
+            <div class="contenedor-sobre-nosotros">
+                <h3>Sobre nosotros</h3>
+                <a href="/sobre-nosotros">Sobre nosotros</a>
+            </div>
+            <div class="contenedor-contactanos">
+                <h3>Contactanos</h3>
+                <ul>
+                    <li><i class="fa-solid fa-phone"></i>+52 55 3190 8274</li>
+                    <li><i class="fa-solid fa-envelope"></i>gamevaultcontacto@gmail.com</li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+</div>
 
 <div id="fondo"></div>
 
@@ -161,5 +164,5 @@
 <script src="/static/js/user-menu.js"></script>
 <script src="/static/js/carrito-sync.js"></script>
 <script src="/static/js/barra-lateral.js"></script>
-<script src="/static/js/contacto.js"></script> 
+<script src="/static/js/contacto.js"></script>
 {% endblock %}
