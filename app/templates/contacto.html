@@ -160,6 +160,50 @@
 
 <div id="fondo"></div>
 
+<script>
+    // contacto.js
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formulario-contacto');
+    const mensajeExito = document.getElementById('mensaje-exito');
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validación básica
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const asunto = document.getElementById('asunto').value;
+            const mensaje = document.getElementById('mensaje').value.trim();
+
+            if (!nombre || !email || !asunto || !mensaje) {
+                alert('Por favor completa todos los campos obligatorios');
+                return;
+            }
+
+            if (!email.includes('@') || !email.includes('.')) {
+                alert('Por favor ingresa un email válido');
+                return;
+            }
+
+            // Mostrar mensaje de éxito
+            mensajeExito.style.display = 'block';
+            
+            // Opcional: Ocultar después de 5 segundos
+            setTimeout(() => {
+                mensajeExito.style.display = 'none';
+            }, 5000);
+            
+            // Limpiar formulario
+            form.reset();
+            
+            // Scroll suave hasta el mensaje
+            mensajeExito.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    }
+});
+</script>
+
 <!-- Scripts -->
 <script src="/static/js/user-menu.js"></script>
 <script src="/static/js/carrito-sync.js"></script>
