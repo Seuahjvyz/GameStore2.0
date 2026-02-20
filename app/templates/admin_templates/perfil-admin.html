@@ -55,33 +55,35 @@
     </nav>
 
     <div class="principal">
-        <div class="contenido-centrado">
-            <div class="perfil-contenedor-centrado">
-                <h1 class="titulo-centrado">Mi perfil</h1>
+        <div class="contenido">
+            <div class="contenido-centrado">
+                <div class="perfil-contenedor-centrado">
+                    <h1 class="titulo-centrado">Mi perfil</h1>
 
-                <div class="perfil-card-centrado">
-                    <h2 class="nombre-usuario">{{ usuario.nombre_usuario }}</h2>
-                    <p class="numero-cliente">Administrador #{{ usuario.id_usuario }}</p>
+                    <div class="perfil-card-centrado">
+                        <h2 class="nombre-usuario">{{ usuario.nombre_usuario }}</h2>
+                        <p class="numero-cliente">Administrador #{{ usuario.id_usuario }}</p>
 
-                    <div class="separador"></div>
+                        <div class="separador"></div>
 
-                    <div class="datos-usuario">
-                        <div class="dato-fila">
-                            <span class="dato-label">Email:</span>
-                            <span class="dato-valor">{{ usuario.correo }}</span>
+                        <div class="datos-usuario">
+                            <div class="dato-fila">
+                                <span class="dato-label">Email:</span>
+                                <span class="dato-valor">{{ usuario.correo }}</span>
+                            </div>
+                            <div class="dato-fila">
+                                <span class="dato-label">Rol:</span>
+                                <span class="dato-valor">Administrador</span>
+                            </div>
+                            <div class="dato-fila">
+                                <span class="dato-label">ID de Usuario:</span>
+                                <span class="dato-valor">{{ usuario.id_usuario }}</span>
+                            </div>
                         </div>
-                        <div class="dato-fila">
-                            <span class="dato-label">Rol:</span>
-                            <span class="dato-valor">Administrador</span>
-                        </div>
-                        <div class="dato-fila">
-                            <span class="dato-label">ID de Usuario:</span>
-                            <span class="dato-valor">{{ usuario.id_usuario }}</span>
-                        </div>
+
+                        <div class="separador"></div>
+
                     </div>
-
-                    <div class="separador"></div>
-
                 </div>
             </div>
         </div>
