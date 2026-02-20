@@ -13,7 +13,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at center, #431d75 0%, #0a0514 100%);
+    background: radial-gradient(circle at center, #4c277b 0%, #3a1e5b 100%);
     position: relative;
     font-family: 'Poppins', sans-serif;
 }
