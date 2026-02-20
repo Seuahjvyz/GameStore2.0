@@ -876,6 +876,7 @@ body {
 /* Responsive para el footer */
 @media (max-width: 768px) {
     .contenedor-footer {
+        margin: 0;
         flex-direction: column; /* Apila las columnas verticalmente */
         align-items: center; /* Centra las columnas */
         gap: 40px;
