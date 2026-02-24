@@ -1,12 +1,13 @@
 from dotenv import load_dotenv
 load_dotenv()
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from apscheduler.schedulers.background import BackgroundScheduler
 import os
 import atexit
+import datetime 
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -31,14 +32,21 @@ def create_app():
     env = os.environ.get('FLASK_ENV', 'development')
     if env == 'production':
         app.config.from_object('config.ProductionConfig')
-        # Configuración importante para producción
         app.config.update(
             SESSION_COOKIE_SECURE=True,
             SESSION_COOKIE_HTTPONLY=True,
             SESSION_COOKIE_SAMESITE='Lax',
+            SESSION_COOKIE_NAME='session',
+            SESSION_PERMANENT=False,
+            PERMANENT_SESSION_LIFETIME=1800,
         )
     else:
         app.config.from_object('config.DevelopmentConfig')
+        app.config.update(
+        SESSION_PERMANENT=False,  # La sesión NO es permanente
+        PERMANENT_SESSION_LIFETIME=1600,  # 1h
+        SESSION_REFRESH_EACH_REQUEST=True
+    )
     
     # Asegurar la clave secreta
     if not app.config.get('SECRET_KEY'):
@@ -62,6 +70,46 @@ def create_app():
                 'code': 404
             }), 404
         return render_template('/errores/404.html'), 404
+    
+    @app.before_request
+    def check_session_timeout():
+        """Verificar tiempo de inactividad de la sesión"""
+        # Excluir rutas públicas que no requieren sesión
+        rutas_publicas = ['/login', '/api/login', '/registro', '/api/registro', '/', '/static']
+        
+        # Si la ruta actual es pública, permitir acceso sin verificar
+        if any(request.path.startswith(ruta) for ruta in rutas_publicas):
+            return None
+        
+        if 'user_id' in session:
+            last_activity = session.get('last_activity')
+            
+            if last_activity:
+                # Convertir string a datetime si está guardado como string
+                if isinstance(last_activity, str):
+                    try:
+                        last_activity = datetime.datetime.fromisoformat(last_activity)
+                    except:
+                        last_activity = None
+                
+                if last_activity:
+                    # Si pasaron más de 30 minutos sin actividad, cerrar sesión
+                    tiempo_inactivo = (datetime.datetime.now() - last_activity).seconds
+                    if tiempo_inactivo > 1800:  # 30 minutos
+                        session.clear()
+                        # Si es petición API, devolver JSON
+                        if request.path.startswith('/api/'):
+                            return jsonify({
+                                'success': False, 
+                                'error': 'Sesión expirada',
+                                'redirect': '/login'
+                            }), 401
+                        # Si es página web, redirigir a login
+                        return redirect(url_for('web.login'))
+            
+            # Actualizar última actividad (guardar como string ISO para evitar problemas de serialización)
+            session['last_activity'] = datetime.datetime.now().isoformat()
+    
     
     # Registrar blueprints
     from app.routes.web import web_bp

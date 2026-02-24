@@ -8,52 +8,59 @@
 
 {% block content %}
 
-<div class="principal">
-    <div class="main-content">
-        <div class="container">
-            <h1>Crear una Cuenta</h1>
-            <p class="description">¡Vamos a crear tu cuenta!</p>
+<header class="barra-superior">
+    <div class="marca">
+        <h1>Game Store</h1>
+    </div>
+</header>
 
-            <form id="registro-form" class="form-section">
-                <div class="form-line">
-                    <span class="label">Nombre De Usuario:</span>
-                    <input type="text" id="username" name="username" class="input-field"
-                        placeholder="Ingresa tu nombre de usuario" required>
-                    <span class="error-message" id="username-error"></span>
-                </div>
+<div class="main-content">
+    <div class="container">
+        <div class="volver">
+            <a href="/" class="btn-volver"><i class="fa-solid fa-circle-arrow-left"></i> Volver</a>
+        </div>
+        <h1>Crear una Cuenta</h1>
+        <p class="description">¡Vamos a crear tu cuenta!</p>
 
-                <div class="form-line">
-                    <span class="label">Email:</span>
-                    <input type="email" id="email" name="email" class="input-field"
-                        placeholder="Ingresa tu correo electrónico" required>
-                    <span class="error-message" id="email-error"></span>
-                </div>
-
-                <div class="form-line">
-                    <span class="label">Contraseña:</span>
-                    <input type="password" id="password" name="password" class="input-field"
-                        placeholder="Crea una contraseña segura" required>
-                    <span class="error-message" id="password-error"></span>
-                </div>
-
-                <div class="form-line">
-                    <span class="label">Confirmar Contraseña:</span>
-                    <input type="password" id="confirm-password" name="confirm_password" class="input-field"
-                        placeholder="Confirma tu contraseña" required>
-                    <span class="error-message" id="confirm-error"></span>
-                </div>
-
-                <div class="register-section">
-                    <button type="submit" class="register-btn" id="registro-btn">
-                        <i class="fa-solid fa-user-plus"></i> Crear Cuenta
-                    </button>
-                </div>
-            </form>
-
-            <div class="sidebar-register-section">
-                <p class="preguntaxd">¿Ya tienes cuenta?</p>
-                <a class="sidebar-register-btn" href="/login">Iniciar Sesión</a>
+        <form id="registro-form" class="form-section">
+            <div class="form-line">
+                <span class="label">Nombre De Usuario:</span>
+                <input type="text" id="username" name="username" class="input-field"
+                    placeholder="Ingresa tu nombre de usuario" required>
+                <span class="error-message" id="username-error"></span>
             </div>
+
+            <div class="form-line">
+                <span class="label">Email:</span>
+                <input type="email" id="email" name="email" class="input-field"
+                    placeholder="Ingresa tu correo electrónico" required>
+                <span class="error-message" id="email-error"></span>
+            </div>
+
+            <div class="form-line">
+                <span class="label">Contraseña:</span>
+                <input type="password" id="password" name="password" class="input-field"
+                    placeholder="Crea una contraseña segura" required>
+                <span class="error-message" id="password-error"></span>
+            </div>
+
+            <div class="form-line">
+                <span class="label">Confirmar Contraseña:</span>
+                <input type="password" id="confirm-password" name="confirm_password" class="input-field"
+                    placeholder="Confirma tu contraseña" required>
+                <span class="error-message" id="confirm-error"></span>
+            </div>
+
+            <div class="register-section">
+                <button type="submit" class="register-btn" id="registro-btn">
+                    <i class="fa-solid fa-user-plus"></i> Crear Cuenta
+                </button>
+            </div>
+        </form>
+
+        <div class="sidebar-register-section">
+            <p class="preguntaxd">¿Ya tienes cuenta?</p>
+            <a class="sidebar-register-btn" href="/login">Iniciar Sesión</a>
         </div>
     </div>
 </div>

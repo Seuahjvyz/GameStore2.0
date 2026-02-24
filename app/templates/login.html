@@ -5,9 +5,18 @@
 {% endblock %}
 
 {% block content %}
-<!-- Contenido Principal -->
+
+<header class="barra-superior">
+    <div class="marca">
+        <h1><a href="/">Game Store</a></h1>
+    </div>
+</header>
+
 <div class="main-content">
     <div class="container">
+         <div class="volver">
+      <a href="/" class="btn-volver"><i class="fa-solid fa-circle-arrow-left"></i> Volver</a>
+    </div>
         <h1>Iniciar Sesión</h1>
 
         <p class="description">Ingresa el nombre o correo electrónico registrado.</p>
@@ -42,7 +51,23 @@
 </div>
 
 <!-- Scripts -->
-
+<!-- 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('desactivada') === 'true') {
+        const mensaje = sessionStorage.getItem('logout_message') || 'Tu cuenta ha sido desactivada. Contacta al administrador.';
+        alert(mensaje);
+        sessionStorage.removeItem('logout_message');
+    } else if (urlParams.get('expired') === 'true') {
+        const mensaje = sessionStorage.getItem('logout_message') || 'Tu sesión ha expirado. Inicia sesión nuevamente.';
+        alert(mensaje);
+        sessionStorage.removeItem('logout_message');
+    }
+});
+</script>
+-->
 <script src="/static/js/login.js"></script>
 
 {% endblock %}

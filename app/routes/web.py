@@ -18,26 +18,92 @@ web_bp = Blueprint('web', __name__)
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        print(f"🎯 login_required EJECUTÁNDOSE para: {request.path}")
-        print(f"🔍 Session data: {dict(session)}")
-        print(f"🔍 user_id en session: {'user_id' in session}")
+        print(f" login_required EJECUTÁNDOSE para: {request.path}")
+        print(f" Session data: {dict(session)}")
+        print(f" user_id en session: {'user_id' in session}")
         
+        # VERIFICACIÓN BÁSICA
         if 'user_id' not in session:
             print("❌ REDIRIGIENDO a login - usuario NO autenticado")
+            
+            if request.path.startswith('/api/'):
+                return jsonify({
+                    'success': False, 
+                    'error': 'Sesión no válida',
+                    'redirect': '/login'
+                }), 401
+            
             return redirect(url_for('web.login'))
         
-        print("✅ Acceso PERMITIDO - usuario autenticado")
+        # 🔥 VERIFICAR QUE EL USUARIO SIGA ACTIVO EN BD
+        usuario = Usuario.query.get(session['user_id'])
+        if not usuario or not usuario.activo:
+            print(f"❌ Usuario {session['user_id']} desactivado - cerrando sesión")
+            session.clear()
+            
+            if request.path.startswith('/api/'):
+                return jsonify({
+                    'success': False, 
+                    'error': 'Tu cuenta ha sido desactivada',
+                    'redirect': '/login?desactivada=true'
+                }), 401
+            
+            return redirect(url_for('web.login', desactivada=True))
+        
+        # VERIFICAR TIEMPO DE INACTIVIDAD
+        last_activity = session.get('last_activity')
+        if last_activity:
+            if isinstance(last_activity, str):
+                try:
+                    last_activity = datetime.datetime.fromisoformat(last_activity)
+                    tiempo_inactivo = (datetime.datetime.now() - last_activity).seconds
+                    if tiempo_inactivo > 1800:  # 30 minutos
+                        session.clear()
+                        if request.path.startswith('/api/'):
+                            return jsonify({
+                                'success': False, 
+                                'error': 'Sesión expirada por inactividad',
+                                'redirect': '/login'
+                            }), 401
+                        return redirect(url_for('web.login'))
+                except:
+                    pass
+        
+        print("✅ Acceso PERMITIDO - usuario autenticado y activo")
         return f(*args, **kwargs)
     return decorated_function
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # Verificar autenticación primero
         if 'user_id' not in session:
+            if request.path.startswith('/api/'):
+                return jsonify({'success': False, 'error': 'No autenticado'}), 401
             return redirect(url_for('web.login'))
         
-        if session.get('user_role') != 1:  # 1 = Administrador
-            return jsonify({'error': 'Acceso denegado. Se requieren privilegios de administrador'}), 403
+        # 🔥 VERIFICAR QUE EL USUARIO SIGA ACTIVO
+        usuario = Usuario.query.get(session['user_id'])
+        if not usuario or not usuario.activo:
+            session.clear()
+            if request.path.startswith('/api/'):
+                return jsonify({
+                    'success': False, 
+                    'error': 'Tu cuenta ha sido desactivada'
+                }), 401
+            return redirect(url_for('web.login', desactivada=True))
+        
+        # Verificar rol de administrador (1)
+        if session.get('user_role') != 1:
+            print(f"Acceso denegado - Usuario {session.get('user_id')} con rol {session.get('user_role')} intentó acceder a ruta admin")
+            
+            if request.path.startswith('/api/'):
+                return jsonify({
+                    'success': False, 
+                    'error': 'Acceso denegado'
+                }), 403
+            
+            return redirect('/')
         
         return f(*args, **kwargs)
     return decorated_function
@@ -173,6 +239,7 @@ def pago_cancelado():
 
 # ----------------------------------------- AUTENTICACIÓN Y SESIÓN ---------------------------------------- #
 
+# En web.py - Ruta de login
 @web_bp.route('/api/login', methods=['POST'])
 def api_login():
     try:
@@ -184,11 +251,8 @@ def api_login():
         login_input = data.get('login_input')
         password = data.get('password')
         
-        if not login_input:
-            return jsonify({'error': 'Ingresa tu usuario o email'}), 400
-        
-        if not password:
-            return jsonify({'error': 'Ingresa tu contraseña'}), 400
+        if not login_input or not password:
+            return jsonify({'error': 'Completa todos los campos'}), 400
         
         # Buscar usuario
         usuario = Usuario.query.filter(
@@ -197,6 +261,12 @@ def api_login():
         
         if not usuario:
             return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
+        
+        # 🔥 VERIFICAR SI LA CUENTA ESTÁ ACTIVA
+        if not usuario.activo:
+            return jsonify({
+                'error': 'Tu cuenta ha sido desactivada. Contacta al administrador.'
+            }), 403  # 403 = Forbidden
         
         # Verificar contraseña
         if not check_password_hash(usuario.password, password):
@@ -207,26 +277,24 @@ def api_login():
         session['user_id'] = usuario.id_usuario
         session['username'] = usuario.nombre_usuario
         session['user_role'] = usuario.rol_id
-        
-        print(f"LOGIN EXITOSO: {usuario.nombre_usuario} (Rol: {usuario.rol_id})")
+        session['last_activity'] = datetime.datetime.now().isoformat()
         
         # Redirigir según rol
-        if usuario.rol_id == 1:  # Administrador
+        if usuario.rol_id == 1:
             redirect_url = '/dashboard'
-            message = 'Login de administrador exitoso'
-        else:  # Usuario normal
+        else:
             redirect_url = '/'
-            message = 'Login exitoso'
         
         return jsonify({
             'success': True, 
-            'message': message,
+            'message': 'Login exitoso',
             'redirect_url': redirect_url,
             'user': {
                 'id': usuario.id_usuario,
                 'username': usuario.nombre_usuario,
                 'email': usuario.correo,
-                'role': usuario.rol_id
+                'role': usuario.rol_id,
+                'activo': usuario.activo  # Incluir estado
             }
         }), 200
         
@@ -237,7 +305,10 @@ def api_login():
 @web_bp.route('/logout')
 def logout():
     session.clear()
-    return redirect('/')
+    response = redirect('/')
+    response.delete_cookie('session')  # 'session' es el nombre por defecto
+    
+    return response
 
 @web_bp.route('/api/user-info')
 def user_info():
@@ -1941,3 +2012,30 @@ def api_paypal_config():
             'success': False, 
             'error': 'Error interno del servidor'
         }), 500
+@web_bp.route('/api/verify-user-status')
+def verify_user_status():
+    """Verificar si el usuario actual sigue activo en el sistema"""
+    if 'user_id' in session:
+        usuario = Usuario.query.get(session['user_id'])
+        
+        # Verificar si el usuario existe y está activo
+        if not usuario or not usuario.activo:
+            # Usuario fue desactivado o eliminado
+            session.clear()
+            return jsonify({
+                'valid': False,
+                'message': 'Tu cuenta ha sido desactivada',
+                'redirect': '/login?desactivada=true'
+            }), 401
+            
+        return jsonify({
+            'valid': True,
+            'user': {
+                'id': usuario.id_usuario,
+                'username': usuario.nombre_usuario,
+                'role': usuario.rol_id,
+                'activo': usuario.activo
+            }
+        })
+    
+    return jsonify({'valid': False}), 401

@@ -22,7 +22,10 @@ body {
 
 .barra-superior {
     background: linear-gradient(135deg, #58009A, #8858f7);
-    background: linear-gradient(#5d14b0, #7e15a0);
+    background: linear-gradient(135deg, #501c8c, #8010ca, #7e15a0);
+    background: linear-gradient(90deg, #4c1d95, #7c3aed);
+    background: linear-gradient(135deg, #522566, #7a3a8e, #ad74c3);
+    
     color: white;
 
     height: 50px;
@@ -705,6 +708,7 @@ body {
 
 .contenedor-footer{
     background: linear-gradient(135deg, #3a1a5e, #60149a );
+    
     padding: 30px 40px;
     display: flex;
     flex-wrap: wrap; 
@@ -1939,6 +1943,7 @@ body {
 }
 
 @media (max-width: 600px) {
+   
     .btn-buscador {
         justify-content: center;
         width: 100%;
