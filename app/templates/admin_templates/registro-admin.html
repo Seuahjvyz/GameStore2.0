@@ -1,10 +1,17 @@
 {% extends "base.html" %}
 
-
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/style.css">
+{% endblock %}
 
 {% block content %}
 
-    <main>
+<header class="barra-superior">
+    <div class="marca">
+        <h1>Game Store</h1>
+    </div>
+</header>
+
         <div class="principal-auth">
             <div class="main-content-auth">
                 <div class="container-auth">
@@ -41,7 +48,7 @@
 
                         <div class="auth-section">
                             <button type="submit" class="btn-auth" id="registro-btn">
-                                <i class="fa-solid fa-shield-alt"></i> Crear Cuenta de Admin
+                                 Crear Cuenta de Admin
                             </button>
                         </div>
                     </form>
@@ -53,12 +60,7 @@
                 </div>
             </div>
         </div>
-    </main>
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="/static/js/favoritos-backbone.js"></script>
     <script src="/static/js/registro-admin.js"></script>
 
 {% endblock %}

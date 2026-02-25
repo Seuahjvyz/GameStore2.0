@@ -1,74 +1,51 @@
-// static/js/revisar-sesion.js
+// revisar-sesion.js - Versión optimizada
+let sesionVerificada = false;
+let timeoutVerificacion = null;
 
-function checkUserStatus() {
-    fetch('/api/verify-user-status')
-        .then(response => {
-            if (response.status === 401) {
-                return response.json().then(data => {
-                    handleSessionInvalid(data.message || 'Sesión no válida');
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && !data.valid) {
-                handleSessionInvalid(data.message || 'Sesión no válida');
-            }
-        })
-        .catch(error => {
-            console.error('Error verificando usuario:', error);
-            // Opcional: si hay error de red, no hacer nada
-        });
-}
-
-function handleSessionInvalid(message) {
-    // Evitar redirecciones múltiples
-    if (window.sessionInvalidRedirect) return;
-    window.sessionInvalidRedirect = true;
+async function checkUserStatus() {
+    // Evitar múltiples verificaciones simultáneas
+    if (sesionVerificada) return;
     
-    const currentPath = window.location.pathname;
-    const publicPaths = ['/login', '/registro', '/', '/sobre-nosotros', '/contacto', '/juegos', '/consolas', '/controles', '/accesorios'];
-    
-    // Solo redirigir si no estamos ya en una página pública
-    if (!publicPaths.includes(currentPath)) {
-        // Mostrar mensaje si existe
-        if (message) {
-            sessionStorage.setItem('logout_message', message);
+    try {
+        const response = await fetch('/api/verify-user-status');
+        const data = await response.json();
+        
+        if (!data.valid) {
+            console.log('Sesión no válida');
+            // Solo redirigir si es necesario y no estamos ya en login
+            if (!window.location.pathname.includes('/login') && 
+                !window.location.pathname.includes('/registro')) {
+                // No redirigir automáticamente, solo mostrar notificación si es necesario
+                if (data.message) {
+                    console.warn(data.message);
+                }
+            }
+        } else {
+            sesionVerificada = true;
+            console.log('Sesión válida:', data.user);
         }
-        window.location.href = '/login?expired=true';
-    } else {
-        // Si estamos en página pública, solo resetear el flag
-        window.sessionInvalidRedirect = false;
+    } catch (error) {
+        console.error('Error checking user status:', error);
+    } finally {
+        // Programar próxima verificación solo si es necesario
+        if (timeoutVerificacion) {
+            clearTimeout(timeoutVerificacion);
+        }
+        // Verificar cada 30 segundos en lugar de cada 2 segundos
+        timeoutVerificacion = setTimeout(checkUserStatus, 30000);
     }
 }
 
-// Limpiar flag al recargar la página
-window.addEventListener('beforeunload', function() {
-    window.sessionInvalidRedirect = false;
+// Iniciar verificación cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar 2 segundos antes de la primera verificación
+    setTimeout(checkUserStatus, 2000);
 });
 
-// Verificar cada 8 segundos
-setInterval(checkUserStatus, 8000);
-
-// También al cargar la página
-document.addEventListener('DOMContentLoaded', checkUserStatus);
-
-// Interceptar peticiones fetch
-const originalFetch = window.fetch;
-window.fetch = function(url, options = {}) {
-    return originalFetch(url, options).then(response => {
-        if (response.status === 401) {
-            response.clone().json().then(data => {
-                if (data.message) {
-                    handleSessionInvalid(data.message);
-                } else {
-                    handleSessionInvalid('Sesión expirada');
-                }
-            }).catch(() => {
-                handleSessionInvalid('Sesión expirada');
-            });
-            throw new Error('Sesión inválida');
-        }
-        return response;
-    });
-};
+// También verificar cuando la ventana recupera el foco
+window.addEventListener('focus', function() {
+    if (timeoutVerificacion) {
+        clearTimeout(timeoutVerificacion);
+    }
+    checkUserStatus();
+});

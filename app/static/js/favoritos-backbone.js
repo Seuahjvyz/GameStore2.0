@@ -245,14 +245,12 @@ class FavoritosManager {
     }
 
 async agregarAlCarritoDesdeFavoritos(productId, button) {
-    // ✅ PREVENIR MÚLTIPLES CLICKS
     if (button.disabled) {
         console.log('⏳ Botón ya en proceso, ignorando click');
         return;
     }
     
     try {
-        // Deshabilitar botón temporalmente
         button.disabled = true;
         const originalText = button.innerHTML;
         button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AGREGANDO...';
@@ -273,15 +271,22 @@ async agregarAlCarritoDesdeFavoritos(productId, button) {
         const data = await response.json();
         console.log('📨 Respuesta del servidor:', data);
 
+        if (response.status === 401) {
+            // ✅ MANEJO ESPECÍFICO DE NO AUTENTICADO
+            this.showNotification('Debes iniciar sesión para agregar productos al carrito', 'error');
+            
+            button.disabled = false;
+            button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
+            return;
+        }
+
         if (data.success) {
             this.showNotification(data.message, 'success');
             
-            // Actualizar contador del carrito
             if (window.carritoSimple) {
                 window.carritoSimple.actualizarContadorCarrito();
             }
             
-            // Si estamos en la página del carrito, recargar
             if (window.carritoDinamico && document.getElementById('carrito-container')) {
                 await window.carritoDinamico.cargarCarrito();
                 window.carritoDinamico.actualizarVistaCarrito();
@@ -293,10 +298,7 @@ async agregarAlCarritoDesdeFavoritos(productId, button) {
         console.error('❌ Error agregando al carrito:', error);
         this.showNotification('Error de conexión', 'error');
     } finally {
-        // ✅ GARANTIZAR QUE EL BOTÓN SIEMPRE SE RESTAURE
         button.disabled = false;
-        
-        // Restaurar texto original basado en stock
         const tieneStock = !button.hasAttribute('data-sin-stock');
         if (tieneStock) {
             button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';

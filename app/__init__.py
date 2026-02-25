@@ -9,6 +9,9 @@ import os
 import atexit
 import datetime 
 
+# 🔥 IMPORTAR PAYPAL SDK
+import paypalrestsdk
+
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
@@ -51,6 +54,20 @@ def create_app():
     # Asegurar la clave secreta
     if not app.config.get('SECRET_KEY'):
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-secret-key-for-dev')
+    
+    # 🔥 CONFIGURACIÓN DE PAYPAL
+    app.config['PAYPAL_CLIENT_ID'] = os.environ.get('PAYPAL_CLIENT_ID')
+    app.config['PAYPAL_CLIENT_SECRET'] = os.environ.get('PAYPAL_CLIENT_SECRET')
+    app.config['PAYPAL_MODE'] = os.environ.get('PAYPAL_MODE', 'sandbox')
+    
+    # 🔥 INICIALIZAR PAYPAL SDK
+    paypalrestsdk.configure({
+        "mode": app.config['PAYPAL_MODE'],
+        "client_id": app.config['PAYPAL_CLIENT_ID'],
+        "client_secret": app.config['PAYPAL_CLIENT_SECRET']
+    })
+    
+    print(f"✅ PayPal SDK configurado - Modo: {app.config['PAYPAL_MODE']}")
     
     # Inicializar extensiones
     db.init_app(app)

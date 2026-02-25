@@ -12,7 +12,7 @@ class CarritoDinamico {
         await this.cargarCarrito();
         this.actualizarVistaCarrito();
         this.initEventListeners();
-        
+
         // Precargar PayPal SDK
         this.preloadPayPalSDK();
     }
@@ -192,7 +192,7 @@ class CarritoDinamico {
             if (data.success) {
                 await this.cargarCarrito();
                 this.actualizarVistaCarrito();
-                
+
                 if (window.carritoSimple) {
                     window.carritoSimple.actualizarContadorCarrito();
                 }
@@ -220,11 +220,11 @@ class CarritoDinamico {
             if (data.success) {
                 await this.cargarCarrito();
                 this.actualizarVistaCarrito();
-                
+
                 if (window.carritoSimple) {
                     window.carritoSimple.actualizarContadorCarrito();
                 }
-                
+
                 this.mostrarNotificacion('Producto eliminado del carrito', 'success');
             } else {
                 this.mostrarNotificacion(data.error, 'error');
@@ -255,9 +255,9 @@ class CarritoDinamico {
             if (data.success) {
                 console.log('✅ Producto agregado/actualizado en carrito:', data);
                 this.mostrarNotificacion(data.message, 'success');
-                
+
                 this.actualizarContadorCarrito(data.carrito_count);
-                
+
                 if (document.getElementById('carrito-container')) {
                     await this.cargarCarrito();
                     this.actualizarVistaCarrito();
@@ -274,11 +274,11 @@ class CarritoDinamico {
 
     actualizarContadorCarrito(count) {
         console.log('🔄 Actualizando contador del carrito:', count);
-        
+
         if (window.actualizarContadorCarrito) {
             window.actualizarContadorCarrito(count);
         }
-        
+
         const contadores = document.querySelectorAll('.carrito-count, .cart-count, #carrito-contador');
         contadores.forEach(contador => {
             contador.textContent = count;
@@ -288,7 +288,7 @@ class CarritoDinamico {
             contador.style.right = '-8px';
             contador.style.zIndex = '1001';
         });
-        
+
         if (window.carritoSync) {
             window.carritoSync.notificarActualizacion();
         } else {
@@ -369,98 +369,98 @@ class CarritoDinamico {
         document.getElementById('btnVolverCarrito').addEventListener('click', () => {
             this.actualizarVistaCarrito();
         });
-        
+
         this.inicializarPayPal();
     }
 
     // Precargar PayPal SDK al inicio - CONFIGURADO PARA SANDBOX
-preloadPayPalSDK() {
-    if (window.paypal || this.paypalSDKCargado) {
-        return;
-    }
-
-    console.log('📥 Precargando PayPal SDK de forma segura...');
-    
-    this.cargarPayPalDeFormaSegura();
-}
-
-async cargarPayPalDeFormaSegura() {
-    try {
-        // 1. Obtener configuración del backend
-        const config = await this.obtenerConfiguracionPayPal();
-        
-        if (!config || !config.client_id) {
-            throw new Error('Configuración de PayPal no disponible');
+    preloadPayPalSDK() {
+        if (window.paypal || this.paypalSDKCargado) {
+            return;
         }
 
-        console.log('🔐 Configuración PayPal obtenida:', { 
-            client_id: config.client_id.substring(0, 10) + '...', 
-            mode: config.mode 
-        });
+        console.log('📥 Precargando PayPal SDK de forma segura...');
 
-        // 2. Determinar la URL correcta (sandbox vs live)
-        const baseUrl = config.mode === 'live' 
-            ? 'https://www.paypal.com' 
-            : 'https://www.sandbox.paypal.com';
-
-        // 3. Cargar SDK
-        const script = document.createElement('script');
-        script.src = `${baseUrl}/sdk/js?client-id=${config.client_id}&currency=USD&intent=capture`;
-        
-        script.onload = () => {
-            console.log('✅ PayPal SDK cargado exitosamente');
-            this.paypalSDKCargado = true;
-        };
-        
-        script.onerror = (error) => {
-            console.error('❌ Error cargando PayPal SDK:', error);
-            this.mostrarErrorPayPal('No se pudo cargar PayPal. Verifica tu conexión.');
-        };
-        
-        document.body.appendChild(script);
-
-    } catch (error) {
-        console.error('❌ Error en carga segura de PayPal:', error);
-        this.mostrarErrorPayPal('Error de configuración: ' + error.message);
+        this.cargarPayPalDeFormaSegura();
     }
-}
 
-async obtenerConfiguracionPayPal() {
-    try {
-        const response = await fetch('/api/paypal/config');
-        
-        if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
+    async cargarPayPalDeFormaSegura() {
+        try {
+            // 1. Obtener configuración del backend
+            const config = await this.obtenerConfiguracionPayPal();
+
+            if (!config || !config.client_id) {
+                throw new Error('Configuración de PayPal no disponible');
+            }
+
+            console.log('🔐 Configuración PayPal obtenida:', {
+                client_id: config.client_id.substring(0, 10) + '...',
+                mode: config.mode
+            });
+
+            // 2. Determinar la URL correcta (sandbox vs live)
+            const baseUrl = config.mode === 'live'
+                ? 'https://www.paypal.com'
+                : 'https://www.sandbox.paypal.com';
+
+            // 3. Cargar SDK
+            const script = document.createElement('script');
+            script.src = `${baseUrl}/sdk/js?client-id=${config.client_id}&currency=USD&intent=capture`;
+
+            script.onload = () => {
+                console.log('✅ PayPal SDK cargado exitosamente');
+                this.paypalSDKCargado = true;
+            };
+
+            script.onerror = (error) => {
+                console.error('❌ Error cargando PayPal SDK:', error);
+                this.mostrarErrorPayPal('No se pudo cargar PayPal. Verifica tu conexión.');
+            };
+
+            document.body.appendChild(script);
+
+        } catch (error) {
+            console.error('❌ Error en carga segura de PayPal:', error);
+            this.mostrarErrorPayPal('Error de configuración: ' + error.message);
         }
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            return data;
-        } else {
-            throw new Error(data.error || 'Error del servidor');
-        }
-    } catch (error) {
-        console.error('Error obteniendo configuración PayPal:', error);
-        return null;
     }
-}
 
-mostrarErrorPayPal(mensaje) {
-    this.mostrarNotificacion(mensaje, 'error');
-    
-    // También mostrar en la consola para debugging
-    console.error('🔴 Error PayPal:', mensaje);
-}
+    async obtenerConfiguracionPayPal() {
+        try {
+            const response = await fetch('/api/paypal/config');
+
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+                return data;
+            } else {
+                throw new Error(data.error || 'Error del servidor');
+            }
+        } catch (error) {
+            console.error('Error obteniendo configuración PayPal:', error);
+            return null;
+        }
+    }
+
+    mostrarErrorPayPal(mensaje) {
+        this.mostrarNotificacion(mensaje, 'error');
+
+        // También mostrar en la consola para debugging
+        console.error('🔴 Error PayPal:', mensaje);
+    }
 
     async inicializarPayPal() {
         console.log('🔄 Inicializando PayPal (Sandbox)...');
-        
+
         try {
             // Esperar a que PayPal esté disponible
             await this.waitForPayPal();
-            await this.crearPedidoPayPal();
-            
+            this.renderPayPalButtons();  // ← LLAMA DIRECTAMENTE A renderPayPalButtons
+
         } catch (error) {
             console.error('❌ Error inicializando PayPal:', error);
             this.mostrarErrorPayPal('Error al inicializar PayPal: ' + error.message);
@@ -478,17 +478,17 @@ mostrarErrorPayPal(mensaje) {
             console.log('⏳ Esperando a que PayPal SDK esté disponible...');
             let attempts = 0;
             const maxAttempts = 40;
-            
+
             const checkPayPal = setInterval(() => {
                 attempts++;
-                
+
                 if (window.paypal) {
                     clearInterval(checkPayPal);
                     console.log('✅ PayPal SDK disponible después de ' + (attempts * 500) + 'ms');
                     resolve();
                     return;
                 }
-                
+
                 if (attempts >= maxAttempts) {
                     clearInterval(checkPayPal);
                     reject(new Error('Timeout: PayPal SDK no se cargó después de 20 segundos'));
@@ -498,60 +498,34 @@ mostrarErrorPayPal(mensaje) {
         });
     }
 
-    async crearPedidoPayPal() {
-        try {
-            console.log('📦 Creando pedido en sistema para PayPal...');
-            
-            const response = await fetch('/api/pedidos/crear-paypal', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            // Si el endpoint no existe, simular éxito para testing
-            if (!response.ok) {
-                console.warn('⚠️ Endpoint /api/pedidos/crear-paypal no disponible, usando ID temporal para testing');
-                this.pedidoPendienteId = 'temp-' + Date.now();
-                this.renderPayPalButtons();
-                return;
-            }
-
-            const data = await response.json();
-            
-            if (data.success) {
-                this.pedidoPendienteId = data.pedido_id;
-                console.log('✅ Pedido creado:', this.pedidoPendienteId);
-                this.renderPayPalButtons();
-            } else {
-                throw new Error(data.error || 'Error desconocido al crear pedido');
-            }
-        } catch (error) {
-            console.error('❌ Error creando pedido:', error);
-            console.warn('⚠️ Continuando con ID temporal debido a error:', error.message);
-            this.pedidoPendienteId = 'temp-' + Date.now();
-            this.renderPayPalButtons();
-        }
-    }
-
     renderPayPalButtons() {
-        console.log('🎨 Renderizando botones PayPal para pedido:', this.pedidoPendienteId);
-        
+        console.log('🎨 Renderizando botones PayPal');
+
         if (!window.paypal) {
             console.error('❌ PayPal SDK no disponible');
             this.mostrarErrorPayPal('PayPal SDK no se cargó correctamente');
             return;
         }
-        
+
         const container = document.getElementById('paypal-button-container');
         if (!container) {
             console.error('❌ Contenedor PayPal no encontrado');
             return;
         }
-        
+
         try {
+            // Limpiar container
             container.innerHTML = '';
-            
+
+            // Verificar que no haya botones ya renderizados
+            if (this.paypalButtons) {
+                try {
+                    this.paypalButtons.close();
+                } catch (e) {
+                    // Ignorar error si no se puede cerrar
+                }
+            }
+
             this.paypalButtons = paypal.Buttons({
                 style: {
                     layout: 'vertical',
@@ -571,45 +545,70 @@ mostrarErrorPayPal(mensaje) {
                                 currency_code: 'USD'
                             },
                             description: `Pedido GameStore - ${this.carritoData.count} productos`
-                        }]
+                        }],
+                        application_context: {
+                            shipping_preference: 'NO_SHIPPING'
+                        }
                     });
                 },
 
-                // ✅ CORRECCIÓN: Enfoque simplificado para evitar "Target window is closed"
                 onApprove: async (data, actions) => {
-                    console.log('✅ Orden PayPal aprobada:', data);
-                    
-                    // Mostrar mensaje de procesamiento
-                    container.innerHTML = '<div class="processing-payment"><i class="fa-solid fa-spinner fa-spin"></i> Procesando pago...</div>';
-                    
-                    try {
-                        // ✅ ENFOQUE CORREGIDO: No usar actions.order.capture() directamente
-                        // En su lugar, obtener los detalles de la orden y procesar en el backend
-                        console.log('📋 Obteniendo detalles de la orden...');
-                        
-                        // Simular procesamiento exitoso (para testing)
-                        console.log('🎉 Pago procesado exitosamente (Sandbox)');
-                        
-                        // Redirigir directamente a página de éxito
-                        setTimeout(() => {
-                            window.location.href = `/pago-exitoso?pedido_id=${this.pedidoPendienteId}&paypal_order_id=${data.orderID}`;
-                        }, 2000);
-                        
-                    } catch (error) {
-                        console.error('❌ Error en onApprove:', error);
-                        this.mostrarNotificacion('Error al procesar el pago: ' + error.message, 'error');
-                        this.actualizarVistaCarrito();
-                    }
-                },
+    console.log('✅ Orden PayPal aprobada:', data);
+    
+    // Mostrar mensaje de procesamiento
+    const container = document.getElementById('paypal-button-container');
+    if (container) {
+        container.innerHTML = '<div class="processing-payment"><i class="fa-solid fa-spinner fa-spin"></i> Procesando pago...</div>';
+    }
+    
+    try {
+        // ✅ YA NO CAPTURAMOS AQUÍ - Solo enviamos el order_id al backend
+        console.log('📦 Enviando order_id al backend:', data.orderID);
+        
+        const response = await fetch('/api/pedidos/procesar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                metodo_pago: 'paypal',
+                order_id: data.orderID  // Solo enviamos el ID
+            })
+        });
+
+        const result = await response.json();
+        console.log('📦 Respuesta del backend:', result);
+
+        if (result.success) {
+            console.log('✅ Pedido procesado exitosamente en BD:', result);
+            
+            // Limpiar carrito del localStorage
+            localStorage.removeItem('carrito');
+            
+            // Actualizar contador del carrito a 0
+            this.actualizarContadorCarrito(0);
+            
+            // Redirigir a página de éxito
+            window.location.href = `/pago-exitoso?pedido_id=${result.pedido_id}`;
+        } else {
+            throw new Error(result.error || 'Error al procesar el pedido');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error en onApprove:', error);
+        this.mostrarNotificacion('Error al procesar el pago: ' + error.message, 'error');
+        this.actualizarVistaCarrito();
+    }
+},
 
                 onError: (err) => {
                     console.error('❌ Error PayPal:', err);
                     let errorMsg = 'Error en el proceso de PayPal';
-                    
+
                     if (err && err.message) {
                         errorMsg += ': ' + err.message;
                     }
-                    
+
                     this.mostrarNotificacion(errorMsg, 'error');
                     this.mostrarErrorPayPal(errorMsg);
                 },
@@ -630,7 +629,7 @@ mostrarErrorPayPal(mensaje) {
                 console.error('❌ Error renderizando botones PayPal:', error);
                 this.mostrarErrorPayPal('Error al crear botones de PayPal: ' + error.message);
             });
-            
+
         } catch (error) {
             console.error('❌ Error en renderPayPalButtons:', error);
             this.mostrarErrorPayPal('Error inesperado: ' + error.message);
@@ -670,22 +669,22 @@ mostrarErrorPayPal(mensaje) {
             window.carritoSimple.mostrarNotificacion(mensaje, tipo);
             return;
         }
-        
+
         const notification = document.createElement('div');
         notification.className = `notification-custom ${tipo}`;
-        
+
         let icon = 'info';
         if (tipo === 'success') icon = 'check';
         if (tipo === 'error') icon = 'exclamation-triangle';
         if (tipo === 'warning') icon = 'exclamation';
-        
+
         notification.innerHTML = `
             <div class="notification-content">
                 <i class="fa-solid fa-${icon}"></i>
                 <span>${mensaje}</span>
             </div>
         `;
-        
+
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -701,14 +700,14 @@ mostrarErrorPayPal(mensaje) {
             transition: all 0.3s ease;
             max-width: 400px;
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
             notification.style.opacity = '1';
             notification.style.transform = 'translateY(0)';
         }, 10);
-        
+
         setTimeout(() => {
             notification.style.opacity = '0';
             notification.style.transform = 'translateY(-20px)';
@@ -722,7 +721,7 @@ mostrarErrorPayPal(mensaje) {
 }
 
 // Función global para agregar al carrito
-window.agregarAlCarritoGlobal = function(productoId) {
+window.agregarAlCarritoGlobal = function (productoId) {
     if (window.carritoDinamico) {
         window.carritoDinamico.agregarAlCarrito(productoId);
     } else {
@@ -736,16 +735,16 @@ window.agregarAlCarritoGlobal = function(productoId) {
                 cantidad: 1
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const contadores = document.querySelectorAll('.carrito-count, .cart-count');
-                contadores.forEach(contador => {
-                    contador.textContent = data.carrito_count;
-                    contador.style.display = data.carrito_count > 0 ? 'inline' : 'none';
-                });
-            }
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const contadores = document.querySelectorAll('.carrito-count, .cart-count');
+                    contadores.forEach(contador => {
+                        contador.textContent = data.carrito_count;
+                        contador.style.display = data.carrito_count > 0 ? 'inline' : 'none';
+                    });
+                }
+            });
     }
 };
 

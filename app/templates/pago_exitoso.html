@@ -1,82 +1,130 @@
 {% extends "base.html" %}
 
-
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/prov.css">
+{% endblock %}
 
 {% block content %}
 
-    <nav class="barra_lateral">
-        <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+<header class="barra-superior">
+    <div class="boton">
+        <button id="btn-menu" class="btn-menu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="marca">
+        <h1>Game Store</h1>
+    </div>
+
+    <section class="iconos">
+        <!--<button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i></button> -->
+        <div class="contenedor-btn-carrito">
+            <a class="btn-carrito" href="/carrito"><i class="fa-solid fa-cart-shopping"></i><span
+                    class="carrito-count">0</span></a>
+        </div>
+        <!-- Menu usuario -->
+        <button class="btn-menu-user" id="btn-menu-user">
+            <i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="menu-user" id="menu-user">
+            <div class="contenido-menu-user">
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
+        </div>
+    </section>
+</header>
+
+
+<div class="contenedor-principal">
+    <nav class="barra-lateral">
+        <div class="contenedor-logo">
+            <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        </div>
+
         <ul>
-            <li><a class="enlace_barra_lateral" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li><a class="barra-lateral-link" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
             <li>
-                <h3>Mis compras y deseos</h3>
+                <div class="divisor"></div>
             </li>
-            <li><a class="enlace_barra_lateral" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
-            <li><a class="enlace_barra_lateral" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
+            <li><a class="barra-lateral-link" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+            <li><a class="barra-lateral-link" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
             <li>
-                <h3>Categorías</h3>
+                <div class="divisor"></div>
             </li>
-            <li><a class="enlace_barra_lateral" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
-            <li><a class="enlace_barra_lateral" href="/accesorios"><i class="fa-solid fa-headset"></i> Accesorios</a>
-            </li>
-            <li><a class="enlace_barra_lateral" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
-            <li><a class="enlace_barra_lateral" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
+            <li><a class="barra-lateral-link" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
+            <li><a class="barra-lateral-link" href="/accesorios"><i class="fa-solid fa-headset"></i>
+                    Accesorios</a></li>
+            <li><a class="barra-lateral-link" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
+            <li><a class="barra-lateral-link" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
+            <div class="divisor"></div>
+            <li><a class="barra-lateral-link" href="/sobre-nosotros"><i class="fa-solid fa-circle-info"></i>¿Quienes
+                    somos?</a></li>
+            <li><a class="barra-lateral-link" href="/contacto"><i
+                        class="fa-solid fa-circle-question"></i>Contactanos</a></li>
+
         </ul>
     </nav>
 
-    <main>
-        <header class="encabezado">
-            <section class="buscador">
-                <input type="text" id="buscar-input" placeholder="Buscar producto">
-                <button class="btn_buscar" id="btn-buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </section>
+    <div class="principal">
 
-            <section class="iconos">
-                <button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i></button>
-                <a class="icon carrito-link" href="/carrito">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                </a>
-
-                <!-- Menu usuario -->
-                <div class="user-menu-container">
-                    <button class="user-menu-btn" id="userMenuBtn">
-                        <i class="fa-solid fa-circle-user"></i>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="dropdown-content">
-                            <!-- El contenido se cargará dinámicamente -->
-                            <div class="loading-menu">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
-                            </div>
-                        </div>
-                    </div>
+        <div class="contenido">
+            <div class="compra-exitosa">
+                <div class="icono-exito">
+                    <i class="fa-solid fa-check-circle"></i>
                 </div>
-            </section>
-        </header>
-
-    <div class="container">
-        <div class="compra-exitosa">
-            <div class="icono-exito">
-                <i class="fa-solid fa-check-circle"></i>
-            </div>
-            <h2>¡Pago Exitoso!</h2>
-            <p>Tu pago ha sido procesado correctamente</p>
-            
-            
-            
-            
-            <div class="acciones-compra">
-                <a href="/pedidos" class="btn-ver-pedidos">
-                    <i class="fa-solid fa-box"></i> Ver mis pedidos
-                </a>
-                <a href="/" class="btn-seguir-comprando">
-                    <i class="fa-solid fa-house"></i> Seguir comprando
-                </a>
+                <h2>¡Pago Exitoso!</h2>
+                <p>Tu pago ha sido procesado correctamente</p>
+                <div class="acciones-compra">
+                    <a href="/pedidos" class="btn-ver-pedidos">
+                        <i class="fa-solid fa-box"></i> Ver mis pedidos
+                    </a>
+                    <a href="/" class="btn-seguir-comprando">
+                        <i class="fa-solid fa-house"></i> Inicio
+                    </a>
+                </div>
             </div>
         </div>
+
+
+        <footer class="contenedor-footer">
+            <div class="contenedor-redes-sociales">
+                <h3>Redes Sociales</h3>
+                <div class="iconos-redes-sociales">
+                    <a href="https://instagram.com/gamestore" target="_blank" class="instagram" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://facebook.com/gamestore" target="_blank" class="facebook" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com/gamestore" target="_blank" class="twitter" aria-label="Twitter/X">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="" target="_blank" class="whatsapp" aria-label="WhatsApp"><i
+                            class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="contenedor-sobre-nosotros">
+                <h3>Sobre nosotros</h3>
+                <a href="/sobre-nosotros">Sobre nosotros</a>
+            </div>
+            <div class="contenedor-contactanos">
+                <h3>Contactanos</h3>
+                <ul>
+                    <li><i class="fa-solid fa-phone"></i>+52 55 3190 8274</li>
+                    <li><i class="fa-solid fa-envelope"></i>gamevaultcontacto@gmail.com</li>
+                </ul>
+            </div>
+        </footer>
+
     </div>
 
-    <script src="/static/js/user-menu.js"></script>
+</div>
+
+<div id="fondo"></div>
+
+<script src="/static/js/user-menu.js"></script>
+<script src="/static/js/barra-lateral.js"></script>
+
 
 {% endblock %}

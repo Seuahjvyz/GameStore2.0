@@ -1,27 +1,129 @@
 {% extends "base.html" %}
 
-
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/prov.css">
+{% endblock %}
 
 {% block content %}
 
-    <div class="container">
-        <div class="pago-cancelado">
-            <div class="icono-cancelado">
-                <i class="fa-solid fa-times-circle"></i>
-            </div>
-            <h2>Pago Cancelado</h2>
-            <p>El proceso de pago ha sido cancelado. Tu carrito sigue intacto.</p>
-            <p class="info-adicional">Puedes volver a intentar el pago cuando lo desees.</p>
-            <div class="acciones">
-                <a href="/carrito" class="btn-volver-carrito">
-                    <i class="fa-solid fa-arrow-left"></i> Volver al carrito
-                </a>
-                <a href="/" class="btn-seguir-comprando">
-                    <i class="fa-solid fa-shopping-cart"></i> Seguir comprando
-                </a>
-            </div>
-        </div>
+<header class="barra-superior">
+    <div class="boton">
+        <button id="btn-menu" class="btn-menu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="marca">
+        <h1>Game Store</h1>
     </div>
 
+    <section class="iconos">
+        <!--<button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i></button> -->
+        <div class="contenedor-btn-carrito">
+            <a class="btn-carrito" href="/carrito"><i class="fa-solid fa-cart-shopping"></i><span
+                    class="carrito-count">0</span></a>
+        </div>
+        <!-- Menu usuario -->
+        <button class="btn-menu-user" id="btn-menu-user">
+            <i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="menu-user" id="menu-user">
+            <div class="contenido-menu-user">
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
+        </div>
+    </section>
+</header>
+
+<div class="contenedor-principal">
+    <nav class="barra-lateral">
+        <div class="contenedor-logo">
+            <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        </div>
+
+        <ul>
+            <li><a class="barra-lateral-link" href="/"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li>
+                <div class="divisor"></div>
+            </li>
+            <li><a class="barra-lateral-link" href="/favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+            <li><a class="barra-lateral-link" href="/pedidos"><i class="fa-solid fa-box"></i> Pedidos</a></li>
+            <li>
+                <div class="divisor"></div>
+            </li>
+            <li><a class="barra-lateral-link" href="/juegos"><i class="fa-solid fa-ghost"></i> Juegos</a></li>
+            <li><a class="barra-lateral-link" href="/accesorios"><i class="fa-solid fa-headset"></i>
+                    Accesorios</a></li>
+            <li><a class="barra-lateral-link" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
+            <li><a class="barra-lateral-link" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
+            <div class="divisor"></div>
+            <li><a class="barra-lateral-link" href="/sobre-nosotros"><i class="fa-solid fa-circle-info"></i>¿Quienes
+                    somos?</a></li>
+            <li><a class="barra-lateral-link" href="/contacto"><i
+                        class="fa-solid fa-circle-question"></i>Contactanos</a></li>
+
+        </ul>
+    </nav>
+
+    <div class="principal">
+
+        <div class="contenido">
+            <div class="compra-exitosa">
+                <div class="icono-exito">
+                    <i class="fa-solid fa-times-circle"></i>
+                </div>
+                <h2>Pago Cancelado</h2>
+                <p>El proceso de pago ha sido cancelado. </p>
+                <p class="info-adicional">Puedes volver a intentar el pago cuando lo desees.</p>
+                <div class="acciones-compra">
+                    <a href="/carrito" class="btn-volver-carrito">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al carrito
+                    </a>
+                    <a href="/" class="btn-seguir-comprando">
+                        <i class="fa-solid fa-shopping-cart"></i> Seguir comprando
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <footer class="contenedor-footer">
+            <div class="contenedor-redes-sociales">
+                <h3>Redes Sociales</h3>
+                <div class="iconos-redes-sociales">
+                    <a href="https://instagram.com/gamestore" target="_blank" class="instagram" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://facebook.com/gamestore" target="_blank" class="facebook" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com/gamestore" target="_blank" class="twitter" aria-label="Twitter/X">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="" target="_blank" class="whatsapp" aria-label="WhatsApp"><i
+                            class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="contenedor-sobre-nosotros">
+                <h3>Sobre nosotros</h3>
+                <a href="/sobre-nosotros">Sobre nosotros</a>
+            </div>
+            <div class="contenedor-contactanos">
+                <h3>Contactanos</h3>
+                <ul>
+                    <li><i class="fa-solid fa-phone"></i>+52 55 3190 8274</li>
+                    <li><i class="fa-solid fa-envelope"></i>gamevaultcontacto@gmail.com</li>
+                </ul>
+            </div>
+        </footer>
+
+    </div>
+
+</div>
+
+<div id="fondo"></div>
+
+<script src="/static/js/barra-lateral.js"></script>
+<script src="/static/js/user-menu.js"></script>
+
+
 {% endblock %}
-    

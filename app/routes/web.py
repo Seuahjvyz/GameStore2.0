@@ -24,7 +24,7 @@ def login_required(f):
         
         # VERIFICACIÓN BÁSICA
         if 'user_id' not in session:
-            print("❌ REDIRIGIENDO a login - usuario NO autenticado")
+            print("REDIRIGIENDO a login - usuario NO autenticado")
             
             if request.path.startswith('/api/'):
                 return jsonify({
@@ -35,10 +35,10 @@ def login_required(f):
             
             return redirect(url_for('web.login'))
         
-        # 🔥 VERIFICAR QUE EL USUARIO SIGA ACTIVO EN BD
+        # VERIFICAR QUE EL USUARIO SIGA ACTIVO EN BD
         usuario = Usuario.query.get(session['user_id'])
         if not usuario or not usuario.activo:
-            print(f"❌ Usuario {session['user_id']} desactivado - cerrando sesión")
+            print(f"Usuario {session['user_id']} desactivado - cerrando sesión")
             session.clear()
             
             if request.path.startswith('/api/'):
@@ -195,7 +195,8 @@ def accesorios():
 @web_bp.route('/favoritos')
 @login_required
 def favoritos():
-    return render_template('favoritos.html')
+    return render_template('favoritos.html', usuario_actual=session.get('user_id'))
+
 
 @web_bp.route('/perfil-usuario')
 @login_required
@@ -220,7 +221,7 @@ def compra_finalizada():
 @web_bp.route('/carrito')
 @login_required
 def carrito():
-    return render_template('Carrito.html')
+    return render_template('Carrito.html', usuario_actual=session.get('user_id'))
 
 
 # ----------------------------------------- AUTENTICACIÓN Y SESIÓN ---------------------------------------- #
@@ -504,7 +505,7 @@ def api_productos():
         })
         
     except Exception as e:
-        print(f"❌ Error obteniendo productos: {e}")
+        print(f" Error obteniendo productos: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al obtener productos'}), 500
@@ -512,11 +513,11 @@ def api_productos():
 @web_bp.route('/api/productos/categoria/<int:categoria_id>')
 def api_productos_por_categoria(categoria_id):
     try:
-        # ✅ SOLO productos activos y con stock
+        #  SOLO productos activos y con stock
         productos = Producto.query.filter(
             Producto.categoria_id == categoria_id,
             Producto.activo == True,
-            Producto.stock > 0  # ✅ SOLO productos con stock
+            Producto.stock > 0  # SOLO productos con stock
         ).all()
         
         productos_data = []
@@ -537,7 +538,7 @@ def api_productos_por_categoria(categoria_id):
         })
         
     except Exception as e:
-        print(f"❌ Error obteniendo productos por categoría: {e}")
+        print(f"Error obteniendo productos por categoría: {e}")
         return jsonify({'success': False, 'error': 'Error al obtener productos'}), 500
 
 # ----------------------------------------- CARRITO API ---------------------------------------- #
@@ -597,37 +598,39 @@ def agregar_al_carrito():
             activo=True
         ).first()
 
-        print(f"🛒 Carrito encontrado: {carrito.id_carrito if carrito else 'NONE'}")
-
         if not carrito:
             carrito = Carrito(usuario_id=session['user_id'])
             db.session.add(carrito)
             db.session.flush()
-            print(f"🆕 Nuevo carrito creado: {carrito.id_carrito}")
 
-        # ✅ VERIFICACIÓN MÁS ROBUSTA: Buscar item existente
+        # Buscar item existente
         item_existente = CarritoItem.query.filter_by(
             carrito_id=carrito.id_carrito,
             producto_id=producto_id
         ).first()
 
-        print(f"🔍 Item existente: {item_existente.id_item if item_existente else 'NONE'}")
-
         if item_existente:
-            # Si ya existe, aumentar la cantidad
+            # Si ya existe, calcular nueva cantidad
             nueva_cantidad = item_existente.cantidad + cantidad
-            print(f"📈 Actualizando cantidad: {item_existente.cantidad} + {cantidad} = {nueva_cantidad}")
             
-            # Verificar stock disponible
+            # 🔥 VERIFICAR STOCK DISPONIBLE (considerando lo que ya tiene en carrito)
             if nueva_cantidad > producto.stock:
-                return jsonify({'success': False, 'error': f'Stock insuficiente. Solo quedan {producto.stock} unidades'}), 400
+                return jsonify({
+                    'success': False, 
+                    'error': f'Solo hay {producto.stock} unidades disponibles. Ya tienes {item_existente.cantidad} en tu carrito.'
+                }), 400
             
             item_existente.cantidad = nueva_cantidad
             mensaje = f'Cantidad actualizada: ahora tienes {nueva_cantidad} unidades'
             accion = 'actualizado'
         else:
-            # Si no existe, crear nuevo item
-            print(f"🆕 Creando nuevo item para producto {producto_id}")
+            # Si no existe, verificar stock para nueva compra
+            if cantidad > producto.stock:
+                return jsonify({
+                    'success': False, 
+                    'error': f'Solo hay {producto.stock} unidades disponibles'
+                }), 400
+            
             nuevo_item = CarritoItem(
                 carrito_id=carrito.id_carrito,
                 producto_id=producto_id,
@@ -639,7 +642,7 @@ def agregar_al_carrito():
             accion = 'agregado'
 
         db.session.commit()
-        print(f"✅ Commit exitoso - {accion}")
+        print(f"Commit exitoso - {accion}")
         
         # Obtener el conteo actualizado
         carrito_actualizado = Carrito.query.filter_by(
@@ -660,7 +663,7 @@ def agregar_al_carrito():
 
     except Exception as e:
         db.session.rollback()
-        print(f"❌ ERROR en agregar_al_carrito: {e}")
+        print(f"ERROR en agregar_al_carrito: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
@@ -689,36 +692,55 @@ def api_carrito_detalles():
 
         items_data = []
         subtotal = 0
+        items_a_eliminar = []  # Lista para items que debemos eliminar
         
         for item in carrito.items:
+            producto = Producto.query.get(item.producto_id)
+            
+            # 🔥 VERIFICAR SI EL PRODUCTO EXISTE Y ESTÁ ACTIVO
+            if not producto or not producto.activo:
+                # Producto no existe o está inactivo - marcarlo para eliminar
+                items_a_eliminar.append(item)
+                print(f"⚠️ Producto {item.producto_id} no disponible - será eliminado del carrito")
+                continue
+            
+            # Producto válido - calcular total
             item_total = float(item.precio_unitario) * item.cantidad
             subtotal += item_total
             
             items_data.append({
                 'id': item.id_item,
-                'producto_id': item.producto.id_producto,
-                'nombre': item.producto.nombre,
+                'producto_id': item.producto_id,
+                'nombre': producto.nombre,
                 'precio_unitario': float(item.precio_unitario),
                 'cantidad': item.cantidad,
                 'total': item_total,
-                'imagen': item.producto.imagen,
-                'stock': item.producto.stock
+                'imagen': producto.imagen,
+                'stock': producto.stock,
+                'activo': producto.activo
             })
-
+        
+        # 🔥 ELIMINAR ITEMS DE PRODUCTOS INACTIVOS O ELIMINADOS
+        if items_a_eliminar:
+            for item in items_a_eliminar:
+                db.session.delete(item)
+            db.session.commit()
+            print(f"✅ Eliminados {len(items_a_eliminar)} items del carrito por productos no disponibles")
+        
         return jsonify({
             'success': True,
             'carrito': {
                 'items': items_data,
                 'subtotal': subtotal,
                 'total': subtotal,
-                'count': len(carrito.items)
+                'count': len(items_data)
             }
         })
 
     except Exception as e:
         print(f"Error obteniendo carrito: {e}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
-
+    
 @web_bp.route('/api/carrito/actualizar/<int:item_id>', methods=['PUT'])
 def actualizar_cantidad_carrito(item_id):
     try:
@@ -757,6 +779,8 @@ def actualizar_cantidad_carrito(item_id):
         db.session.rollback()
         print(f"Error actualizando carrito: {e}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
+    
+
 
 @web_bp.route('/api/carrito/eliminar/<int:item_id>', methods=['DELETE'])
 def eliminar_item_carrito(item_id):
@@ -1115,10 +1139,10 @@ def api_admin_editar_producto():
             nuevo_stock = int(data['stock'])
             producto.stock = nuevo_stock
             
-            # ✅ DESHABILITAR SI EL NUEVO STOCK ES 0
+            #  DESHABILITAR SI EL NUEVO STOCK ES 0
             if nuevo_stock == 0:
                 producto.activo = False
-            # ✅ HABILITAR SI HABÍA STOCK 0 Y AHORA TIENE STOCK
+            # HABILITAR SI HABÍA STOCK 0 Y AHORA TIENE STOCK
             elif nuevo_stock > 0 and stock_anterior == 0:
                 producto.activo = True
                 
@@ -1211,16 +1235,26 @@ def api_admin_eliminar_producto(producto_id):
 @web_bp.route('/api/pedidos/procesar', methods=['POST'])
 @login_required
 def api_procesar_pedido():
+    """Procesa el pedido después del pago exitoso (VERSIÓN COMPLETA)"""
     try:
         if 'user_id' not in session:
             return jsonify({'success': False, 'error': 'No autenticado'}), 401
 
         data = request.get_json()
-        metodo_pago = data.get('metodo_pago', 'paypal')
-        detalles_paypal = data.get('detalles_paypal', {})
+        print(f"DATOS RECIBIDOS: {data}")  # ← AGREGAR ESTE LOG PARA DEBUG
         
-        print(f"🎯 Procesando pedido para usuario {session['user_id']}")
+        metodo_pago = data.get('metodo_pago', 'paypal')
+        order_id = data.get('order_id')  # ← AGREGAR ESTA LÍNEA
+        detalles_paypal = data.get('detalles_paypal', {})
+        direccion_envio = data.get('direccion_envio', '')
+        
+        # Si recibimos order_id, lo usamos como transacción
+        id_transaccion = order_id if order_id else detalles_paypal.get('id', '')
+        
+        print(f" Procesando pedido para usuario {session['user_id']}")
+        print(f" ID Transacción: {id_transaccion}")
 
+        # El resto del código IGUAL...
         # Obtener el carrito activo del usuario
         carrito = Carrito.query.filter_by(
             usuario_id=session['user_id'], 
@@ -1249,7 +1283,6 @@ def api_procesar_pedido():
                     'error': f'Stock insuficiente para {producto.nombre}. Disponible: {producto.stock}, Solicitado: {item.cantidad}'
                 }), 400
             
-            # Calcular total del item
             item_total = float(item.precio_unitario) * item.cantidad
             total_pedido += item_total
             items_pedido.append({
@@ -1260,24 +1293,43 @@ def api_procesar_pedido():
                 'total': item_total
             })
 
-        # ✅ CREAR PEDIO CON INFORMACIÓN DE PAYPAL
+        # Calcular fecha de entrega
+        from datetime import datetime, timedelta
+        
+        fecha_actual = datetime.utcnow()
+        
+        dias_habiles = 0
+        fecha_temp = fecha_actual
+        
+        while dias_habiles < 20:
+            fecha_temp += timedelta(days=1)
+            if fecha_temp.weekday() < 5:
+                dias_habiles += 1
+        
+        fecha_entrega = fecha_temp
+
+        # Crear pedido (usando id_transaccion)
         nuevo_pedido = Pedido(
             usuario_id=session['user_id'],
             total=total_pedido,
-            estado='completado',  # Cambiar a 'pendiente' si quieres confirmación manual
+            estado='completado',
+            estado_seguimiento='procesando',
+            fecha_pedido=fecha_actual,
+            fecha_entrega_estimada=fecha_entrega,
             metodo_pago=metodo_pago,
-            id_transaccion_paypal=detalles_paypal.get('id', '')  # Guardar ID de transacción PayPal
+            id_transaccion_paypal=id_transaccion,  # ← AHORA USA id_transaccion
+            direccion_envio=direccion_envio,
+            puede_cancelar=True
         )
         
         db.session.add(nuevo_pedido)
-        db.session.flush()  # Para obtener el ID del pedido
+        db.session.flush()
 
         # Crear items del pedido y actualizar stock
         for item_data in items_pedido:
             producto = item_data['producto']
             item_carrito = item_data['item_carrito']
             
-            # Crear item del pedido
             pedido_item = PedidoItem(
                 pedido_id=nuevo_pedido.id_pedido,
                 producto_id=producto.id_producto,
@@ -1286,13 +1338,11 @@ def api_procesar_pedido():
             )
             db.session.add(pedido_item)
             
-            # Actualizar stock del producto
             producto.stock -= item_carrito.cantidad
             
-            # Deshabilitar producto si stock llega a 0
             if producto.stock == 0:
                 producto.activo = False
-                print(f"⚠️ Producto deshabilitado por stock 0: {producto.nombre}")
+                print(f"Producto deshabilitado por stock 0: {producto.nombre}")
 
         # Limpiar el carrito
         for item in carrito.items:
@@ -1302,22 +1352,202 @@ def api_procesar_pedido():
 
         db.session.commit()
 
-        print(f"✅ Pedido {nuevo_pedido.id_pedido} procesado exitosamente. Total: ${total_pedido}")
+        print(f"Pedido {nuevo_pedido.id_pedido} procesado exitosamente. Total: ${total_pedido}")
+        print(f"Fecha de entrega estimada: {fecha_entrega.strftime('%d/%m/%Y')}")
 
         return jsonify({
             'success': True,
             'message': 'Compra procesada correctamente',
             'pedido_id': nuevo_pedido.id_pedido,
             'total': float(total_pedido),
-            'transaccion_id': nuevo_pedido.id_transaccion_paypal
+            'transaccion_id': nuevo_pedido.id_transaccion_paypal,
+            'fecha_entrega_estimada': fecha_entrega.strftime('%Y-%m-%d'),
+            'estado_seguimiento': 'procesando'
         })
 
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Error procesando pedido: {e}")
+        print(f"Error procesando pedido: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al procesar la compra'}), 500
+        
+# ----------------------------------------- API PEDIDOS USUARIO ---------------------------------------- #
+@web_bp.route('/api/pedidos/mis-pedidos', methods=['GET'])
+@login_required
+def api_mis_pedidos():
+    """Obtiene todos los pedidos del usuario autenticado"""
+    try:
+        usuario_id = session['user_id']
+        print(f"Obteniendo pedidos para usuario ID: {usuario_id}")
+        
+        # Obtener información del usuario
+        usuario = Usuario.query.get(usuario_id)
+        print(f" Usuario: {usuario.nombre_usuario} (ID: {usuario_id})")
+        
+        # Obtener TODOS los pedidos del usuario ordenados por fecha (para contar)
+        todos_pedidos_usuario = Pedido.query.filter_by(usuario_id=usuario_id)\
+            .order_by(Pedido.fecha_pedido.asc())\
+            .all()
+        
+        # Crear un diccionario que mapea ID real → número secuencial
+        # El más antiguo (primero en la lista) será #1
+        mapeo_ids = {}
+        for idx, pedido in enumerate(todos_pedidos_usuario, 1):
+            mapeo_ids[pedido.id_pedido] = idx
+            print(f" Mapeo: Pedido ID={pedido.id_pedido} → #{idx} (fecha: {pedido.fecha_pedido})")
+        
+        print(f" Total de pedidos del usuario: {len(todos_pedidos_usuario)}")
+        
+        #  Ahora obtenerlos ordenados del más reciente al más antiguo para la vista
+        pedidos_ordenados = Pedido.query.filter_by(usuario_id=usuario_id)\
+            .order_by(Pedido.fecha_pedido.desc())\
+            .all()
+        
+        from datetime import datetime
+        ahora = datetime.utcnow()
+        
+        pedidos_json = []
+        for pedido in pedidos_ordenados:
+            try:
+                # Obtener el número secuencial del mapeo
+                numero_secuencial = mapeo_ids.get(pedido.id_pedido, 0)
+                
+                # Actualizar estado de seguimiento automáticamente
+                if pedido.estado_seguimiento not in ['cancelado', 'entregado']:
+                    if pedido.fecha_entrega_estimada and ahora >= pedido.fecha_entrega_estimada:
+                        pedido.estado_seguimiento = 'entregado'
+                        pedido.fecha_entrega_real = ahora
+                        pedido.puede_cancelar = False
+                    elif (ahora - pedido.fecha_pedido).days >= 7:
+                        pedido.estado_seguimiento = 'enviado'
+                    
+                    pedido.puede_cancelar = (ahora - pedido.fecha_pedido).total_seconds() < 86400
+                
+                # Usamos el número secuencial del mapeo
+                pedido_json = {
+                    'id_pedido': pedido.id_pedido,
+                    'numero_pedido': f"#{numero_secuencial}",
+                    'fecha_pedido': pedido.fecha_pedido.strftime('%Y-%m-%d %H:%M:%S') if pedido.fecha_pedido else None,
+                    'fecha_entrega_estimada': pedido.fecha_entrega_estimada.strftime('%Y-%m-%d') if pedido.fecha_entrega_estimada else None,
+                    'fecha_entrega_real': pedido.fecha_entrega_real.strftime('%Y-%m-%d') if pedido.fecha_entrega_real else None,
+                    'total': float(pedido.total),
+                    'estado_pago': pedido.estado,
+                    'estado_seguimiento': pedido.estado_seguimiento,
+                    'puede_cancelar': pedido.puede_cancelar,
+                    'items': []
+                }
+                
+                # Agregar items
+                for item in pedido.items:
+                    try:
+                        producto = Producto.query.get(item.producto_id)
+                        
+                        nombre_producto = 'Producto no disponible'
+                        imagen_producto = '/static/img/default-product.png'
+                        
+                        if producto:
+                            nombre_producto = producto.nombre or 'Producto sin nombre'
+                            if hasattr(producto, 'imagen') and producto.imagen:
+                                imagen_producto = producto.imagen
+                        
+                        pedido_json['items'].append({
+                            'producto_id': item.producto_id,
+                            'nombre': nombre_producto,
+                            'imagen': imagen_producto,
+                            'cantidad': item.cantidad,
+                            'precio_unitario': float(item.precio_unitario) if item.precio_unitario else 0,
+                            'subtotal': float(item.cantidad * item.precio_unitario) if item.precio_unitario else 0
+                        })
+                    except Exception as item_error:
+                        print(f"Error procesando item {item.id_item}: {item_error}")
+                        pedido_json['items'].append({
+                            'producto_id': item.producto_id,
+                            'nombre': 'Error al cargar producto',
+                            'imagen': '/static/img/default-product.png',
+                            'cantidad': item.cantidad,
+                            'precio_unitario': 0,
+                            'subtotal': 0
+                        })
+                
+                pedidos_json.append(pedido_json)
+                
+            except Exception as pedido_error:
+                print(f"Error procesando pedido {pedido.id_pedido}: {pedido_error}")
+                continue
+        
+        # Guardar cambios de estado
+        try:
+            db.session.commit()
+        except Exception as commit_error:
+            print(f"Error en commit: {commit_error}")
+            db.session.rollback()
+        
+        print(f"Pedidos procesados correctamente: {len(pedidos_json)}")
+        
+        return jsonify({
+            'success': True,
+            'pedidos': pedidos_json,
+            'count': len(pedidos_json)
+        })
+        
+    except Exception as e:
+        print(f"Error obteniendo pedidos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': f'Error al obtener pedidos: {str(e)}'}), 500
+@web_bp.route('/api/pedidos/<int:pedido_id>/cancelar', methods=['POST'])
+@login_required
+def api_cancelar_pedido(pedido_id):
+    """Cancela un pedido si es posible"""
+    try:
+        pedido = Pedido.query.get_or_404(pedido_id)
+        
+        # Verificar que el pedido pertenezca al usuario
+        if pedido.usuario_id != session['user_id']:
+            return jsonify({'success': False, 'error': 'No autorizado'}), 403
+        
+        from datetime import datetime
+        ahora = datetime.utcnow()
+        horas_desde_compra = (ahora - pedido.fecha_pedido).total_seconds() / 3600
+        
+        # Verificar si puede cancelar (menos de 24 horas)
+        if horas_desde_compra >= 24:
+            return jsonify({
+                'success': False, 
+                'error': 'Ya no puedes cancelar este pedido (han pasado más de 24 horas)'
+            }), 400
+        
+        if pedido.estado_seguimiento in ['entregado', 'cancelado']:
+            return jsonify({
+                'success': False, 
+                'error': f'El pedido ya está {pedido.estado_seguimiento}'
+            }), 400
+        
+        # Cancelar pedido
+        pedido.estado_seguimiento = 'cancelado'
+        pedido.puede_cancelar = False
+        
+        # Restaurar stock
+        for item in pedido.items:
+            producto = Producto.query.get(item.producto_id)
+            if producto:
+                producto.stock += item.cantidad
+                # Reactivar si estaba deshabilitado por stock 0
+                if producto.stock > 0 and not producto.activo:
+                    producto.activo = True
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Pedido cancelado exitosamente'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error cancelando pedido: {e}")
+        return jsonify({'success': False, 'error': 'Error al cancelar pedido'}), 500
 
 # ----------------------------------------- API USUARIOS ADMIN ---------------------------------------- #
 
@@ -1542,7 +1772,7 @@ def api_admin_roles():
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al obtener roles'}), 500
 
-# ----------------------------------------- API PEDIDOS ADMIN ---------------------------------------- #
+# ----------------------------------------- API PEDIDOS ADMIN (CORREGIDA) ---------------------------------------- #
 
 @web_bp.route('/api/admin/pedidos')
 @admin_required
@@ -1555,12 +1785,13 @@ def api_admin_pedidos():
         
         # Obtener parámetros de filtro
         search = request.args.get('search', '')
-        estado = request.args.get('estado', '')
+        estado_pago = request.args.get('estado_pago', '')  # ✅ Cambiar nombre
+        estado_seguimiento = request.args.get('estado_seguimiento', '')  # ✅ NUEVO filtro
         fecha_inicio = request.args.get('fecha_inicio', '')
         fecha_fin = request.args.get('fecha_fin', '')
         
-        # Consulta base con joins
-        query = Pedido.query.join(Usuario).join(PedidoItem).join(Producto)
+        # Consulta base
+        query = Pedido.query.join(Usuario).outerjoin(PedidoItem).outerjoin(Producto)
         
         # Aplicar filtros
         if search:
@@ -1568,17 +1799,23 @@ def api_admin_pedidos():
                 (Usuario.nombre_usuario.ilike(f'%{search}%')) |
                 (Usuario.correo.ilike(f'%{search}%')) |
                 (Producto.nombre.ilike(f'%{search}%')) |
-                (Pedido.id_pedido.ilike(f'%{search}%'))
+                (Pedido.id_pedido.cast(db.String).ilike(f'%{search}%'))
             )
         
-        if estado:
-            query = query.filter(Pedido.estado == estado)
+        if estado_pago:
+            query = query.filter(Pedido.estado == estado_pago)
+        
+        if estado_seguimiento:  # ✅ NUEVO filtro
+            query = query.filter(Pedido.estado_seguimiento == estado_seguimiento)
         
         if fecha_inicio:
             query = query.filter(Pedido.fecha_pedido >= fecha_inicio)
         
         if fecha_fin:
             query = query.filter(Pedido.fecha_pedido <= fecha_fin)
+        
+        # Eliminar duplicados por los joins
+        query = query.distinct()
         
         # Ordenar por fecha más reciente primero
         pedidos = query.order_by(Pedido.fecha_pedido.desc()).all()
@@ -1590,6 +1827,7 @@ def api_admin_pedidos():
             items_data = []
             for item in pedido.items:
                 items_data.append({
+                    'producto_id': item.producto_id,
                     'producto_nombre': item.producto.nombre if item.producto else 'Producto no disponible',
                     'cantidad': item.cantidad,
                     'precio_unitario': float(item.precio_unitario) if item.precio_unitario else 0,
@@ -1604,10 +1842,16 @@ def api_admin_pedidos():
                 'productos': items_data,
                 'cantidad_total': sum(item.cantidad for item in pedido.items),
                 'total_pedido': float(pedido.total) if pedido.total else 0,
-                'estado': pedido.estado,
+                'estado_pago': pedido.estado,  # ✅ Más claro
+                'estado_seguimiento': pedido.estado_seguimiento,  # ✅ NUEVO campo
+                'puede_cancelar': pedido.puede_cancelar,  # ✅ NUEVO campo
                 'fecha_pedido': pedido.fecha_pedido.strftime('%Y-%m-%d %H:%M') if pedido.fecha_pedido else '',
+                'fecha_entrega_estimada': pedido.fecha_entrega_estimada.strftime('%Y-%m-%d') if pedido.fecha_entrega_estimada else '',  # ✅ NUEVO
+                'fecha_entrega_real': pedido.fecha_entrega_real.strftime('%Y-%m-%d') if pedido.fecha_entrega_real else '',  # ✅ NUEVO
                 'fecha_iso': pedido.fecha_pedido.isoformat() if pedido.fecha_pedido else '',
-                'direccion_envio': pedido.direccion_envio or 'No especificada'
+                'direccion_envio': pedido.direccion_envio or 'No especificada',
+                'metodo_pago': pedido.metodo_pago,  # ✅
+                'id_transaccion': pedido.id_transaccion_paypal  # ✅
             })
         
         return jsonify({
@@ -1616,7 +1860,8 @@ def api_admin_pedidos():
             'total': len(pedidos_data),
             'filtros_aplicados': {
                 'search': search,
-                'estado': estado,
+                'estado_pago': estado_pago,
+                'estado_seguimiento': estado_seguimiento,
                 'fecha_inicio': fecha_inicio,
                 'fecha_fin': fecha_fin
             }
@@ -1631,12 +1876,13 @@ def api_admin_pedidos():
 @web_bp.route('/api/admin/pedidos/estado', methods=['PUT'])
 @admin_required
 def api_admin_cambiar_estado_pedido():
-    """Cambiar estado de un pedido"""
+    """Cambiar estado de un pedido (ahora maneja ambos estados)"""
     try:
         from app.models.pedido import Pedido
         
         data = request.get_json()
         pedido_id = data.get('pedido_id')
+        tipo_estado = data.get('tipo_estado', 'pago')  # 'pago' o 'seguimiento'
         nuevo_estado = data.get('estado')
         
         if not pedido_id or not nuevo_estado:
@@ -1646,17 +1892,37 @@ def api_admin_cambiar_estado_pedido():
         if not pedido:
             return jsonify({'success': False, 'error': 'Pedido no encontrado'}), 404
         
-        # Validar estado
-        estados_validos = ['pendiente', 'procesando', 'completado', 'cancelado']
-        if nuevo_estado not in estados_validos:
-            return jsonify({'success': False, 'error': 'Estado no válido'}), 400
+        # Validar según tipo
+        if tipo_estado == 'pago':
+            estados_validos = ['pendiente', 'procesando', 'completado', 'cancelado', 'fallido']
+            if nuevo_estado not in estados_validos:
+                return jsonify({'success': False, 'error': 'Estado de pago no válido'}), 400
+            pedido.estado = nuevo_estado
+            
+        elif tipo_estado == 'seguimiento':
+            estados_validos = ['procesando', 'enviado', 'entregado', 'cancelado']
+            if nuevo_estado not in estados_validos:
+                return jsonify({'success': False, 'error': 'Estado de seguimiento no válido'}), 400
+            pedido.estado_seguimiento = nuevo_estado
+            
+            # Si se marca como entregado, registrar fecha
+            if nuevo_estado == 'entregado' and not pedido.fecha_entrega_real:
+                pedido.fecha_entrega_real = datetime.utcnow()
+                pedido.puede_cancelar = False
+            
+            # Si se cancela, restaurar stock
+            if nuevo_estado == 'cancelado':
+                for item in pedido.items:
+                    producto = Producto.query.get(item.producto_id)
+                    if producto:
+                        producto.stock += item.cantidad
+                pedido.puede_cancelar = False
         
-        pedido.estado = nuevo_estado
         db.session.commit()
         
         return jsonify({
             'success': True,
-            'message': f'Estado del pedido actualizado a {nuevo_estado}',
+            'message': f'Estado actualizado a {nuevo_estado}',
             'nuevo_estado': nuevo_estado
         })
         
@@ -1668,7 +1934,7 @@ def api_admin_cambiar_estado_pedido():
 @web_bp.route('/api/admin/pedidos/<int:pedido_id>')
 @admin_required
 def api_admin_detalle_pedido(pedido_id):
-    """Obtener detalle completo de un pedido"""
+    """Obtener detalle completo de un pedido (versión mejorada)"""
     try:
         from app.models.pedido import Pedido, PedidoItem
         from app.models.usuario import Usuario
@@ -1678,7 +1944,7 @@ def api_admin_detalle_pedido(pedido_id):
         if not pedido:
             return jsonify({'success': False, 'error': 'Pedido no encontrado'}), 404
         
-        # Datos del pedido
+        # Datos del pedido con todos los campos
         pedido_data = {
             'id_pedido': pedido.id_pedido,
             'numero_pedido': f"#ORD-{pedido.id_pedido:03d}",
@@ -1686,12 +1952,18 @@ def api_admin_detalle_pedido(pedido_id):
                 'id': pedido.usuario.id_usuario,
                 'nombre': pedido.usuario.nombre_usuario,
                 'email': pedido.usuario.correo,
-                'telefono': pedido.usuario.telefono
+                'telefono': pedido.usuario.telefono if hasattr(pedido.usuario, 'telefono') else ''
             } if pedido.usuario else None,
             'fecha_pedido': pedido.fecha_pedido.strftime('%Y-%m-%d %H:%M') if pedido.fecha_pedido else '',
+            'fecha_entrega_estimada': pedido.fecha_entrega_estimada.strftime('%Y-%m-%d') if pedido.fecha_entrega_estimada else '',
+            'fecha_entrega_real': pedido.fecha_entrega_real.strftime('%Y-%m-%d') if pedido.fecha_entrega_real else '',
             'total': float(pedido.total) if pedido.total else 0,
-            'estado': pedido.estado,
-            'direccion_envio': pedido.direccion_envio
+            'estado_pago': pedido.estado,
+            'estado_seguimiento': pedido.estado_seguimiento,
+            'puede_cancelar': pedido.puede_cancelar,
+            'direccion_envio': pedido.direccion_envio or 'No especificada',
+            'metodo_pago': pedido.metodo_pago,
+            'id_transaccion': pedido.id_transaccion_paypal
         }
         
         # Items del pedido
@@ -1703,7 +1975,7 @@ def api_admin_detalle_pedido(pedido_id):
                 'cantidad': item.cantidad,
                 'precio_unitario': float(item.precio_unitario) if item.precio_unitario else 0,
                 'total': float(item.precio_unitario * item.cantidad) if item.precio_unitario else 0,
-                'imagen': item.producto.imagen if item.producto else ''
+                'imagen': item.producto.imagen if item.producto and hasattr(item.producto, 'imagen') else '/static/img/default-product.png'
             })
         
         pedido_data['items'] = items_data
@@ -1715,7 +1987,60 @@ def api_admin_detalle_pedido(pedido_id):
         
     except Exception as e:
         print(f"Error obteniendo detalle de pedido: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al obtener detalle'}), 500
+
+# ✅ NUEVA ruta para estadísticas de pedidos (útil para dashboard)
+@web_bp.route('/api/admin/pedidos/estadisticas')
+@admin_required
+def api_admin_estadisticas_pedidos():
+    """Obtener estadísticas de pedidos para el dashboard"""
+    try:
+        from datetime import datetime, timedelta
+        
+        # Totales por estado de seguimiento
+        procesando = Pedido.query.filter_by(estado_seguimiento='procesando').count()
+        enviado = Pedido.query.filter_by(estado_seguimiento='enviado').count()
+        entregado = Pedido.query.filter_by(estado_seguimiento='entregado').count()
+        cancelado = Pedido.query.filter_by(estado_seguimiento='cancelado').count()
+        
+        # Totales por estado de pago
+        pagado = Pedido.query.filter_by(estado='completado').count()
+        pendiente = Pedido.query.filter_by(estado='pendiente').count()
+        
+        # Pedidos de hoy
+        hoy = datetime.now().date()
+        pedidos_hoy = Pedido.query.filter(
+            db.func.date(Pedido.fecha_pedido) == hoy
+        ).count()
+        
+        # Ingresos totales
+        ingresos_totales = db.session.query(db.func.sum(Pedido.total)).filter(
+            Pedido.estado == 'completado'
+        ).scalar() or 0
+        
+        return jsonify({
+            'success': True,
+            'estadisticas': {
+                'seguimiento': {
+                    'procesando': procesando,
+                    'enviado': enviado,
+                    'entregado': entregado,
+                    'cancelado': cancelado
+                },
+                'pago': {
+                    'completado': pagado,
+                    'pendiente': pendiente
+                },
+                'pedidos_hoy': pedidos_hoy,
+                'ingresos_totales': float(ingresos_totales)
+            }
+        })
+        
+    except Exception as e:
+        print(f"Error obteniendo estadísticas: {e}")
+        return jsonify({'success': False, 'error': 'Error al obtener estadísticas'}), 500
 
 # ----------------------------------------- UTILIDADES ---------------------------------------- #
 
@@ -1790,202 +2115,7 @@ def api_validar_producto():
         print(f"Error validando producto: {e}")
         return jsonify({'existe': False, 'error': 'Error en validación'}), 500
 
-# ----------------------------------------- RUTAS DE DEBUG ---------------------------------------- #
 
-@web_bp.route('/debug/database')
-def debug_database():
-    """Ruta para debuggear el estado de la base de datos"""
-    try:
-        categorias = Categoria.query.all()
-        productos = Producto.query.all()
-        usuarios = Usuario.query.all()
-        roles = Role.query.all()
-        
-        debug_info = {
-            'categorias_count': len(categorias),
-            'categorias': [{'id': c.id_categoria, 'nombre': c.nombre} for c in categorias],
-            'productos_count': len(productos),
-            'productos': [{'id': p.id_producto, 'nombre': p.nombre, 'categoria_id': p.categoria_id} for p in productos],
-            'usuarios_count': len(usuarios),
-            'usuarios': [{'id': u.id_usuario, 'username': u.nombre_usuario, 'rol_id': u.rol_id} for u in usuarios],
-            'roles_count': len(roles),
-            'roles': [{'id': r.id_rol, 'nombre': r.nombre} for r in roles]
-        }
-        
-        return jsonify(debug_info)
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@web_bp.route('/debug/session')
-def debug_session():
-    """Ruta para debuggear la sesión"""
-    return jsonify({
-        'session_data': dict(session),
-        'user_id_in_session': 'user_id' in session,
-        'user_role_in_session': 'user_role' in session
-    })
-
-@web_bp.route('/debug/favoritos')
-@login_required
-def debug_favoritos():
-    """Ruta para debuggear favoritos"""
-    try:
-        usuario_id = session['user_id']
-        
-        # Contar favoritos del usuario
-        count = Favorito.query.filter_by(usuario_id=usuario_id).count()
-        
-        # Obtener algunos favoritos de ejemplo
-        favoritos = Favorito.query.filter_by(usuario_id=usuario_id).limit(5).all()
-        
-        favoritos_data = []
-        for fav in favoritos:
-            favoritos_data.append({
-                'id_favorito': fav.id_favorito,
-                'usuario_id': fav.usuario_id,
-                'producto_id': fav.producto_id,
-                'fecha_agregado': fav.fecha_agregado.isoformat() if fav.fecha_agregado else None
-            })
-        
-        return jsonify({
-            'usuario_actual': usuario_id,
-            'total_favoritos': count,
-            'favoritos_ejemplo': favoritos_data,
-            'tabla_existe': True,
-            'estructura': 'id_favorito, usuario_id, producto_id, fecha_agregado'
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@web_bp.route('/api/pedidos/crear-paypal', methods=['POST'])
-@login_required
-def crear_pedido_paypal():
-    try:
-        # Obtener el usuario actual
-        usuario_id = session.get('user_id')
-        
-        # Obtener el carrito del usuario
-        carrito = Carrito.query.filter_by(usuario_id=usuario_id).first()
-        if not carrito or not carrito.items:
-            return jsonify({'success': False, 'error': 'Carrito vacío'})
-        
-        # Calcular total
-        total = sum(item.cantidad * item.producto.precio for item in carrito.items)
-        
-        # Crear pedido en la base de datos
-        nuevo_pedido = Pedido(
-            usuario_id=usuario_id,
-            total=total,
-            estado='pendiente',
-            metodo_pago='paypal'
-        )
-        
-        db.session.add(nuevo_pedido)
-        db.session.flush()  # Para obtener el ID
-        
-        # Crear items del pedido
-        for item in carrito.items:
-            pedido_item = PedidoItem(
-                pedido_id=nuevo_pedido.id_pedido,
-                producto_id=item.producto_id,
-                cantidad=item.cantidad,
-                precio_unitario=item.producto.precio
-            )
-            db.session.add(pedido_item)
-        
-        db.session.commit()
-        
-        return jsonify({
-            'success': True, 
-            'pedido_id': nuevo_pedido.id_pedido,
-            'total': float(total)
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)})
-    
-@web_bp.route('/api/pedidos/confirmar-paypal', methods=['POST'])
-@login_required
-def confirmar_pedido_paypal():
-    try:
-        data = request.get_json()
-        pedido_id = data.get('pedido_id')
-        detalles_paypal = data.get('detalles_paypal', {})
-        
-        # Buscar el pedido
-        pedido = Pedido.query.get(pedido_id)
-        if not pedido:
-            return jsonify({'success': False, 'error': 'Pedido no encontrado'})
-        
-        # Actualizar pedido
-        pedido.estado = 'completado'
-        pedido.id_transaccion_paypal = detalles_paypal.get('id', '')
-        
-        # Limpiar carrito
-        carrito = Carrito.query.filter_by(usuario_id=pedido.usuario_id).first()
-        if carrito:
-            # Eliminar items del carrito
-            CarritoItem.query.filter_by(carrito_id=carrito.id_carrito).delete()
-        
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Pedido confirmado exitosamente'
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)})
-    
-    
-@web_bp.route('/api/pedidos/detalles/<int:pedido_id>')
-@login_required
-def obtener_detalles_pedido(pedido_id):
-    try:
-        usuario_id = session.get('user_id')
-        
-        # Buscar pedido (solo del usuario actual)
-        pedido = Pedido.query.filter_by(
-            id_pedido=pedido_id, 
-            usuario_id=usuario_id
-        ).first()
-        
-        if not pedido:
-            return jsonify({'success': False, 'error': 'Pedido no encontrado'})
-        
-        # Obtener items del pedido
-        items = PedidoItem.query.filter_by(pedido_id=pedido_id).all()
-        
-        pedido_data = {
-            'id_pedido': pedido.id_pedido,
-            'fecha_pedido': pedido.fecha_pedido.isoformat(),
-            'total': float(pedido.total),
-            'estado': pedido.estado,
-            'metodo_pago': pedido.metodo_pago,
-            'items': []
-        }
-        
-        for item in items:
-            producto = Producto.query.get(item.producto_id)
-            pedido_data['items'].append({
-                'nombre': producto.nombre,
-                'cantidad': item.cantidad,
-                'precio_unitario': float(item.precio_unitario),
-                'subtotal': float(item.cantidad * item.precio_unitario)
-            })
-        
-        return jsonify({
-            'success': True,
-            'pedido': pedido_data
-        })
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-    
 @web_bp.route('/api/paypal/config')
 def api_paypal_config():
     """Endpoint seguro para obtener configuración de PayPal"""
@@ -2012,6 +2142,7 @@ def api_paypal_config():
             'success': False, 
             'error': 'Error interno del servidor'
         }), 500
+        
 @web_bp.route('/api/verify-user-status')
 def verify_user_status():
     """Verificar si el usuario actual sigue activo en el sistema"""

@@ -31,13 +31,13 @@ const ProductosController = {
                 console.log('📊 Datos completos recibidos:', data);
 
                 if (!data) {
-                    console.error('❌ data es null o undefined');
+                    console.error('Data es null o undefined');
                     this.mostrarError('No se recibieron datos del servidor');
                     return;
                 }
 
                 if (!data.success) {
-                    console.error('❌ success es false:', data.error);
+                    console.error('success es false:', data.error);
                     this.mostrarError(data.error || 'Error en BD');
                     return;
                 }
@@ -67,7 +67,7 @@ const ProductosController = {
                 this.mostrarProductos(productos);
             })
             .catch(error => {
-                console.error('❌ Error en cargarProductos:', error);
+                console.error('Error en cargarProductos:', error);
                 this.mostrarError('Error al cargar los productos: ' + error.message);
             });
     },
@@ -75,14 +75,14 @@ const ProductosController = {
     // Obtener categoría actual desde la URL
     obtenerCategoriaActual: function () {
         const path = window.location.pathname;
-        console.log(`📍 Ruta actual: ${path}`);
-        
+        console.log(`Ruta actual: ${path}`);
+
         if (path.includes('/juegos')) return 'Juegos';
         if (path.includes('/consolas')) return 'Consolas';
         if (path.includes('/controles')) return 'Controles';
         if (path.includes('/accesorios')) return 'Accesorios';
         if (path.includes('/')) return null;
-        
+
         console.log('No se detectó categoría específica, cargando todos los productos');
         return null;
     },
@@ -93,7 +93,7 @@ const ProductosController = {
             const container = document.getElementById('productos-container');
 
             if (!container) {
-                console.error('❌ No se encontró el container con id "productos-container"');
+                console.error('No se encontró el container con id "productos-container"');
                 return;
             }
 
@@ -123,19 +123,19 @@ const ProductosController = {
                     <p class="descripcion">${producto.descripcion}</p>
                     <p class="precio">$${typeof producto.precio === 'number' ? producto.precio.toFixed(2) : '0.00'}</p>
                     
-                    ${producto.stock > 0 ? 
-                        `<button class="btn-agregar-carrito" 
+                    ${producto.stock > 0 ?
+                    `<button class="btn-agregar-carrito" 
                                 data-id="${producto.id}">
                             <i class="fa-solid fa-cart-arrow-down"></i>Agregar al Carrito
                         </button>` :
-                        `<button class="btn-sin-stock" disabled>
+                    `<button class="btn-sin-stock" disabled>
                             <i class="fa-solid fa-times"></i>Sin Stock
                         </button>`
-                    }
+                }
                 </div>
             `).join('');
 
-            console.log('✅ Productos renderizados correctamente');
+            console.log('Productos renderizados correctamente');
             this.agregarEventListeners();
 
             // Sincronizar favoritos después de renderizar
@@ -146,7 +146,7 @@ const ProductosController = {
             }, 500);
 
         } catch (error) {
-            console.error('❌ Error en mostrarProductos:', error);
+            console.error(' Error en mostrarProductos:', error);
             this.mostrarError('Error al mostrar los productos');
         }
     },
@@ -169,23 +169,23 @@ const ProductosController = {
     // Agregar event listeners globales - FUNCIÓN QUE FALTABA
     agregarEventListenersGlobales: function () {
         console.log('🌍 Agregando event listeners globales...');
-        
+
         // Buscador global si existe
         const buscador = document.getElementById('btn-buscar');
         const buscarInput = document.getElementById('buscar-input');
-        
+
         if (buscador && buscarInput) {
             buscador.addEventListener('click', () => {
                 this.buscarProductos(buscarInput.value);
             });
-            
+
             buscarInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     this.buscarProductos(buscarInput.value);
                 }
             });
         }
-        
+
         // Filtros de categoría si existen
         const filtrosCategoria = document.querySelectorAll('.filtro-categoria');
         if (filtrosCategoria.length > 0) {
@@ -200,15 +200,15 @@ const ProductosController = {
     },
 
     // Función de búsqueda
-    buscarProductos: function(termino) {
+    buscarProductos: function (termino) {
         if (!termino || termino.trim() === '') {
             this.cargarProductos();
             return;
         }
-        
+
         console.log(`🔍 Buscando: ${termino}`);
         this.mostrarLoading();
-        
+
         // Aquí puedes implementar la búsqueda si tu API la soporta
         // Por ahora recargamos todos y filtramos en el cliente
         this.cargarProductos();
@@ -239,10 +239,10 @@ const ProductosController = {
             });
     },
 
-    // Agregar producto al carrito - CORREGIDO
+    // Agregar producto al carrito
     agregarAlCarrito: function (productoId, button) {
-        console.log(`🛒 Intentando agregar producto ${productoId} al carrito`);
-        
+        console.log(`Intentando agregar producto ${productoId} al carrito`);
+
         // Verificar autenticación de manera más robusta
         this.verificarAutenticacion()
             .then(autenticado => {
@@ -251,11 +251,11 @@ const ProductosController = {
                 }
 
                 if (button && button.disabled) {
-                    console.log('⏳ Botón ya en proceso, ignorando click');
+                    console.log('Botón ya en proceso, ignorando click');
                     return;
                 }
 
-                console.log(`✅ Usuario autenticado, procediendo con producto ${productoId}`);
+                console.log(`Usuario autenticado, procediendo con producto ${productoId}`);
 
                 let originalText = '';
                 if (button) {
@@ -274,70 +274,76 @@ const ProductosController = {
                         cantidad: 1
                     })
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('📨 Respuesta del servidor:', data);
-                    
-                    if (button) {
-                        button.disabled = false;
-                        const tieneStock = data.success && !data.error?.includes('Stock insuficiente');
-                        if (tieneStock) {
-                            button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
-                        } else {
-                            button.innerHTML = 'SIN STOCK';
-                            button.disabled = true;
+                    .then(async response => {
+                        if (response.status === 401) {
+                            // ✅ MANEJAR ESPECÍFICAMENTE EL 401
+                            const data = await response.json();
+                            throw new Error(data.error || 'Sesión no válida');
                         }
-                    }
-                    
-                    if (data.success) {
-                        this.mostrarNotificacion(data.message || 'Producto agregado al carrito');
-                        this.actualizarContadorCarrito(data.carrito_count);
-                    } else {
-                        this.mostrarNotificacion(data.error || 'Error al agregar al carrito', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Error agregando al carrito:', error);
-                    this.mostrarNotificacion('Error de conexión al servidor', 'error');
-                    
-                    if (button) {
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
-                    }
-                });
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('📨 Respuesta del servidor:', data);
+
+                        if (button) {
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
+                        }
+
+                        if (data.success) {
+                            this.mostrarNotificacion(data.message || 'Producto agregado al carrito', 'success');
+                            this.actualizarContadorCarrito(data.carrito_count);
+                        } else {
+                            this.mostrarNotificacion(data.error || 'Error al agregar al carrito', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error agregando al carrito:', error);
+
+                        // ✅ MANEJO DE ERROR DE AUTENTICACIÓN
+                        if (error.message.includes('Sesión no válida') || error.message.includes('401')) {
+                            this.mostrarNotificacion('Debes iniciar sesión para agregar productos al carrito', 'error');
+
+                            // Restaurar el botón
+                            if (button) {
+                                button.disabled = false;
+                                button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
+                            }
+
+                        } else {
+                            this.mostrarNotificacion('Error de conexión al servidor', 'error');
+
+                            if (button) {
+                                button.disabled = false;
+                                button.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> AGREGAR AL CARRITO';
+                            }
+                        }
+                    });
             })
             .catch(error => {
-                console.error('❌ Error verificando autenticación:', error);
+                console.error('Error verificando autenticación:', error);
                 this.mostrarNotificacion('Error al verificar autenticación', 'error');
             });
     },
-
     // Verificar autenticación de manera más robusta
-    verificarAutenticacion: function() {
+    verificarAutenticacion: function () {
         return new Promise((resolve) => {
-            // Primero verificar si hay sesión en localStorage/sessionStorage
-            if (localStorage.getItem('user_id') || sessionStorage.getItem('user_id')) {
-                resolve(true);
-                return;
-            }
-            
-            // Si no, hacer una llamada a la API para verificar
             fetch('/api/user-info')
                 .then(response => response.json())
                 .then(data => {
-                    resolve(data.logged_in || false);
+                    const autenticado = data.logged_in || false;
+                    console.log('🔐 Estado de autenticación:', autenticado);
+                    resolve(autenticado);
                 })
                 .catch(() => {
+                    console.log('🔐 Error verificando autenticación, asumiendo no autenticado');
                     resolve(false);
                 });
         });
     },
-
     actualizarContadorCarrito: function (count) {
         if (window.actualizarContadorCarrito) {
             window.actualizarContadorCarrito(count);
@@ -366,7 +372,6 @@ const ProductosController = {
             right: 20px;
             background: ${tipo === 'success' ? '#4CAF50' : '#f44336'};
             color: white;
-            padding: 15px 20px;
             border-radius: 5px;
             z-index: 1000;
             animation: fadeIn 0.3s;
@@ -395,7 +400,7 @@ const ProductosController = {
     },
 
     mostrarError: function (mensaje) {
-        console.error('❌ Mostrando error:', mensaje);
+        console.error('Mostrando error:', mensaje);
         const container = document.getElementById('productos-container');
         if (container) {
             container.innerHTML = `
@@ -412,7 +417,7 @@ const ProductosController = {
     },
 
     mostrarMensaje: function (mensaje) {
-        console.log('ℹ️ Mostrando mensaje:', mensaje);
+        console.log('Mostrando mensaje:', mensaje);
         const container = document.getElementById('productos-container');
         if (container) {
             container.innerHTML = `
@@ -428,7 +433,7 @@ const ProductosController = {
 
 // Inicializar cuando el DOM esté listo - CORREGIDO
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📄 DOM cargado, inicializando ProductosController...');
+    console.log('DOM cargado, inicializando ProductosController...');
     // Esperar un poco para evitar conflictos con otros scripts
     setTimeout(() => {
         ProductosController.init();
@@ -443,4 +448,4 @@ if (window.ProductosControllerInicializado) {
     window.ProductosController = ProductosController;
 }
 
-console.log('✅ productos-dinamicos.js cargado correctamente');
+console.log('productos-dinamicos.js cargado correctamente');
