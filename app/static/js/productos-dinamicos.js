@@ -372,6 +372,7 @@ const ProductosController = {
             right: 20px;
             background: ${tipo === 'success' ? '#4CAF50' : '#f44336'};
             color: white;
+            padding: 15px 20px;
             border-radius: 5px;
             z-index: 1000;
             animation: fadeIn 0.3s;

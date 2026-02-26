@@ -2,6 +2,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/prov.css">
+<link rel="stylesheet" href="/static/css/admin-pedidos.css">
 {% endblock %}
 
 {% block content %}
@@ -15,9 +16,6 @@
     </div>
 
     <section class="iconos">
-
-        <!-- Menu usuario -->
-
         <button class="btn-menu-user" id="btn-menu-user">
             <i class="fa-solid fa-circle-user"></i>
             <i class="fa-solid fa-chevron-down"></i>
@@ -40,31 +38,31 @@
         </div>
 
         <ul>
-            <li><a class="barra-lateral-link" href="/dashboard"><i class="fa-solid fa-house"></i> Inicio </a></li>
-            <li><a class="barra-lateral-link" href="/admin/gestion-pedidos"><i class="fa-solid fa-truck"></i> Gestión de
-                    pedidos</a></li>
-            <li><a class="barra-lateral-link" href="/admin/gestion-productos"><i class="fa-solid fa-boxes-packing"></i>
-                    Gestión de productos</a></li>
-            <li><a class="barra-lateral-link" href="/admin/gestion-usuarios"><i class="fa-solid fa-users"></i> Gestión de
-                    usuarios</a></li>
-            <!--<li><a class="barra-lateral_fijo" href="/admin/reportes"><i class="fa-solid fa-chart-column"></i> Reportes</a></li>-->
+            <li><a class="barra-lateral-link" href="/dashboard"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li><a class="barra-lateral-link" href="/admin/gestion-pedidos"><i class="fa-solid fa-truck"></i> Gestión de pedidos</a></li>
+            <li><a class="barra-lateral-link" href="/admin/gestion-productos"><i class="fa-solid fa-boxes-packing"></i> Gestión de productos</a></li>
+            <li><a class="barra-lateral-link" href="/admin/gestion-usuarios"><i class="fa-solid fa-users"></i> Gestión de usuarios</a></li>
         </ul>
-
     </nav>
+
     <div class="principal">
         <div class="contenido">
-            <h1>Gestión de Pedidos</h1>
+            <div class="header-acciones">
+                <h1>Gestión de Pedidos</h1>
+                <!--<button class="btn-primary" id="btnAgregarPedido">
+                    <i class="fa-solid fa-plus"></i> Nuevo Pedido
+                </button>-->
+            </div>
 
             <!-- Filtros -->
             <div class="filtros-pedidos">
                 <div class="search-container">
                     <input type="text" class="search-input" id="searchInput"
-                        placeholder="Buscar pedidos por cliente, producto o ID...">
+                        placeholder="Buscar por cliente o ID...">
                     <button class="search-button" id="searchButton">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
                 </div>
-
 
                 <select class="filtro-select" id="filtroEstado">
                     <option value="">Todos los estados</option>
@@ -78,48 +76,43 @@
                 <input type="date" class="filtro-select" id="filtroFechaFin" placeholder="Fecha fin">
 
                 <!--<button class="btn-secondary" id="btnLimpiarFiltros">
-                    <i class="fa-solid fa-broom"></i> Limpiar filtros
+                    <i class="fa-solid fa-broom"></i> Limpiar
                 </button>-->
             </div>
 
+            <!-- Header con contador -->
             <!--<div class="section-header">
                 <h2>Todos los Pedidos</h2>
                 <span class="badge" id="contadorPedidos">0 pedidos</span>
             </div>-->
-
-
-
 
             <!-- Loading -->
             <div id="loadingPedidos" class="loading-container">
                 <i class="fa-solid fa-spinner fa-spin"></i> Cargando pedidos...
             </div>
 
-
-
-
             <!-- Tabla de pedidos -->
             <div class="table-container" id="tablaPedidosContainer" style="display: none;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Pedido</th>
-                            <th>Cliente</th>
-                            <th>Producto(s)</th>
-                            <th>Cantidad</th>
-                            <th>Total</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyPedidos">
-                        <!-- Los pedidos se cargarán aquí dinámicamente -->
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="pedidos-table">
+                        <thead>
+                            <tr>
+                                <th>ID Pedido</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPedidos">
+                            <!-- Los pedidos se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- Mensaje cuando no hay pedidos -->
+            <!-- Mensaje sin pedidos -->
             <div id="noPedidos" class="no-data-message" style="display: none;">
                 <i class="fa-solid fa-box-open"></i>
                 <h3>No hay pedidos</h3>
@@ -129,13 +122,110 @@
     </div>
 </div>
 
+<!-- Modal para detalle del pedido -->
+<div id="modalDetallePedido" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2>Detalle del Pedido <span id="modalNumeroPedido"></span></h2>
+            <span class="modal-close" id="modalCerrar">&times;</span>
+        </div>
+        <div class="modal-body" id="modalBodyDetalle">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cambiar estado -->
+<div id="modalCambiarEstado" class="modal modal-small">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Cambiar Estado</h2>
+            <span class="modal-close" id="modalEstadoCerrar">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Pedido: <strong id="estadoPedidoId"></strong></p>
+            <div class="form-group">
+                <label for="selectNuevoEstado">Nuevo estado:</label>
+                <select id="selectNuevoEstado" class="filtro-select">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="procesando">Procesando</option>
+                    <option value="completado">Completado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCancelarCambio">Cancelar</button>
+                <button class="btn-primary" id="btnConfirmarCambio">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para nuevo pedido (paso 1: seleccionar cliente) -->
+<div id="modalNuevoPedidoPaso1" class="modal modal-small">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Nuevo Pedido - Paso 1</h2>
+            <span class="modal-close" id="modalNuevoPaso1Cerrar">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p class="info-message">Selecciona el cliente para el nuevo pedido</p>
+            <div class="form-group">
+                <label for="selectCliente">Cliente:</label>
+                <select id="selectCliente" class="filtro-select">
+                    <option value="">Cargando clientes...</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCancelarNuevoPaso1">Cancelar</button>
+                <button class="btn-primary" id="btnSiguientePaso" disabled>Siguiente</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para nuevo pedido (paso 2: seleccionar productos) -->
+<div id="modalNuevoPedidoPaso2" class="modal modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Nuevo Pedido - Paso 2</h2>
+            <span class="modal-close" id="modalNuevoPaso2Cerrar">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p class="info-message">Cliente: <strong id="clienteSeleccionado"></strong></p>
+            
+            <div class="buscador-productos">
+                <input type="text" id="buscarProducto" class="search-input" placeholder="Buscar productos...">
+                <select id="filtroCategoriaProducto" class="filtro-select">
+                    <option value="">Todas las categorías</option>
+                </select>
+            </div>
+            
+            <div class="productos-grid" id="productosGrid">
+                <!-- Productos se cargarán aquí -->
+            </div>
+            
+            <div class="carrito-resumen" id="carritoResumen" style="display: none;">
+                <h3>Productos seleccionados</h3>
+                <div class="carrito-items" id="carritoItems"></div>
+                <div class="carrito-total">
+                    <strong>Total:</strong> <span id="carritoTotal">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnVolverPaso1">Volver</button>
+                <button class="btn-primary" id="btnCrearPedido" disabled>Crear Pedido</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="fondo"></div>
 
-<script src="/static/js/admin-pedidos"></script>
+<!-- Scripts -->
 <script src="/static/js/user-menu.js"></script>
-<script src="../static/js/script.js"></script>
+<script src="/static/js/admin-pedidos.js"></script>
 <script src="/static/js/barra-lateral.js"></script>
-
 
 {% endblock %}

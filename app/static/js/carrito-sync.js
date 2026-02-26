@@ -17,7 +17,7 @@ class CarritoSync {
         }
         
         // Actualizar cada 30 segundos por si hay cambios en otras pestañas
-        setInterval(() => this.actualizarContadorGlobal(), 30000);
+        setInterval(() => this.actualizarContadorGlobal(), 1000);
     }
 
     async actualizarContadorGlobal() {

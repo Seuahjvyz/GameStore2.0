@@ -553,53 +553,53 @@ class CarritoDinamico {
                 },
 
                 onApprove: async (data, actions) => {
-    console.log('✅ Orden PayPal aprobada:', data);
-    
-    // Mostrar mensaje de procesamiento
-    const container = document.getElementById('paypal-button-container');
-    if (container) {
-        container.innerHTML = '<div class="processing-payment"><i class="fa-solid fa-spinner fa-spin"></i> Procesando pago...</div>';
-    }
-    
-    try {
-        // ✅ YA NO CAPTURAMOS AQUÍ - Solo enviamos el order_id al backend
-        console.log('📦 Enviando order_id al backend:', data.orderID);
-        
-        const response = await fetch('/api/pedidos/procesar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                metodo_pago: 'paypal',
-                order_id: data.orderID  // Solo enviamos el ID
-            })
-        });
+                    console.log('✅ Orden PayPal aprobada:', data);
 
-        const result = await response.json();
-        console.log('📦 Respuesta del backend:', result);
+                    // Mostrar mensaje de procesamiento
+                    const container = document.getElementById('paypal-button-container');
+                    if (container) {
+                        container.innerHTML = '<div class="processing-payment"><i class="fa-solid fa-spinner fa-spin"></i> Procesando pago...</div>';
+                    }
 
-        if (result.success) {
-            console.log('✅ Pedido procesado exitosamente en BD:', result);
-            
-            // Limpiar carrito del localStorage
-            localStorage.removeItem('carrito');
-            
-            // Actualizar contador del carrito a 0
-            this.actualizarContadorCarrito(0);
-            
-            // Redirigir a página de éxito
-            window.location.href = `/pago-exitoso?pedido_id=${result.pedido_id}`;
-        } else {
-            throw new Error(result.error || 'Error al procesar el pedido');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error en onApprove:', error);
-        this.mostrarNotificacion('Error al procesar el pago: ' + error.message, 'error');
-        this.actualizarVistaCarrito();
-    }
-},
+                    try {
+                        // ✅ YA NO CAPTURAMOS AQUÍ - Solo enviamos el order_id al backend
+                        console.log('📦 Enviando order_id al backend:', data.orderID);
+
+                        const response = await fetch('/api/pedidos/procesar', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                metodo_pago: 'paypal',
+                                order_id: data.orderID  // Solo enviamos el ID
+                            })
+                        });
+
+                        const result = await response.json();
+                        console.log('📦 Respuesta del backend:', result);
+
+                        if (result.success) {
+                            console.log('✅ Pedido procesado exitosamente en BD:', result);
+
+                            // Limpiar carrito del localStorage
+                            localStorage.removeItem('carrito');
+
+                            // Actualizar contador del carrito a 0
+                            this.actualizarContadorCarrito(0);
+
+                            // Redirigir a página de éxito
+                            window.location.href = `/pago-exitoso?pedido_id=${result.pedido_id}`;
+                        } else {
+                            throw new Error(result.error || 'Error al procesar el pedido');
+                        }
+
+                    } catch (error) {
+                        console.error('❌ Error en onApprove:', error);
+                        this.mostrarNotificacion('Error al procesar el pago: ' + error.message, 'error');
+                        this.actualizarVistaCarrito();
+                    }
+                },
 
                 onError: (err) => {
                     console.error('❌ Error PayPal:', err);

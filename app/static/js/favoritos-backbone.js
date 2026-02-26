@@ -223,7 +223,7 @@ class FavoritosManager {
                 <button class="btn-agregar-carrito" 
                         data-id="${favorito.producto.id}"
                         ${favorito.producto.stock === 0 ? 'disabled' : ''}>
-                    ${favorito.producto.stock === 0 ? 'Sin Stock' : '<i class="fa-solid fa-cart-shopping"></i> Agregar al Carrito'}
+                    ${favorito.producto.stock === 0 ? 'Agotado' : '<i class="fa-solid fa-cart-shopping"></i> Agregar al Carrito'}
                 </button>
             </div>
         `).join('');

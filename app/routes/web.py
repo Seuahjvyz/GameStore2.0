@@ -57,7 +57,7 @@ def login_required(f):
                 try:
                     last_activity = datetime.datetime.fromisoformat(last_activity)
                     tiempo_inactivo = (datetime.datetime.now() - last_activity).seconds
-                    if tiempo_inactivo > 1800:  # 30 minutos
+                    if tiempo_inactivo > 3000:  # 30 minutos
                         session.clear()
                         if request.path.startswith('/api/'):
                             return jsonify({
@@ -1371,6 +1371,90 @@ def api_procesar_pedido():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error al procesar la compra'}), 500
+    
+    
+@web_bp.route('/api/pedidos/crear-manual', methods=['POST'])
+@login_required
+@admin_required
+def api_crear_pedido_manual():
+    """Crear un pedido manualmente desde el panel de admin"""
+    try:
+        data = request.get_json()
+        
+        usuario_id = data.get('usuario_id')
+        items = data.get('items', [])
+        total = data.get('total', 0)
+        metodo_pago = data.get('metodo_pago', 'manual')
+        
+        if not usuario_id or not items:
+            return jsonify({'success': False, 'error': 'Datos incompletos'}), 400
+        
+        # Verificar stock
+        for item in items:
+            producto = Producto.query.get(item['producto_id'])
+            if not producto or not producto.activo:
+                return jsonify({'success': False, 'error': f'Producto {item["producto_id"]} no disponible'}), 400
+            if producto.stock < item['cantidad']:
+                return jsonify({'success': False, 'error': f'Stock insuficiente para {producto.nombre}'}), 400
+        
+        # Calcular fecha de entrega
+        from datetime import datetime, timedelta
+        fecha_actual = datetime.utcnow()
+        
+        dias_habiles = 0
+        fecha_temp = fecha_actual
+        while dias_habiles < 20:
+            fecha_temp += timedelta(days=1)
+            if fecha_temp.weekday() < 5:
+                dias_habiles += 1
+        
+        fecha_entrega = fecha_temp
+        
+        # Crear pedido
+        nuevo_pedido = Pedido(
+            usuario_id=usuario_id,
+            total=total,
+            estado='pendiente',
+            estado_seguimiento='procesando',
+            fecha_pedido=fecha_actual,
+            fecha_entrega_estimada=fecha_entrega,
+            metodo_pago=metodo_pago,
+            direccion_envio='',
+            puede_cancelar=True
+        )
+        
+        db.session.add(nuevo_pedido)
+        db.session.flush()
+        
+        # Crear items y actualizar stock
+        for item in items:
+            pedido_item = PedidoItem(
+                pedido_id=nuevo_pedido.id_pedido,
+                producto_id=item['producto_id'],
+                cantidad=item['cantidad'],
+                precio_unitario=item['precio']
+            )
+            db.session.add(pedido_item)
+            
+            producto = Producto.query.get(item['producto_id'])
+            producto.stock -= item['cantidad']
+            if producto.stock == 0:
+                producto.activo = False
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Pedido creado exitosamente',
+            'pedido_id': nuevo_pedido.id_pedido
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creando pedido manual: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': 'Error al crear pedido'}), 500
         
 # ----------------------------------------- API PEDIDOS USUARIO ---------------------------------------- #
 @web_bp.route('/api/pedidos/mis-pedidos', methods=['GET'])
@@ -1379,11 +1463,11 @@ def api_mis_pedidos():
     """Obtiene todos los pedidos del usuario autenticado"""
     try:
         usuario_id = session['user_id']
-        print(f"Obteniendo pedidos para usuario ID: {usuario_id}")
+        print(f"🔍 Obteniendo pedidos para usuario ID: {usuario_id}")
         
         # Obtener información del usuario
         usuario = Usuario.query.get(usuario_id)
-        print(f" Usuario: {usuario.nombre_usuario} (ID: {usuario_id})")
+        print(f"👤 Usuario: {usuario.nombre_usuario} (ID: {usuario_id})")
         
         # Obtener TODOS los pedidos del usuario ordenados por fecha (para contar)
         todos_pedidos_usuario = Pedido.query.filter_by(usuario_id=usuario_id)\
@@ -1395,17 +1479,21 @@ def api_mis_pedidos():
         mapeo_ids = {}
         for idx, pedido in enumerate(todos_pedidos_usuario, 1):
             mapeo_ids[pedido.id_pedido] = idx
-            print(f" Mapeo: Pedido ID={pedido.id_pedido} → #{idx} (fecha: {pedido.fecha_pedido})")
+            print(f"📌 Mapeo: Pedido ID={pedido.id_pedido} → #{idx} (fecha: {pedido.fecha_pedido})")
         
-        print(f" Total de pedidos del usuario: {len(todos_pedidos_usuario)}")
+        print(f"📦 Total de pedidos del usuario: {len(todos_pedidos_usuario)}")
         
-        #  Ahora obtenerlos ordenados del más reciente al más antiguo para la vista
+        # ✅ Ahora obtenerlos ordenados del más reciente al más antiguo para la vista
         pedidos_ordenados = Pedido.query.filter_by(usuario_id=usuario_id)\
             .order_by(Pedido.fecha_pedido.desc())\
             .all()
         
         from datetime import datetime
+        import pytz
         ahora = datetime.utcnow()
+        
+        # Zona horaria de México
+        zona_mexico = pytz.timezone('America/Mexico_City')
         
         pedidos_json = []
         for pedido in pedidos_ordenados:
@@ -1424,13 +1512,46 @@ def api_mis_pedidos():
                     
                     pedido.puede_cancelar = (ahora - pedido.fecha_pedido).total_seconds() < 86400
                 
-                # Usamos el número secuencial del mapeo
+                # ✅ CONVERTIR FECHA UTC A HORA DE MÉXICO USANDO PYTZ
+                if pedido.fecha_pedido:
+                    # Asegurar que la fecha tenga zona horaria UTC
+                    fecha_utc = pedido.fecha_pedido
+                    if fecha_utc.tzinfo is None:
+                        fecha_utc = pytz.UTC.localize(fecha_utc)
+                    
+                    # Convertir a zona horaria de México
+                    fecha_mexico = fecha_utc.astimezone(zona_mexico)
+                    fecha_pedido_str = fecha_mexico.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    fecha_pedido_str = None
+                
+                # ✅ CONVERTIR FECHA ENTREGA ESTIMADA (solo fecha, sin hora)
+                if pedido.fecha_entrega_estimada:
+                    fecha_entrega_utc = pedido.fecha_entrega_estimada
+                    if fecha_entrega_utc.tzinfo is None:
+                        fecha_entrega_utc = pytz.UTC.localize(fecha_entrega_utc)
+                    fecha_entrega_mexico = fecha_entrega_utc.astimezone(zona_mexico)
+                    fecha_entrega_str = fecha_entrega_mexico.strftime('%Y-%m-%d')
+                else:
+                    fecha_entrega_str = None
+                
+                # ✅ CONVERTIR FECHA ENTREGA REAL (solo fecha, sin hora)
+                if pedido.fecha_entrega_real:
+                    fecha_real_utc = pedido.fecha_entrega_real
+                    if fecha_real_utc.tzinfo is None:
+                        fecha_real_utc = pytz.UTC.localize(fecha_real_utc)
+                    fecha_real_mexico = fecha_real_utc.astimezone(zona_mexico)
+                    fecha_real_str = fecha_real_mexico.strftime('%Y-%m-%d')
+                else:
+                    fecha_real_str = None
+                
+                # ✅ Usamos el número secuencial del mapeo
                 pedido_json = {
                     'id_pedido': pedido.id_pedido,
                     'numero_pedido': f"#{numero_secuencial}",
-                    'fecha_pedido': pedido.fecha_pedido.strftime('%Y-%m-%d %H:%M:%S') if pedido.fecha_pedido else None,
-                    'fecha_entrega_estimada': pedido.fecha_entrega_estimada.strftime('%Y-%m-%d') if pedido.fecha_entrega_estimada else None,
-                    'fecha_entrega_real': pedido.fecha_entrega_real.strftime('%Y-%m-%d') if pedido.fecha_entrega_real else None,
+                    'fecha_pedido': fecha_pedido_str,
+                    'fecha_entrega_estimada': fecha_entrega_str,
+                    'fecha_entrega_real': fecha_real_str,
                     'total': float(pedido.total),
                     'estado_pago': pedido.estado,
                     'estado_seguimiento': pedido.estado_seguimiento,
@@ -1460,7 +1581,7 @@ def api_mis_pedidos():
                             'subtotal': float(item.cantidad * item.precio_unitario) if item.precio_unitario else 0
                         })
                     except Exception as item_error:
-                        print(f"Error procesando item {item.id_item}: {item_error}")
+                        print(f"⚠️ Error procesando item {item.id_item}: {item_error}")
                         pedido_json['items'].append({
                             'producto_id': item.producto_id,
                             'nombre': 'Error al cargar producto',
@@ -1473,17 +1594,17 @@ def api_mis_pedidos():
                 pedidos_json.append(pedido_json)
                 
             except Exception as pedido_error:
-                print(f"Error procesando pedido {pedido.id_pedido}: {pedido_error}")
+                print(f"⚠️ Error procesando pedido {pedido.id_pedido}: {pedido_error}")
                 continue
         
         # Guardar cambios de estado
         try:
             db.session.commit()
         except Exception as commit_error:
-            print(f"Error en commit: {commit_error}")
+            print(f"⚠️ Error en commit: {commit_error}")
             db.session.rollback()
         
-        print(f"Pedidos procesados correctamente: {len(pedidos_json)}")
+        print(f"✅ Pedidos procesados correctamente: {len(pedidos_json)}")
         
         return jsonify({
             'success': True,
@@ -1492,7 +1613,7 @@ def api_mis_pedidos():
         })
         
     except Exception as e:
-        print(f"Error obteniendo pedidos: {e}")
+        print(f"❌ Error obteniendo pedidos: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': f'Error al obtener pedidos: {str(e)}'}), 500
@@ -2170,3 +2291,206 @@ def verify_user_status():
         })
     
     return jsonify({'valid': False}), 401
+
+# ----------------------------------------- ESTADÍSTICAS PARA DASHBOARD ---------------------------------------- #
+
+@web_bp.route('/api/admin/estadisticas/productos-mas-vendidos')
+@admin_required
+def api_productos_mas_vendidos():
+    """Obtiene los productos más vendidos para la gráfica del dashboard"""
+    try:
+        # Obtener parámetros
+        limite = request.args.get('limite', 10, type=int)
+        meses = request.args.get('meses', 6, type=int)  # Últimos N meses
+        
+        from datetime import datetime, timedelta
+        
+        # Calcular fecha de inicio (hace N meses)
+        fecha_inicio = datetime.utcnow() - timedelta(days=30*meses)
+        
+        # Consulta para obtener productos más vendidos
+        resultados = db.session.query(
+            Producto.id_producto,
+            Producto.nombre,
+            Producto.imagen,
+            db.func.sum(PedidoItem.cantidad).label('total_vendido'),
+            db.func.sum(PedidoItem.cantidad * PedidoItem.precio_unitario).label('total_ingresos')
+        ).join(
+            PedidoItem, PedidoItem.producto_id == Producto.id_producto
+        ).join(
+            Pedido, Pedido.id_pedido == PedidoItem.pedido_id
+        ).filter(
+            Pedido.fecha_pedido >= fecha_inicio,
+            Pedido.estado.in_(['completado', 'pendiente'])  # Solo pedidos confirmados
+        ).group_by(
+            Producto.id_producto, Producto.nombre, Producto.imagen
+        ).order_by(
+            db.desc('total_vendido')
+        ).limit(limite).all()
+        
+        productos_data = []
+        for prod in resultados:
+            productos_data.append({
+                'id': prod.id_producto,
+                'nombre': prod.nombre,
+                'imagen': prod.imagen or '/static/img/default-product.png',
+                'total_vendido': int(prod.total_vendido),
+                'total_ingresos': float(prod.total_ingresos)
+            })
+        
+        # Obtener total de ingresos general para porcentajes
+        total_ingresos_general = db.session.query(
+            db.func.sum(PedidoItem.cantidad * PedidoItem.precio_unitario)
+        ).join(
+            Pedido, Pedido.id_pedido == PedidoItem.pedido_id
+        ).filter(
+            Pedido.fecha_pedido >= fecha_inicio,
+            Pedido.estado.in_(['completado', 'pendiente'])
+        ).scalar() or 1  # Evitar división por cero
+        
+        return jsonify({
+            'success': True,
+            'productos': productos_data,
+            'total_ingresos': float(total_ingresos_general),
+            'periodo': {
+                'desde': fecha_inicio.strftime('%Y-%m-%d'),
+                'hasta': datetime.utcnow().strftime('%Y-%m-%d'),
+                'meses': meses
+            }
+        })
+        
+    except Exception as e:
+        print(f"❌ Error obteniendo productos más vendidos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@web_bp.route('/api/admin/estadisticas/ventas-por-mes')
+@admin_required
+def api_ventas_por_mes():
+    """Obtiene las ventas por mes para la gráfica de tendencia"""
+    try:
+        from datetime import datetime, timedelta
+        import calendar
+        
+        # Últimos 12 meses
+        meses = []
+        labels = []
+        datos_ventas = []
+        
+        fecha_actual = datetime.utcnow()
+        
+        for i in range(11, -1, -1):
+            fecha = fecha_actual - timedelta(days=30*i)
+            mes = fecha.month
+            año = fecha.year
+            
+            # Primer día del mes
+            inicio_mes = datetime(año, mes, 1)
+            # Último día del mes
+            if mes == 12:
+                fin_mes = datetime(año + 1, 1, 1) - timedelta(days=1)
+            else:
+                fin_mes = datetime(año, mes + 1, 1) - timedelta(days=1)
+            
+            # Total de ventas en el mes
+            total = db.session.query(
+                db.func.sum(Pedido.total)
+            ).filter(
+                Pedido.fecha_pedido >= inicio_mes,
+                Pedido.fecha_pedido <= fin_mes,
+                Pedido.estado.in_(['completado', 'pendiente'])
+            ).scalar() or 0
+            
+            meses.append({
+                'año': año,
+                'mes': mes,
+                'nombre': calendar.month_name[mes][:3]  # Abreviatura
+            })
+            labels.append(f"{calendar.month_name[mes][:3]} {año}")
+            datos_ventas.append(float(total))
+        
+        return jsonify({
+            'success': True,
+            'labels': labels,
+            'datos': datos_ventas,
+            'meses': meses
+        })
+        
+    except Exception as e:
+        print(f"❌ Error obteniendo ventas por mes: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@web_bp.route('/api/admin/estadisticas/resumen')
+@admin_required
+def api_resumen_estadisticas():
+    """Obtiene un resumen de estadísticas para el dashboard"""
+    try:
+        from datetime import datetime, timedelta
+        
+        ahora = datetime.utcnow()
+        inicio_mes = datetime(ahora.year, ahora.month, 1)
+        inicio_semana = ahora - timedelta(days=7)
+        inicio_ano = datetime(ahora.year, 1, 1)
+        
+        # Totales generales
+        total_productos = Producto.query.count()
+        total_usuarios = Usuario.query.filter_by(rol_id=2).count()  # Solo clientes
+        total_pedidos = Pedido.query.count()
+        
+        # Pedidos por estado
+        pedidos_pendientes = Pedido.query.filter_by(estado='pendiente').count()
+        pedidos_completados = Pedido.query.filter_by(estado='completado').count()
+        pedidos_cancelados = Pedido.query.filter_by(estado='cancelado').count()
+        
+        # Ventas del mes
+        ventas_mes = db.session.query(
+            db.func.sum(Pedido.total)
+        ).filter(
+            Pedido.fecha_pedido >= inicio_mes,
+            Pedido.estado.in_(['completado', 'pendiente'])
+        ).scalar() or 0
+        
+        # Ventas de la semana
+        ventas_semana = db.session.query(
+            db.func.sum(Pedido.total)
+        ).filter(
+            Pedido.fecha_pedido >= inicio_semana,
+            Pedido.estado.in_(['completado', 'pendiente'])
+        ).scalar() or 0
+        
+        # Ventas del año
+        ventas_ano = db.session.query(
+            db.func.sum(Pedido.total)
+        ).filter(
+            Pedido.fecha_pedido >= inicio_ano,
+            Pedido.estado.in_(['completado', 'pendiente'])
+        ).scalar() or 0
+        
+        # Productos con stock bajo
+        stock_bajo = Producto.query.filter(
+            Producto.stock < 10,
+            Producto.activo == True
+        ).count()
+        
+        return jsonify({
+            'success': True,
+            'resumen': {
+                'total_productos': total_productos,
+                'total_usuarios': total_usuarios,
+                'total_pedidos': total_pedidos,
+                'pedidos_pendientes': pedidos_pendientes,
+                'pedidos_completados': pedidos_completados,
+                'pedidos_cancelados': pedidos_cancelados,
+                'ventas_mes': float(ventas_mes),
+                'ventas_semana': float(ventas_semana),
+                'ventas_ano': float(ventas_ano),
+                'stock_bajo': stock_bajo
+            }
+        })
+        
+    except Exception as e:
+        print(f"❌ Error obteniendo resumen: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
