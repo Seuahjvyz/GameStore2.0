@@ -93,7 +93,7 @@ const ProductosController = {
             const container = document.getElementById('productos-container');
 
             if (!container) {
-                console.error('No se encontró el container con id "productos-container"');
+                console.error(' No se encontró el container con id "productos-container"');
                 return;
             }
 

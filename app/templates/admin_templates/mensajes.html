@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/prov.css">
+{% endblock %}
+
+{% block content %}
+
+<header class="barra-superior">
+    <div class="boton">
+        <button id="btn-menu" class="btn-menu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="marca">
+        <h1>Game Store</h1>
+    </div>
+
+    <section class="iconos">
+        <button class="btn-menu-user" id="btn-menu-user">
+            <i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="menu-user" id="menu-user">
+            <div class="contenido-menu-user">
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
+        </div>
+    </section>
+</header>
+
+<div class="contenedor-principal">
+
+    <nav class="barra-lateral">
+        <div class="contenedor-logo">
+            <a href="/"><img class="logo" src="/static/img/Icon_GS.png" alt="Logo"></a>
+        </div>
+
+        <ul>
+            <li><a class="barra-lateral-link" href="/dashboard"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li><a class="barra-lateral-link" href="/admin/gestion-pedidos"><i class="fa-solid fa-truck"></i> Gestión de pedidos</a></li>
+            <li><a class="barra-lateral-link" href="/admin/gestion-productos"><i class="fa-solid fa-boxes-packing"></i> Gestión de productos</a></li>
+            <li><a class="barra-lateral-link" href="/admin/gestion-usuarios"><i class="fa-solid fa-users"></i> Gestión de usuarios</a></li>
+            <!--<li><a class="barra-lateral-link" href="/admin/mensajes"><i class="fa-regular fa-envelope"></i>Mensajes</a></li>-->
+        </ul>
+    </nav>
+
+    <main class="principal">
+        <div class="contenido">
+            <div class="admin-mensajes-container">
+                <h1><i class="fa-regular fa-envelope"></i> Mensajes de Contacto</h1>
+                
+                <!-- Filtros - SIN BOTONES -->
+                <div class="filtros-container">
+                    
+                    <!-- Búsqueda con icono a la derecha (FUERA del input) -->
+                    <div class="filtro-group search-group">
+                        <label for="buscar">Buscar</label>
+                        <div class="search-wrapper">
+                            <input class="search-input" type="text" id="buscar" 
+                                placeholder="Nombre, email o mensaje...">
+                            <button class="search-button" id="search-btn">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtro Leído -->
+                    <div class="filtro-group">
+                        <label for="filtro-leido">Leído</label>
+                        <select id="filtro-leido" class="auto-filter">
+                            <option value="">Todos</option>
+                            <option value="false">No leídos</option>
+                            <option value="true">Leídos</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro Respondido -->
+                    <div class="filtro-group">
+                        <label for="filtro-respondido">Respondido</label>
+                        <select id="filtro-respondido" class="auto-filter">
+                            <option value="">Todos</option>
+                            <option value="false">No respondidos</option>
+                            <option value="true">Respondidos</option>
+                        </select>
+                    </div>
+
+                    <!-- Fecha Desde -->
+                    <div class="filtro-group">
+                        <label for="fecha-desde">Desde</label>
+                        <input type="date" id="fecha-desde" class="auto-filter">
+                    </div>
+
+                    <!-- Fecha Hasta -->
+                    <div class="filtro-group">
+                        <label for="fecha-hasta">Hasta</label>
+                        <input type="date" id="fecha-hasta" class="auto-filter">
+                    </div>
+
+                    <!-- Botón Limpiar (único botón) -->
+                    <div class="filtro-group limpiar-group">
+                        <label>&nbsp;</label>
+                        <button id="btn-limpiar" class="btn-secondary" title="Limpiar filtros">
+                            <i class="fa-solid fa-eraser"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Estadísticas rápidas -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <span class="stat-label">Total mensajes</span>
+                        <span class="stat-value" id="total-mensajes">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">No leídos</span>
+                        <span class="stat-value" id="no-leidos">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">No respondidos</span>
+                        <span class="stat-value" id="no-respondidos">0</span>
+                    </div>
+                </div>
+                
+                <!-- Tabla de mensajes -->
+                <div class="table-responsive">
+                    <table class="mensajes-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Asunto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mensajes-body">
+                            <tr>
+                                <td colspan="7" class="text-center">Cargando mensajes...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<div id="fondo"></div>
+
+<!-- Modal de detalle del mensaje -->
+<div id="modal-mensaje" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fa-regular fa-envelope"></i> Detalle del Mensaje</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body-content">
+            <!-- Contenido dinámico -->
+        </div>
+        <div class="modal-footer">
+            <button id="marcar-leido" class="btn-primary"><i class="fa-regular fa-eye"></i> Marcar como leído</button>
+            <button id="marcar-respondido" class="btn-success"><i class="fa-regular fa-check-circle"></i> Marcar como respondido</button>
+            <button id="eliminar-mensaje" class="btn-danger"><i class="fa-regular fa-trash-can"></i> Eliminar</button>
+            <button class="btn-secondary close-modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="/static/js/user-menu.js"></script>
+<script src="/static/js/barra-lateral.js"></script>
+<script src="/static/js/admin-mensaje.js"></script>
+
+{% endblock %}

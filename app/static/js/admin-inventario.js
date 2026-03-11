@@ -20,10 +20,10 @@ class AdminInventario {
             if (data.success) {
                 this.categorias = data.categorias;
                 this.actualizarSelectCategorias();
-                console.log(`✅ ${this.categorias.length} categorías cargadas`);
+                console.log(`${this.categorias.length} categorías cargadas`);
             }
         } catch (error) {
-            console.error('❌ Error cargando categorías:', error);
+            console.error('Error cargando categorías:', error);
         }
     }
 
@@ -47,10 +47,10 @@ class AdminInventario {
                 this.productos = data.productos;
                 this.mostrarProductos();
                 this.actualizarEstadisticas();
-                console.log(`✅ ${this.productos.length} productos cargados`);
+                console.log(`${this.productos.length} productos cargados`);
             }
         } catch (error) {
-            console.error('❌ Error cargando productos:', error);
+            console.error('Error cargando productos:', error);
             this.mostrarNotificacion('Error al cargar los productos', 'error');
         }
     }
@@ -280,7 +280,7 @@ async guardarProducto() {
     // ✅ AUTO-DESHABILITAR SI STOCK ES 0
     if (formData.stock === 0) {
         formData.activo = false;
-        console.log('🔴 Producto deshabilitado automáticamente por stock 0');
+        console.log('Producto deshabilitado automáticamente por stock 0');
     }
 
     // Validaciones básicas
@@ -320,9 +320,9 @@ async guardarProducto() {
         const data = await response.json();
 
         if (data.success) {
-            let mensaje = formData.id ? '✅ Producto actualizado correctamente' : '✅ Producto agregado correctamente';
+            let mensaje = formData.id ? 'Producto actualizado correctamente' : 'Producto agregado correctamente';
             
-            // ✅ AGREGAR INFORMACIÓN SOBRE ESTADO
+            //  AGREGAR INFORMACIÓN SOBRE ESTADO
             if (formData.stock === 0) {
                 mensaje += ' (Producto deshabilitado por stock 0)';
             }
@@ -340,7 +340,7 @@ async guardarProducto() {
     }
 }
 
-    // ✅ NUEVO MÉTODO: Notificar actualización de productos
+    //  NUEVO MÉTODO: Notificar actualización de productos
     notificarActualizacionProductos() {
         // Disparar evento personalizado para que las vistas se actualicen
         const event = new CustomEvent('productosActualizados');
@@ -355,7 +355,7 @@ async guardarProducto() {
             
             return data.existe;
         } catch (error) {
-            console.error('❌ Error validando producto:', error);
+            console.error('Error validando producto:', error);
             return false;
         }
     }
@@ -367,7 +367,7 @@ async guardarProducto() {
             
             return data.existe;
         } catch (error) {
-            console.error('❌ Error validando duplicado:', error);
+            console.error('Error validando duplicado:', error);
             return false;
         }
     }
@@ -458,7 +458,7 @@ async guardarProducto() {
 
             if (data.success) {
                 this.mostrarNotificacion(
-                    nuevoEstado ? '✅ Producto activado correctamente' : '✅ Producto desactivado correctamente',
+                    nuevoEstado ? 'Producto activado correctamente' : 'Producto desactivado correctamente',
                     'success'
                 );
                 await this.cargarProductos();
@@ -467,7 +467,7 @@ async guardarProducto() {
                 this.mostrarNotificacion(data.error, 'error');
             }
         } catch (error) {
-            console.error('❌ Error cambiando estado:', error);
+            console.error('Error cambiando estado:', error);
             this.mostrarNotificacion('Error al cambiar el estado', 'error');
         }
     }
@@ -485,7 +485,7 @@ async guardarProducto() {
             const data = await response.json();
 
             if (data.success) {
-                this.mostrarNotificacion('✅ Producto eliminado correctamente', 'success');
+                this.mostrarNotificacion('Producto eliminado correctamente', 'success');
                 await this.cargarProductos();
                 this.notificarActualizacionProductos();
             } else {

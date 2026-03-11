@@ -10,6 +10,8 @@ from app.models.usuario import Usuario
 from app.models.models import Carrito, CarritoItem, Producto, Categoria
 from app.models.role import Role
 from app.models.favorito import Favorito
+from app.models.contacto import Contacto
+
 
 web_bp = Blueprint('web', __name__)
 
@@ -173,6 +175,11 @@ def admin_perfil():
 def admin():
     """Ruta principal del administrador - SOLO accesible para rol 1"""
     return render_template('admin_templates/dashboard.html')
+
+@web_bp.route('/admin/mensajes')
+@admin_required
+def admin_mensajes():
+    return render_template('admin_templates/mensajes.html')
 
 # ----------------------------------------- RUTAS DE USUARIO ---------------------------------------- #
 
@@ -2493,4 +2500,216 @@ def api_resumen_estadisticas():
         
     except Exception as e:
         print(f"❌ Error obteniendo resumen: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    
+    
+# ----------------------------------------- API CONTACTO ---------------------------------------- #
+
+@web_bp.route('/api/contacto/enviar', methods=['POST'])
+def api_contacto_enviar():
+    """API para enviar mensaje de contacto"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'error': 'Datos no proporcionados'}), 400
+        
+        # Validar campos obligatorios
+        nombre = data.get('nombre', '').strip()
+        email = data.get('email', '').strip()
+        asunto = data.get('asunto', '')
+        mensaje = data.get('mensaje', '').strip()
+        
+        if not nombre:
+            return jsonify({'success': False, 'error': 'El nombre es obligatorio'}), 400
+        
+        if not email or '@' not in email:
+            return jsonify({'success': False, 'error': 'Email inválido'}), 400
+        
+        if not asunto:
+            return jsonify({'success': False, 'error': 'El asunto es obligatorio'}), 400
+        
+        if not mensaje:
+            return jsonify({'success': False, 'error': 'El mensaje es obligatorio'}), 400
+        
+        # Obtener IP y User-Agent (opcional pero útil)
+        ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if ip_usuario and ',' in ip_usuario:
+            ip_usuario = ip_usuario.split(',')[0].strip()
+        
+        user_agent = request.headers.get('User-Agent', '')
+        
+        # Crear mensaje
+        nuevo_mensaje = Contacto(
+            nombre=nombre,
+            email=email,
+            telefono=data.get('telefono', '').strip(),
+            asunto=asunto,
+            mensaje=mensaje,
+            ip_usuario=ip_usuario,
+            user_agent=user_agent
+        )
+        
+        db.session.add(nuevo_mensaje)
+        db.session.commit()
+        
+        print(f"✅ Mensaje de contacto guardado - ID: {nuevo_mensaje.id_mensaje}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Mensaje enviado correctamente',
+            'id': nuevo_mensaje.id_mensaje
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error guardando mensaje: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': 'Error interno del servidor'}), 500
+
+
+@web_bp.route('/api/admin/contacto/mensajes')
+@admin_required
+def api_admin_mensajes():
+    """Obtener todos los mensajes de contacto para administración"""
+    try:
+        # Obtener parámetros de filtro
+        search = request.args.get('search', '')
+        leido = request.args.get('leido', '')
+        respondido = request.args.get('respondido', '')
+        fecha_desde = request.args.get('fecha_desde', '')
+        fecha_hasta = request.args.get('fecha_hasta', '')
+        
+        # Consulta base
+        query = Contacto.query
+        
+        # Aplicar filtros
+        if search:
+            query = query.filter(
+                (Contacto.nombre.ilike(f'%{search}%')) |
+                (Contacto.email.ilike(f'%{search}%')) |
+                (Contacto.mensaje.ilike(f'%{search}%'))
+            )
+        
+        if leido != '':
+            query = query.filter(Contacto.leido == (leido.lower() == 'true'))
+        
+        if respondido != '':
+            query = query.filter(Contacto.respondido == (respondido.lower() == 'true'))
+        
+        if fecha_desde:
+            try:
+                fecha_desde_dt = datetime.datetime.strptime(fecha_desde, '%Y-%m-%d')
+                query = query.filter(Contacto.fecha_envio >= fecha_desde_dt)
+            except:
+                pass
+        
+        if fecha_hasta:
+            try:
+                fecha_hasta_dt = datetime.datetime.strptime(fecha_hasta + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+                query = query.filter(Contacto.fecha_envio <= fecha_hasta_dt)
+            except:
+                pass
+        
+        # Ordenar por fecha descendente
+        mensajes = query.order_by(Contacto.fecha_envio.desc()).all()
+        
+        # Estadísticas rápidas
+        total_no_leidos = Contacto.query.filter_by(leido=False).count()
+        total_no_respondidos = Contacto.query.filter_by(respondido=False).count()
+        
+        return jsonify({
+            'success': True,
+            'mensajes': [m.to_dict() for m in mensajes],
+            'stats': {
+                'total': len(mensajes),
+                'no_leidos': total_no_leidos,
+                'no_respondidos': total_no_respondidos
+            }
+        })
+        
+    except Exception as e:
+        print(f"❌ Error obteniendo mensajes: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@web_bp.route('/api/admin/contacto/mensajes/<int:mensaje_id>')
+@admin_required
+def api_admin_mensaje_detalle(mensaje_id):
+    """Obtener detalle de un mensaje específico"""
+    try:
+        mensaje = Contacto.query.get(mensaje_id)
+        
+        if not mensaje:
+            return jsonify({'success': False, 'error': 'Mensaje no encontrado'}), 404
+        
+        # Marcar como leído automáticamente al verlo
+        if not mensaje.leido:
+            mensaje.leido = True
+            db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'mensaje': mensaje.to_dict()
+        })
+        
+    except Exception as e:
+        print(f"❌ Error obteniendo detalle: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@web_bp.route('/api/admin/contacto/mensajes/<int:mensaje_id>/estado', methods=['PUT'])
+@admin_required
+def api_admin_mensaje_estado(mensaje_id):
+    """Actualizar estado del mensaje (leído/respondido)"""
+    try:
+        data = request.get_json()
+        mensaje = Contacto.query.get(mensaje_id)
+        
+        if not mensaje:
+            return jsonify({'success': False, 'error': 'Mensaje no encontrado'}), 404
+        
+        if 'leido' in data:
+            mensaje.leido = data['leido']
+        
+        if 'respondido' in data:
+            mensaje.respondido = data['respondido']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Estado actualizado correctamente'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error actualizando estado: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@web_bp.route('/api/admin/contacto/mensajes/<int:mensaje_id>', methods=['DELETE'])
+@admin_required
+def api_admin_mensaje_eliminar(mensaje_id):
+    """Eliminar un mensaje de contacto"""
+    try:
+        mensaje = Contacto.query.get(mensaje_id)
+        
+        if not mensaje:
+            return jsonify({'success': False, 'error': 'Mensaje no encontrado'}), 404
+        
+        db.session.delete(mensaje)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Mensaje eliminado correctamente'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error eliminando mensaje: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500

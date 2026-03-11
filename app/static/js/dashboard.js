@@ -1,6 +1,6 @@
 // static/js/dashboard.js
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📊 Inicializando Dashboard...');
+    console.log(' Inicializando Dashboard...');
     
     // Cargar todas las gráficas
     cargarResumenEstadisticas();
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Configurar actualización automática cada 5 minutos
     setInterval(() => {
-        console.log('🔄 Actualizando dashboard...');
+        console.log('Actualizando dashboard...');
         cargarResumenEstadisticas();
         cargarProductosMasVendidos();
         cargarVentasPorMes();
@@ -26,133 +26,6 @@ function cargarResumenEstadisticas() {
             }
         })
         .catch(error => console.error('Error cargando resumen:', error));
-}
-
-// Función para mostrar las tarjetas de resumen
-function mostrarResumen(resumen) {
-    // Crear contenedor si no existe
-    let resumenContainer = document.getElementById('resumen-estadisticas');
-    
-    if (!resumenContainer) {
-        // Insertar después del h1
-        const contenido = document.querySelector('.contenido');
-        const h1 = contenido.querySelector('h1');
-        
-        resumenContainer = document.createElement('div');
-        resumenContainer.id = 'resumen-estadisticas';
-        resumenContainer.className = 'resumen-cards';
-        
-        h1.insertAdjacentElement('afterend', resumenContainer);
-    }
-    
-    // Formatear moneda
-    const formatter = new Intl.NumberFormat('es-MX', {
-        style: 'currency',
-        currency: 'MXN',
-        minimumFractionDigits: 2
-    });
-    
-    resumenContainer.innerHTML = `
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-                <i class="fa-solid fa-box"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${resumen.total_productos}</span>
-                <span class="stat-label">Productos</span>
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                <i class="fa-solid fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${resumen.total_usuarios}</span>
-                <span class="stat-label">Clientes</span>
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
-                <i class="fa-solid fa-shopping-cart"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${resumen.total_pedidos}</span>
-                <span class="stat-label">Pedidos</span>
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
-                <i class="fa-solid fa-check-circle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${resumen.pedidos_completados}</span>
-                <span class="stat-label">Completados</span>
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                <i class="fa-solid fa-clock"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${resumen.pedidos_pendientes}</span>
-                <span class="stat-label">Pendientes</span>
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                <i class="fa-solid fa-times-circle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${resumen.pedidos_cancelados}</span>
-                <span class="stat-label">Cancelados</span>
-            </div>
-        </div>
-        
-        <div class="stat-card stat-card-large">
-            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                <i class="fa-solid fa-chart-line"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${formatter.format(resumen.ventas_semana)}</span>
-                <span class="stat-label">Ventas (7 días)</span>
-            </div>
-        </div>
-        
-        <div class="stat-card stat-card-large">
-            <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                <i class="fa-solid fa-calendar"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${formatter.format(resumen.ventas_mes)}</span>
-                <span class="stat-label">Ventas del mes</span>
-            </div>
-        </div>
-        
-        <div class="stat-card stat-card-large">
-            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                <i class="fa-solid fa-calendar-alt"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${formatter.format(resumen.ventas_ano)}</span>
-                <span class="stat-label">Ventas del año</span>
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                <i class="fa-solid fa-exclamation-triangle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">${resumen.stock_bajo}</span>
-                <span class="stat-label">Stock bajo</span>
-            </div>
-        </div>
-    `;
 }
 
 // Función para cargar productos más vendidos
@@ -212,7 +85,6 @@ function mostrarProductosMasVendidos(productos, totalIngresos) {
                 <div class="producto-top-barra">
                     <div class="producto-top-barra-progreso" style="width: ${porcentaje}%"></div>
                 </div>
-                <span class="producto-top-porcentaje">${porcentaje}% de ingresos</span>
             </div>
         `;
         grid.appendChild(card);
@@ -238,8 +110,8 @@ function mostrarProductosMasVendidos(productos, totalIngresos) {
             datasets: [{
                 label: 'Unidades vendidas',
                 data: productos.map(p => p.total_vendido),
-                backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                borderColor: '#8b5cf6',
+                backgroundColor: 'rgba(92, 246, 177, 0.7)',
+                borderColor: '#5cf67d',
                 borderWidth: 2,
                 borderRadius: 6
             }]
@@ -302,7 +174,7 @@ function mostrarVentasPorMes(labels, datos) {
         const nuevoContainer = document.createElement('div');
         nuevoContainer.id = 'grafica-ventas-mes';
         nuevoContainer.style.marginTop = '40px';
-        nuevoContainer.style.height = '400px';
+        nuevoContainer.style.height = '300px';
         
         // Insertar después de la gráfica de productos
         const graficaProductos = document.getElementById('grafica-productos');
@@ -341,10 +213,10 @@ function renderizarGraficaVentas(canvas, labels, datos) {
             datasets: [{
                 label: 'Ventas',
                 data: datos,
-                borderColor: '#8b5cf6',
-                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                borderColor: '#f44040',
+                backgroundColor: '#f65c5c',
                 borderWidth: 3,
-                pointBackgroundColor: '#8b5cf6',
+                pointBackgroundColor: '#f72c2c',
                 pointBorderColor: 'white',
                 pointRadius: 5,
                 pointHoverRadius: 7,
