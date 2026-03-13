@@ -1,4 +1,3 @@
-
 from flask import Blueprint, request, jsonify, session
 from groq import Groq
 import os
@@ -16,10 +15,10 @@ chatbot_bp = Blueprint('chatbot', __name__, url_prefix='/chatbot')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# MODELOS DE GROQ
+# MODELOS DE GROQ - CORREGIDO
 MODELOS_GROQ = {
     "rapido": "llama-3.1-8b-instant",
-    "potente": "llama-3.3-70b-versatile"
+    "potente": "llama-3.3-70b-versatile"  # ← CORREGIDO: sin espacio extra
 }
 
 # Historial por sesión
@@ -424,4 +423,11 @@ def chat():
             'success': True
         })
         
-    except Exception as
+    except Exception as e:
+        logger.error(f"❌ Error: {str(e)}")
+        return jsonify({
+            'error': 'Error interno',
+            'success': False
+        }), 500
+
+# ... (el resto de los endpoints se mantienen igual)
