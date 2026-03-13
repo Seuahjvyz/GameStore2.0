@@ -74,3 +74,4 @@ urllib3==2.5.0
 websockets==16.0
 Werkzeug==2.3.7
 WTForms==3.0.1
+gunicorn==21.2.0

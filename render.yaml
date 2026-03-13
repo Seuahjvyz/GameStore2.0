@@ -3,13 +3,18 @@ services:
     name: gamestore
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:app  
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install gunicorn==21.2.0
+    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT --workers 4
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: gamestore-db
           property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11.0  # Cambia a versión más estable
 
 databases:
   - name: gamestore-db
