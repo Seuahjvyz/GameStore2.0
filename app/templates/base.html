@@ -21,6 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
     <script src="/static/js/revisar-sesion.js"></script>
+    <script src="/static/js/chatbot.js"></script>
 
 </head>
 
@@ -29,6 +30,23 @@
             style="display:none;visibility:hidden"></iframe></noscript>
     <div id="content">
         {% block content %}{% endblock %}
+    </div>
+
+    <button class="btn-chatbot" id="btn-chatbot"><i class="fa-solid fa-robot"></i></button>
+    <div id="ventana-chatbot" class="ventana-oculto-chatbot">
+        <div class="cabecera-chatbot">
+            <p>Chatbot</p>
+            <button class="btn-cerrar-chatbot" id="btn-cerrar-chatbot"><i class="fa-solid fa-circle-xmark"></i></button>
+        </div>
+        <div class="chatbot">
+            <div class="mensajes-chatbot" id="mensajes-chatbot">
+
+            </div>
+            <div class="input-chatbot">
+                <input type="text" id="mensaje-input-chatbot" placeholder="Escribe tu mensaje...">
+                <button id="btn-enviar-mensaje-chatbot"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
     </div>
 </body>
 

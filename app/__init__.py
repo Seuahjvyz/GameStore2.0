@@ -1,3 +1,5 @@
+# En app/__init__.py
+
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
@@ -9,7 +11,7 @@ import os
 import atexit
 import datetime 
 
-# 🔥 IMPORTAR PAYPAL SDK
+# IMPORTAR PAYPAL SDK
 import paypalrestsdk
 
 db = SQLAlchemy()
@@ -24,10 +26,10 @@ def keep_db_alive():
     try:
         db.session.execute(db.text('SELECT 1'))
         db.session.commit()
-        print("✅ Ping a BD ejecutado - Neon activa")
+        print(" Ping a BD ejecutado - Neon activa")
     except Exception as e:
-        print(f"⚠️ Error en ping a BD: {e}")
-###-------------------------------------------------------
+        print(f" Error en ping a BD: {e}")
+
 def create_app():
     app = Flask(__name__)
     
@@ -55,19 +57,19 @@ def create_app():
     if not app.config.get('SECRET_KEY'):
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-secret-key-for-dev')
     
-    # 🔥 CONFIGURACIÓN DE PAYPAL
+    # CONFIGURACIÓN DE PAYPAL
     app.config['PAYPAL_CLIENT_ID'] = os.environ.get('PAYPAL_CLIENT_ID')
     app.config['PAYPAL_CLIENT_SECRET'] = os.environ.get('PAYPAL_CLIENT_SECRET')
     app.config['PAYPAL_MODE'] = os.environ.get('PAYPAL_MODE', 'sandbox')
     
-    # 🔥 INICIALIZAR PAYPAL SDK
+    # INICIALIZAR PAYPAL SDK
     paypalrestsdk.configure({
         "mode": app.config['PAYPAL_MODE'],
         "client_id": app.config['PAYPAL_CLIENT_ID'],
         "client_secret": app.config['PAYPAL_CLIENT_SECRET']
     })
     
-    print(f"✅ PayPal SDK configurado - Modo: {app.config['PAYPAL_MODE']}")
+    print(f"PayPal SDK configurado - Modo: {app.config['PAYPAL_MODE']}")
     
     # Inicializar extensiones
     db.init_app(app)
@@ -76,7 +78,6 @@ def create_app():
     login_manager.login_view = 'web.login'
 
     #Manejador de Errores 
-    #
     @app.errorhandler(404)
     def page_not_found(error):
         if request.path.startswith('/api/'):
@@ -127,21 +128,23 @@ def create_app():
             # Actualizar última actividad (guardar como string ISO para evitar problemas de serialización)
             session['last_activity'] = datetime.datetime.now().isoformat()
     
-    
     # Registrar blueprints
     from app.routes.web import web_bp
     from app.carrito.routes import carrito_bp    
     from app.api.productos import bp as productos_bp
     from app.api.carrito import bp as carrito_api_bp
-    from app.api.auth import bp as auth_bp
+    from app.api.auth import bp as auth_bp  
+    from app.routes.chatbot import chatbot_bp
     
+    # BLUEPRINT 
     app.register_blueprint(web_bp)
     app.register_blueprint(carrito_bp)
     app.register_blueprint(productos_bp)
     app.register_blueprint(carrito_api_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(chatbot_bp)  
     
-    print("✅ Blueprints registrados: Web, Carrito, Productos, Auth")
+    print("Blueprints registrados: Web, Carrito, Productos, Auth, Chatbot")
     
     # Configurar user_loader para Flask-Login
     from app.models.usuario import Usuario 
