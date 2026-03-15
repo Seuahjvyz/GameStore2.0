@@ -131,6 +131,45 @@ def obtener_productos_reales():
         logger.error(f"Error obteniendo productos: {e}")
         return []
 
+def obtener_contexto_resumido():
+    """Versión resumida del contexto para ahorrar tokens"""
+    productos = obtener_productos_reales()
+    
+    productos_texto = ""
+    if productos:
+        for p in productos[:5]:  # Solo los primeros 5 productos
+            productos_texto += f"- {p['nombre']}: ${p['precio']:,.0f}\n"
+    
+    return f"""Eres un asistente de GAME STORE.
+
+PRODUCTOS DESTACADOS:
+{productos_texto}
+
+SECCIONES:
+- Inicio: {SITE_URL}/
+- Juegos: {SITE_URL}/juegos
+- Consolas: {SITE_URL}/consolas
+- Controles: {SITE_URL}/controles
+- Accesorios: {SITE_URL}/accesorios
+- Carrito: {SITE_URL}/carrito
+- Favoritos: {SITE_URL}/favoritos
+- Pedidos: {SITE_URL}/pedidos
+- Perfil: {SITE_URL}/perfil-usuario
+- Contacto: {SITE_URL}/contacto
+- Registro: {SITE_URL}/registro
+- Login: {SITE_URL}/login
+
+POLÍTICAS:
+- Solo PayPal
+- No cambios/devoluciones
+- Cancelaciones en 24h
+- Contacto: +52 55 3190 8274
+
+INSTRUCCIONES:
+1. Usa SOLO enlaces HTML: <a href="URL">texto</a>
+2. Sé amable y conciso
+3. Si preguntan por cómo hacer algo, da pasos claros"""
+
 def obtener_contexto_completo(mensaje_usuario, session_id):
     """Genera el contexto completo de la tienda para Groq"""
     
@@ -406,7 +445,7 @@ def chat():
 
 @chatbot_bp.route('/api/chat/historial', methods=['GET'])
 def obtener_historial():
-    """Obtiene el historial del usuario actual"""
+    """Obtiene el historial SOLO del usuario actual"""
     try:
         session_id = obtener_session_id()
         historial = conversaciones.get(session_id, [])
@@ -427,11 +466,12 @@ def obtener_historial():
         })
         
     except Exception as e:
+        print(f"Error obteniendo historial: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @chatbot_bp.route('/api/chat/limpiar', methods=['POST'])
 def limpiar_historial():
-    """Limpia el historial del usuario actual"""
+    """Limpia SOLO el historial del usuario actual"""
     try:
         session_id = obtener_session_id()
         if session_id in conversaciones:
@@ -448,7 +488,7 @@ def limpiar_historial():
 
 @chatbot_bp.route('/api/chat/sesion-info', methods=['GET'])
 def sesion_info():
-    """Información de la sesión actual"""
+    """Información de la sesión actual (debug)"""
     session_id = obtener_session_id()
     return jsonify({
         'session_id': session_id,
@@ -460,7 +500,7 @@ def sesion_info():
 
 @chatbot_bp.route('/api/user-info', methods=['GET'])
 def user_info():
-    """Obtiene información del usuario"""
+    """Obtiene información del usuario para personalizar"""
     if 'user_id' in session:
         usuario = Usuario.query.get(session['user_id'])
         return jsonify({
@@ -490,12 +530,12 @@ def test_chatbot():
         
         respuesta = cliente.chat.completions.create(
             model=MODELOS_GROQ["rapido"],
-            messages=[{"role": "user", "content": "Hola, prueba"}],
-            max_tokens=20
+            messages=[{"role": "user", "content": "OK"}],
+            max_tokens=10
         )
         
         return jsonify({
-            'mensaje': '✅ API de chatbot funcionando correctamente',
+            'mensaje': '✅ API de Groq funcionando',
             'respuesta': respuesta.choices[0].message.content,
             'session_id': obtener_session_id(),
             'is_admin': es_administrador(),
@@ -518,7 +558,7 @@ def listar_modelos():
         {
             "id": MODELOS_GROQ["rapido"],
             "nombre": "Llama 3.1 8B",
-            "descripcion": "Modelo rápido para saludos",
+            "descripcion": "Modelo rápido para saludos y consultas simples",
             "contexto": 8192
         }
     ]
