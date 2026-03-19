@@ -1,12 +1,11 @@
 from flask import Blueprint, request, jsonify, session
 from groq import Groq
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from app import db
 from app.models.models import Producto, Categoria
 from app.models.pedido import Pedido
 from app.models.usuario import Usuario
-from app.models.contacto import Contacto
 import uuid
 import logging
 
@@ -16,64 +15,14 @@ chatbot_bp = Blueprint('chatbot', __name__, url_prefix='/chatbot')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# MODELOS DE GROQ
-MODELOS_GROQ = {
-    "rapido": "llama-3.1-8b-instant",      # Para saludos y consultas simples
-    "potente": "llama-3.3-70b-versatile"    # Solo para consultas complejas
-}
+# MODELO DE GROQ
+MODELO_GROQ = "llama-3.3-70b-versatile"
 
-# URL base del sitio - SIN BARRA AL FINAL
+# URL base del sitio
 SITE_URL = "https://gamestore2-0-zytn.onrender.com"
 
 # Historial por sesión
 conversaciones = {}
-
-# Control de límite de tokens
-ultimo_reset = datetime.now()
-tokens_usados_hoy = 0
-LIMITE_DIARIO = 90000  # Dejamos margen de 10000
-
-def formatear_enlace_html(ruta, texto=None):
-    """
-    Genera un enlace en formato HTML en lugar de Markdown
-    para evitar problemas con paréntesis y espacios
-    """
-    if not ruta:
-        ruta = '/'
-    
-    # Limpiar la ruta
-    ruta = ruta.strip().replace(' ', '')
-    
-    # Asegurar que empiece con /
-    if not ruta.startswith('/') and not ruta.startswith('http'):
-        ruta = '/' + ruta
-    
-    # Si no es URL completa, agregar el dominio
-    if not ruta.startswith('http'):
-        url_completa = f"{SITE_URL}{ruta}"
-    else:
-        url_completa = ruta
-    
-    # Texto por defecto si no se proporciona
-    if not texto:
-        texto = ruta
-    
-    # Devolver enlace HTML
-    return f'<a href="{url_completa}" target="_blank" style="color: #8b5cf6; text-decoration: underline;">{texto}</a>'
-
-def formatear_texto_con_enlaces(texto):
-    """
-    Reemplaza cualquier URL en el texto con enlaces HTML clickeables
-    """
-    import re
-    # Patrón para encontrar URLs
-    url_pattern = r'https?://[^\s<>"{}|\\^`\[\]]+'
-    
-    def reemplazar_url(match):
-        url = match.group(0)
-        return f'<a href="{url}" target="_blank" style="color: #8b5cf6;">{url}</a>'
-    
-    return re.sub(url_pattern, reemplazar_url, texto)
 
 def obtener_session_id():
     """Obtiene o crea un ID único para el usuario actual"""
@@ -85,258 +34,250 @@ def obtener_session_id():
     
     return f"anon_{session['chat_session_id']}"
 
-def es_administrador():
-    """Verifica si el usuario actual es administrador"""
-    if 'user_id' in session:
-        usuario = Usuario.query.get(session['user_id'])
-        return usuario and usuario.rol_id == 1
-    return False
-
-def verificar_limite_tokens():
-    """Verifica si hemos alcanzado el límite diario de tokens"""
-    global ultimo_reset, tokens_usados_hoy
+def obtener_contexto_tienda():
+    """Construye el contexto EXACTO de la tienda basado en tu código real"""
     
-    ahora = datetime.now()
-    if ahora.date() > ultimo_reset.date():
-        tokens_usados_hoy = 0
-        ultimo_reset = ahora
+    # Obtener productos de la BD
+    productos = Producto.query.filter(Producto.activo == True, Producto.stock > 0).all()
     
-    return tokens_usados_hoy < LIMITE_DIARIO
-
-def obtener_productos_reales():
-    """Obtiene productos de la BD con su información completa"""
-    try:
-        productos = Producto.query.filter(
-            Producto.activo == True
-        ).all()
-        
-        if not productos:
-            return []
-        
-        lista_productos = []
-        for p in productos:
-            lista_productos.append({
-                'nombre': p.nombre,
-                'precio': float(p.precio),
-                'descripcion': p.descripcion or "Sin descripción disponible",
-                'categoria': p.categoria.nombre if p.categoria else 'General',
-                'stock': p.stock,
-                'id': p.id_producto,
-                'disponible': p.stock > 0,
-                'imagen': p.imagen
-            })
-        
-        return lista_productos
-    except Exception as e:
-        logger.error(f"Error obteniendo productos: {e}")
-        return []
-
-def obtener_contexto_resumido():
-    """Versión resumida del contexto para ahorrar tokens"""
-    productos = obtener_productos_reales()
+    productos_str = ""
+    categorias = {}
     
-    productos_texto = ""
-    if productos:
-        for p in productos[:5]:  # Solo los primeros 5 productos
-            productos_texto += f"- {p['nombre']}: ${p['precio']:,.0f}\n"
+    for p in productos:
+        cat = p.categoria.nombre if p.categoria else 'General'
+        if cat not in categorias:
+            categorias[cat] = []
+        categorias[cat].append(f"  • {p.nombre} - ${float(p.precio):,.0f} (Stock: {p.stock})")
     
-    return f"""Eres un asistente de GAME STORE.
-
-PRODUCTOS DESTACADOS:
-{productos_texto}
-
-SECCIONES:
-- Inicio: {SITE_URL}/
-- Juegos: {SITE_URL}/juegos
-- Consolas: {SITE_URL}/consolas
-- Controles: {SITE_URL}/controles
-- Accesorios: {SITE_URL}/accesorios
-- Carrito: {SITE_URL}/carrito
-- Favoritos: {SITE_URL}/favoritos
-- Pedidos: {SITE_URL}/pedidos
-- Perfil: {SITE_URL}/perfil-usuario
-- Contacto: {SITE_URL}/contacto
-- Registro: {SITE_URL}/registro
-- Login: {SITE_URL}/login
-
-POLÍTICAS:
-- Solo PayPal
-- No cambios/devoluciones
-- Cancelaciones en 24h
-- Contacto: +52 55 3190 8274
-
-INSTRUCCIONES:
-1. Usa SOLO enlaces HTML: <a href="URL">texto</a>
-2. Sé amable y conciso
-3. Si preguntan por cómo hacer algo, da pasos claros"""
-
-def obtener_contexto_completo(mensaje_usuario, session_id):
-    """Genera el contexto completo de la tienda para Groq"""
+    for cat, items in categorias.items():
+        productos_str += f"\n**{cat}:**\n" + "\n".join(items[:5])
+        if len(items) > 5:
+            productos_str += f"\n  ... y {len(items)-5} más"
     
-    # Verificar si el usuario saludó
-    saludos = ['hola', 'holis', 'holi', 'holus', 'buenos dias', 'buenas tardes', 'buenas noches', 
-               'que tal', 'qué tal', 'que onda', 'qué onda', 'k onda', 'k pedo', 'k honda', 'hey',
-               'hola!', 'hola?', 'buenas', 'saludos']
-    usuario_saludo = any(saludo in mensaje_usuario.lower() for saludo in saludos)
-    
-    productos = obtener_productos_reales()
-    
-    # Información del usuario actual
-    info_usuario = ""
+    # Información del usuario si está logueado
+    user_info = ""
     if 'user_id' in session:
         usuario = Usuario.query.get(session['user_id'])
         if usuario:
-            info_usuario = f"El usuario actual es {usuario.nombre_usuario}"
-            if usuario.rol_id == 1:
-                info_usuario += " y es ADMINISTRADOR."
+            pedidos = Pedido.query.filter_by(usuario_id=usuario.id_usuario).order_by(Pedido.fecha_pedido.desc()).limit(3).all()
+            pedidos_str = "\n".join([f"  • Pedido #{p.id_pedido}: {p.estado_seguimiento} - ${float(p.total):,.0f}" for p in pedidos]) if pedidos else "  • No hay pedidos recientes"
+            
+            user_info = f"""
+**INFORMACIÓN DEL USUARIO ACTUAL:**
+- Usuario: {usuario.nombre_usuario}
+- Email: {usuario.correo}
+- ID: {usuario.id_usuario}
+- Rol: {'Administrador' if usuario.rol_id == 1 else 'Cliente'}
+
+**PEDIDOS RECIENTES:**
+{pedidos_str}
+"""
     
-    # Construir contexto
-    contexto = f"""Eres un asistente virtual amigable de GAME STORE, una tienda en línea de videojuegos.
+    # ===== CONTEXTO EXTREMADAMENTE PRECISO =====
+    contexto = f"""Eres un asistente virtual de GAME STORE, una tienda de videojuegos en línea.
+Debes responder SIEMPRE basándote ÚNICAMENTE en la información real de la tienda que se proporciona a continuación.
+NO inventes información que no esté aquí. Si no sabes algo, dilo honestamente.
 
-INFORMACIÓN GENERAL:
-- Teléfono: +52 55 3190 8274
-- Email: gamevaultcontacto@gmail.com
-- Formulario: {formatear_enlace_html('/contacto', 'Contacto')}
-- Horario: L-S 10:00-20:00, D 12:00-18:00
-- Ubicación: Av. Miguel Ángel de Quevedo 1150, Coyoacán, CDMX
+**INFORMACIÓN DE LA TIENDA (REAL):**
+- **Nombre:** Game Store
+- **Sitio web:** https://gamestore2-0-zytn.onrender.com (usa SIEMPRE rutas relativas como /juegos, NO pongas la URL completa)
+- **Teléfono:** +52 55 3190 8274
+- **Email:** gamevaultcontacto@gmail.com
+- **Horario:** Lunes a Sábado 10:00-20:00, Domingos 12:00-18:00
+- **Ubicación:** Av. Miguel Ángel de Quevedo 1150, Coyoacán, CDMX
+- **Redes Sociales:** Instagram https://www.instagram.com/game_store2.0?igsh=MThoZHN0NDMwZjVmZg==, 
+    Facebook https://www.facebook.com/profile.php?id=61588437300186https://www.facebook.com/profile.php?id=61588437300186, 
+    X https://x.com/Game_Store_20, 
+    WhatsApp https://api.whatsapp.com/send?phone=5531908274&text=Hola%20=)
 
-PRODUCTOS:
+**PRODUCTOS DISPONIBLES (REALES, SOLO ESTOS):**
+{productos_str if productos_str else "No hay productos disponibles en este momento."}
+
+**SECCIONES DE LA PÁGINA (USA SIEMPRE RUTAS RELATIVAS, NO URLS COMPLETAS):**
+- / - Página principal
+- /juegos - Todos los juegos
+- /consolas - Todas las consolas
+- /controles - Todos los controles
+- /accesorios - Todos los accesorios
+- /carrito - Ver carrito de compras
+- /favoritos - Productos favoritos (requiere login)
+- /pedidos - Historial de pedidos (requiere login)
+- /perfil-usuario - Perfil del usuario (requiere login)
+- /contacto - Formulario de contacto
+- /sobre-nosotros - Información de la tienda
+- /login - Iniciar sesión
+- /registro - Crear cuenta
+
+{user_info}
+
+**═══════════════════════════════════════════**
+**⚠️ REGLAS ESTRICTAS - INFORMACIÓN 100% REAL ⚠️**
+**═══════════════════════════════════════════**
+
+**1. REGISTRO DE USUARIOS (REAL):**
+   - Campos requeridos ÚNICAMENTE: nombre de usuario, email, contraseña
+   - NO se pide nombre completo, NO se pide apellido
+   - Requisitos: usuario mínimo 6 caracteres, contraseña mínimo 8 caracteres
+   - NO se envía correo de verificación
+   - NO hay términos y condiciones que aceptar
+   - Ruta: /registro
+
+**2. INICIO DE SESIÓN (REAL):**
+   - Se puede iniciar con nombre de usuario O email y la contraseña
+   - Ruta: /login
+
+**3. PAGOS (REAL):**
+   - Único método: PayPal
+   - NO hay tarjetas de crédito/débito
+   - NO hay transferencias bancarias
+   - NO hay efectivo
+   - NO hay cargos adicionales
+   - IVA ya incluido en los precios
+   - NO hay costo de envío (incluido)
+   - La confirmación del pago aparece en pantalla como mensaje de éxito
+   - NO se envía correo de confirmación
+
+**4. COMPRA DE PRODUCTOS (REAL - IMPORTANTE):**
+   - Para comprar, debes:
+     1. Ir a la sección correspondiente (/juegos, /consolas, /controles, /accesorios)
+     2. Buscar el producto que te interesa
+     3. Hacer clic en el botón **"Agregar al Carrito"** (NO dice "Comprar", dice EXACTAMENTE "Agregar al Carrito")
+     4. Ir a /carrito para revisar
+     5. Hacer clic en "Pagar con PayPal"
+   - El botón dice EXACTAMENTE "Agregar al Carrito" - NUNCA digas "botón Comprar"
+
+**5. PEDIDOS (REAL):**
+   - Solo se pueden ver en /pedidos (requiere login)
+   - NO hay vista individual de cada pedido (cada pedido NO tiene página aparte)
+   - NO hay vista individual de cada producto (cada producto NO tiene página aparte)
+   - NO se envían correos de confirmación
+   - NO se envían correos de seguimiento
+   - Estados: Procesando (naranja), Enviado (azul), Entregado (verde), Cancelado (rojo)
+   - Fecha estimada de entrega: 20 días hábiles después de la compra
+
+**6. CANCELACIONES (REAL):**
+   - Solo dentro de las primeras 24 horas
+   - Se hace desde /pedidos (botón rojo "Cancelar pedido")
+   - Después de 24h, contactar a soporte
+
+**7. PROBLEMAS CON PEDIDOS (REAL):**
+   - Producto dañado/faltante: contactar a gamevaultcontacto@gmail.com
+   - Adjuntar fotos/videos como evidencia
+   - Respuesta en aproximadamente 4 horas
+   - NO se procesa por chatbot, solo por email
+
+**8. ENTREGAS (REAL):**
+   - Envíos solo nacionales (México)
+   - Si no hay quien reciba, el paquete regresa a paquetería
+   - Contactar por email para coordinar nueva entrega
+
+**9. FAVORITOS (REAL):**
+   - Requiere iniciar sesión
+   - Se accede en /favoritos
+   - Botón de corazón 🤍 en cada producto (parte superior derecha)
+   - Al hacer clic, se pone rojo ❤️
+   - Aparece mensaje verde "Producto agregado a favoritos"
+
+**10. CARRITO (REAL):**
+    - Requiere iniciar sesión
+    - Se accede en /carrito
+    - Se puede cambiar cantidad (+/-) y eliminar productos (🗑️)
+    - Botón "Pagar con PayPal" para finalizar compra
+
+**11. PERFIL DE USUARIO (REAL):**
+    - en la barra superior presionar el icono 👤
+    - se desplegara un menu
+    - presionar la primer opcion que es perfil
+    - Muestra: nombre de usuario, email, ID de usuario, rol
+    - Ruta: /perfil-usuario (requiere login)
+
+**12. CONTACTO (REAL):**
+    - Formulario: /contacto
+    - Teléfono: +52 55 3190 8274
+    - Email: gamevaultcontacto@gmail.com
+    - Admin responde en 24h por correo
+
+**13. POLÍTICAS (REAL):**
+    - NO hay página de políticas, términos o condiciones
+    - NO hay facturas
+    - NO hay tickets de compra
+    - Cambios/devoluciones: NO se aceptan por NINGUNA razón
+**14. CERRAR SESION :**
+    - en la barra superior presionar el icono 👤
+    - se desplegara un menu
+    - presionar la segunda opcion que es cerrar sesion
+
+
+**═══════════════════════════════════════════**
+**INSTRUCCIONES PARA RESPONDER:**
+**═══════════════════════════════════════════**
+
+1. Responde SIEMPRE en español, amablemente. Usa 😊 ocasionalmente.
+
+2. Usa **negritas** para información importante.
+
+3. Para enlaces, USA SIEMPRE RUTAS RELATIVAS: /juegos, /carrito, /pedidos
+   NUNCA pongas la URL completa (https://gamestore2-0-zytn.onrender.com/juegos)
+
+4. Si preguntan por registro, di EXACTAMENTE:
+   "Para registrarte, ve a /registro. Solo necesitas: nombre de usuario (mínimo 6 caracteres), email y contraseña (mínimo 8 caracteres). No pedimos nombre completo ni apellido, y no enviamos correos de verificación."
+
+5. Si preguntan por cómo comprar un producto, di EXACTAMENTE:
+   "Para comprar [nombre del producto]:
+   1. Ve a la sección correspondiente: /juegos (si es un juego), /consolas, /controles o /accesorios
+   2. Busca el producto y haz clic en el botón **'Agregar al Carrito'**
+   3. Ve a /carrito para revisar tu compra
+   4. Haz clic en **'Pagar con PayPal'** para finalizar"
+
+6. Si preguntan por pagos, di EXACTAMENTE:
+   "Solo aceptamos PayPal. El IVA ya está incluido en los precios y no hay costos de envío adicionales. Al finalizar la compra, verás un mensaje de éxito en pantalla (no enviamos correos de confirmación)."
+
+7. Si preguntan por seguimiento de pedidos, di EXACTAMENTE:
+   "Puedes ver tus pedidos en /pedidos (requiere iniciar sesión). Allí verás el estado: Procesando (naranja), Enviado (azul), Entregado (verde) o Cancelado (rojo). No hay página individual para cada pedido, y no enviamos correos de seguimiento."
+
+8. Si preguntan por favoritos, di EXACTAMENTE:
+   "Para guardar un producto en favoritos:
+   1. Inicia sesión en tu cuenta (necesitas estar logueado)
+   2. Ve a la sección del producto (/juegos, /consolas, etc.)
+   3. En la parte superior derecha de cada producto hay un corazón gris 🤍
+   4. Haz clic en el corazón y se pondrá rojo ❤️
+   5. Aparecerá un mensaje verde 'Producto agregado a favoritos'
+   6. Puedes ver todos tus favoritos en /favoritos"
+
+9. Si preguntan por políticas, di EXACTAMENTE:
+   "No tenemos una página de políticas. Lo que debes saber: solo aceptamos PayPal, no hay cambios/devoluciones por ninguna razón, y las cancelaciones son solo en las primeras 24 horas desde /pedidos."
+
+10. Si preguntan por horario (incluyendo errores como "hotario", "orario", etc.), di EXACTAMENTE:
+    "Nuestro horario de atención es:
+    • Lunes a Sábado: 10:00 a 20:00 hrs
+    • Domingos: 12:00 a 18:00 hrs"
+
+11. Si preguntan por algo que no sabes o no está en este contexto, di:
+    "No tengo información sobre eso en mi base de datos. ¿Te puedo ayudar con otra cosa como productos, pedidos o contacto?"
+
+12. NUNCA menciones:
+    - Correos de verificación
+    - Términos y condiciones
+    - Nombre completo o apellido en registro
+    - Facturas o tickets
+    - Costos de envío (no existen)
+    - Cargos adicionales (no existen)
+    - Botón "Comprar" (el botón dice "Agregar al Carrito")
+    - URLs completas (siempre usa rutas relativas como /juegos)
+    - Páginas individuales de productos o pedidos (NO existen)
 """
-    if productos:
-        for p in productos:
-            if p['disponible']:
-                contexto += f"- {p['nombre']}: ${p['precio']:,.0f}\n"
-    else:
-        contexto += "No hay productos disponibles.\n"
-
-    contexto += f"""
-SECCIONES:
-- Inicio: {formatear_enlace_html('/')}
-- Juegos: {formatear_enlace_html('/juegos')}
-- Consolas: {formatear_enlace_html('/consolas')}
-- Controles: {formatear_enlace_html('/controles')}
-- Accesorios: {formatear_enlace_html('/accesorios')}
-- Carrito: {formatear_enlace_html('/carrito')}
-- Favoritos: {formatear_enlace_html('/favoritos')}
-- Pedidos: {formatear_enlace_html('/pedidos')}
-- Perfil: {formatear_enlace_html('/perfil-usuario')}
-- Contacto: {formatear_enlace_html('/contacto')}
-- Sobre nosotros: {formatear_enlace_html('/sobre-nosotros')}
-- Registrarse: {formatear_enlace_html('/registro')}
-- Iniciar sesión: {formatear_enlace_html('/login')}
-
-POLÍTICAS:
-1. 💰 PAGOS: Solo PayPal
-2. ❌ CAMBIOS Y DEVOLUCIONES: No se aceptan por NINGUNA razón
-3. ⏰ CANCELACIONES: Solo en primeras 24h en {formatear_enlace_html('/pedidos')}
-4. 📦 PEDIDOS: Se ven en {formatear_enlace_html('/pedidos')}
-5. 📧 CORREOS: No enviamos confirmaciones
-6. ❤️ FAVORITOS: En {formatear_enlace_html('/favoritos')} (requiere login)
-7. 👤 PERFIL: Muestra nombre, ID, email, rol
-8. 🔐 RECUPERACIÓN: No hay, contactar a soporte
-9. 📞 CONTACTO: Admin responde en 24h por correo
-10. 📦 PRODUCTO EN MAL ESTADO: Contactar con fotos/video
-
-INSTRUCCIONES DETALLADAS PARA ACCIONES:
-
-**CÓMO AGREGAR A FAVORITOS:**
-- Busca el producto en {formatear_enlace_html('/juegos')}, {formatear_enlace_html('/consolas')}, etc.
-- En la **parte superior derecha** de cada producto hay un ícono de corazón 🤍 (gris)
-- Haz clic en el corazón
-- Se pondrá **ROJO con fondo BLANCO** ❤️
-- Aparecerá un mensaje verde "Producto agregado a favoritos"
-- Para ver todos: {formatear_enlace_html('/favoritos')}
-- Para quitarlo: haz clic nuevamente en el corazón rojo
-
-**CÓMO AGREGAR AL CARRITO:**
-- Ve a la categoría del producto
-- Busca el producto
-- Haz clic en el botón **"Agregar al Carrito"** (fondo degradado azul/morado, ícono 🛒)
-- Aparecerá mensaje de confirmación
-- Ver carrito: {formatear_enlace_html('/carrito')}
-- En el carrito puedes: cambiar cantidades (+/-), eliminar (🗑️)
-
-**CÓMO VER CARRITO:**
-- En la barra superior, ícono del carrito 🛒
-- Al lado, un círculo rojo con el número de productos
-- Haz clic o ve a {formatear_enlace_html('/carrito')}
-
-**CÓMO PAGAR CON PAYPAL:**
-- Ten productos en el carrito
-- Ve a {formatear_enlace_html('/carrito')}
-- Botón **"Pagar con PayPal"** (fondo degradado azul/morado)
-- Serás redirigido a PayPal
-- Confirma el pago
-- Verás mensaje de éxito
-- Ve el pedido en {formatear_enlace_html('/pedidos')}
-
-**CÓMO VER PEDIDOS:**
-- Inicia sesión
-- En barra lateral, "Pedidos"
-- O ve a {formatear_enlace_html('/pedidos')}
-- Verás lista con: número, fecha, total, estado
-- Estados: Procesando (naranja), Enviado (azul), Entregado (verde), Cancelado (rojo)
-
-**CÓMO CANCELAR UN PEDIDO:**
-- Ve a {formatear_enlace_html('/pedidos')}
-- Busca el pedido (menos de 24h)
-- Botón rojo **"Cancelar pedido"**
-- Confirma
-- El estado cambiará a "Cancelado"
-- Después de 24h, no se puede
-
-**CÓMO VER PERFIL:**
-- En barra superior, ícono de usuario 👤
-- En menú, "Perfil"
-- O ve a {formatear_enlace_html('/perfil-usuario')}
-- Verás: nombre, número de cliente (#ID), email, rol
-
-**CÓMO REGISTRARSE:**
-- En barra superior, ícono 👤 → "Registrarse"
-- O ve a {formatear_enlace_html('/registro')}
-- Completa: usuario (mín 6), email, contraseña (mín 8)
-- Botón morado **"Crear Cuenta"**
-- Usa datos reales
-
-**CÓMO INICIAR SESIÓN:**
-- En barra superior, ícono 👤 → "Iniciar Sesión"
-- O ve a {formatear_enlace_html('/login')}
-- Ingresa usuario O email + contraseña
-- Botón morado **"Iniciar Sesión"**
-
-**CÓMO CERRAR SESIÓN:**
-- En barra superior, ícono 👤 → "Cerrar Sesión"
-
-**CÓMO CONTACTAR:**
-- Formulario: {formatear_enlace_html('/contacto')}
-- Teléfono: +52 55 3190 8274
-- Email: gamevaultcontacto@gmail.com
-- Admin responde en 24h
-
-**CÓMO VER UBICACIÓN:**
-- En {formatear_enlace_html('/sobre-nosotros')}
-- Al final hay un mapa
-- Dirección: Av. Miguel Ángel de Quevedo 1150, Coyoacán
-
-**CÓMO VER REDES SOCIALES:**
-- En el footer de cada página
-- Instagram (fondo rosa), Facebook (azul), X (negro), WhatsApp (verde)
-
-**REGLAS IMPORTANTES PARA ENLACES:**
-- Siempre usa enlaces HTML: <a href="URL">texto</a>
-- NUNCA uses formato Markdown [texto](url)
-- Asegúrate de que los enlaces tengan espacios antes y después
-
-{info_usuario}
-"""
+    
     return contexto
+
+# ============================================
+# ENDPOINT PRINCIPAL DEL CHAT
+# ============================================
 
 @chatbot_bp.route('/api/chat', methods=['POST'])
 def chat():
-    """Endpoint principal del chatbot"""
     try:
         data = request.json
-        mensaje_usuario = data.get('mensaje', '').strip()
+        mensaje_usuario = data.get('mensaje', '').strip().lower()
         
         if not mensaje_usuario:
             return jsonify({'error': 'Mensaje vacío', 'success': False}), 400
@@ -344,120 +285,79 @@ def chat():
         session_id = obtener_session_id()
         logger.info(f"👤 Sesión: {session_id} - Mensaje: {mensaje_usuario[:50]}...")
         
-        # Inicializar historial
-        if session_id not in conversaciones:
-            conversaciones[session_id] = []
-        
-        # Verificar límite de tokens
-        if not verificar_limite_tokens():
-            return jsonify({
-                'respuesta': "Lo siento, hemos alcanzado el límite de consultas por hoy. Por favor intenta mañana. 🌙",
-                'success': True,
-                'fuente': 'limite'
-            })
-        
-        # Obtener API key
+        # Verificar API key
         api_key = os.getenv('GROQ_API_KEY')
         if not api_key:
-            logger.error("❌ GROQ_API_KEY no configurada")
+            logger.error("GROQ_API_KEY no configurada")
             return jsonify({
-                'respuesta': "Lo siento, el servicio no está disponible en este momento. Por favor intenta más tarde.",
+                'respuesta': "Lo siento, el servicio no está disponible en este momento. Por favor, intenta más tarde.",
                 'success': True,
                 'fuente': 'error'
             })
         
-        # Crear cliente de Groq
         cliente = Groq(api_key=api_key)
+        contexto = obtener_contexto_tienda()
         
-        # Elegir modelo según la consulta
-        if len(mensaje_usuario.split()) < 5 and any(saludo in mensaje_usuario.lower() for saludo in ['hola', 'holis', 'buenas']):
-            modelo = MODELOS_GROQ["rapido"]  # Modelo rápido para saludos
-        else:
-            modelo = MODELOS_GROQ["potente"]  # Modelo potente para consultas complejas
+        messages = [{"role": "system", "content": contexto}]
         
-        # Obtener contexto
-        contexto_sistema = obtener_contexto_completo(mensaje_usuario, session_id)
-        
-        # Preparar mensajes
-        messages = [{"role": "system", "content": contexto_sistema}]
-        
-        # Agregar historial (solo últimos 4 para ahorrar tokens)
-        for msg in conversaciones[session_id][-4:]:
-            messages.append(msg)
+        if session_id in conversaciones:
+            historial_reciente = conversaciones[session_id][-20:]
+            for msg in historial_reciente:
+                messages.append(msg)
         
         messages.append({"role": "user", "content": mensaje_usuario})
         
-        logger.info(f"🤖 Usando modelo: {modelo}")
-        
-        # Llamar a Groq
-        respuesta = cliente.chat.completions.create(
-            model=modelo,
+        logger.info("🤖 Enviando consulta a Groq...")
+        respuesta_groq = cliente.chat.completions.create(
+            model=MODELO_GROQ,
             messages=messages,
             temperature=0.7,
-            max_tokens=800,  # Reducido para ahorrar tokens
+            max_tokens=800,
             top_p=0.9
         )
         
-        # Actualizar contador de tokens
-        global tokens_usados_hoy
-        if hasattr(respuesta, 'usage'):
-            tokens_usados_hoy += respuesta.usage.total_tokens
-            logger.info(f"📊 Tokens hoy: {tokens_usados_hoy}/{LIMITE_DIARIO}")
+        respuesta_texto = respuesta_groq.choices[0].message.content
         
-        respuesta_texto = respuesta.choices[0].message.content
+        if session_id not in conversaciones:
+            conversaciones[session_id] = []
         
-        # Formatear enlaces en la respuesta
-        respuesta_texto = formatear_texto_con_enlaces(respuesta_texto)
-        
-        # Guardar en historial
         conversaciones[session_id].append({"role": "user", "content": mensaje_usuario})
         conversaciones[session_id].append({"role": "assistant", "content": respuesta_texto})
         
-        # Limitar historial
-        if len(conversaciones[session_id]) > 10:
-            conversaciones[session_id] = conversaciones[session_id][-10:]
+        if len(conversaciones[session_id]) > 50:
+            conversaciones[session_id] = conversaciones[session_id][-50:]
         
         return jsonify({
             'respuesta': respuesta_texto,
-            'modelo': modelo,
             'fuente': 'groq',
             'success': True
         })
         
     except Exception as e:
-        logger.error(f"❌ Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        
-        # Manejo específico de límite de tasa
-        if "rate_limit" in str(e).lower():
-            return jsonify({
-                'respuesta': "Hemos llegado al límite de consultas por hoy. Por favor intenta mañana. 🌙",
-                'success': True,
-                'fuente': 'limite'
-            })
-        
+        logger.error(f"❌ Error crítico: {str(e)}")
         return jsonify({
             'respuesta': "Lo siento, tuve un problema técnico. ¿Puedes repetir tu pregunta? 😊",
             'success': True,
             'fuente': 'error'
         })
 
+# ============================================
+# ENDPOINTS AUXILIARES
+# ============================================
+
 @chatbot_bp.route('/api/chat/historial', methods=['GET'])
 def obtener_historial():
-    """Obtiene el historial SOLO del usuario actual"""
     try:
         session_id = obtener_session_id()
         historial = conversaciones.get(session_id, [])
         
         mensajes_mostrar = []
-        for msg in historial:
-            if msg['role'] in ['user', 'assistant']:
-                mensajes_mostrar.append({
-                    'rol': msg['role'],
-                    'contenido': msg['content'],
-                    'hora': datetime.now().strftime('%H:%M')
-                })
+        for msg in historial[-20:]:
+            mensajes_mostrar.append({
+                'rol': msg['role'],
+                'contenido': msg['content'],
+                'hora': datetime.now().strftime('%H:%M')
+            })
         
         return jsonify({
             'success': True,
@@ -466,12 +366,11 @@ def obtener_historial():
         })
         
     except Exception as e:
-        print(f"Error obteniendo historial: {e}")
+        logger.error(f"Error obteniendo historial: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @chatbot_bp.route('/api/chat/limpiar', methods=['POST'])
 def limpiar_historial():
-    """Limpia SOLO el historial del usuario actual"""
     try:
         session_id = obtener_session_id()
         if session_id in conversaciones:
@@ -488,110 +387,32 @@ def limpiar_historial():
 
 @chatbot_bp.route('/api/chat/sesion-info', methods=['GET'])
 def sesion_info():
-    """Información de la sesión actual (debug)"""
     session_id = obtener_session_id()
+    usuario = None
+    if 'user_id' in session:
+        usuario = Usuario.query.get(session['user_id'])
+    
     return jsonify({
         'session_id': session_id,
         'user_id': session.get('user_id'),
+        'username': usuario.nombre_usuario if usuario else None,
         'is_authenticated': 'user_id' in session,
-        'is_admin': es_administrador(),
+        'is_admin': usuario and usuario.rol_id == 1,
         'historial_size': len(conversaciones.get(session_id, []))
     })
 
 @chatbot_bp.route('/api/user-info', methods=['GET'])
 def user_info():
-    """Obtiene información del usuario para personalizar"""
     if 'user_id' in session:
         usuario = Usuario.query.get(session['user_id'])
-        return jsonify({
-            'logged_in': True,
-            'user': {
-                'username': usuario.nombre_usuario if usuario else session.get('username', 'Usuario'),
-                'id': session.get('user_id'),
-                'email': usuario.correo if usuario else '',
-                'is_admin': usuario and usuario.rol_id == 1
-            },
-            'session_id': obtener_session_id()
-        })
-    return jsonify({
-        'logged_in': False,
-        'session_id': obtener_session_id()
-    })
-
-@chatbot_bp.route('/api/chat/test', methods=['GET'])
-def test_chatbot():
-    """Endpoint de prueba"""
-    try:
-        api_key = os.getenv('GROQ_API_KEY')
-        if not api_key:
-            return jsonify({'error': 'GROQ_API_KEY no configurada'}), 500
-        
-        cliente = Groq(api_key=api_key)
-        
-        respuesta = cliente.chat.completions.create(
-            model=MODELOS_GROQ["rapido"],
-            messages=[{"role": "user", "content": "OK"}],
-            max_tokens=10
-        )
-        
-        return jsonify({
-            'mensaje': '✅ API de Groq funcionando',
-            'respuesta': respuesta.choices[0].message.content,
-            'session_id': obtener_session_id(),
-            'is_admin': es_administrador(),
-            'success': True
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e), 'success': False}), 500
-
-@chatbot_bp.route('/api/chat/modelos', methods=['GET'])
-def listar_modelos():
-    """Lista los modelos disponibles"""
-    modelos = [
-        {
-            "id": MODELOS_GROQ["potente"],
-            "nombre": "Llama 3.3 70B",
-            "descripcion": "Modelo potente para consultas complejas",
-            "contexto": 8192
-        },
-        {
-            "id": MODELOS_GROQ["rapido"],
-            "nombre": "Llama 3.1 8B",
-            "descripcion": "Modelo rápido para saludos y consultas simples",
-            "contexto": 8192
-        }
-    ]
-    return jsonify({'success': True, 'modelos': modelos})
-
-@chatbot_bp.route('/api/buscar-productos', methods=['GET'])
-def buscar_productos_api():
-    """Búsqueda rápida de productos"""
-    try:
-        query = request.args.get('q', '').strip()
-        if len(query) < 2:
-            return jsonify({'resultados': []})
-        
-        productos = Producto.query.filter(
-            Producto.activo == True,
-            Producto.stock > 0,
-            (Producto.nombre.ilike(f'%{query}%') |
-             Producto.descripcion.ilike(f'%{query}%'))
-        ).limit(5).all()
-        
-        resultados = [{
-            'id': p.id_producto,
-            'nombre': p.nombre,
-            'precio': float(p.precio),
-            'imagen': p.imagen,
-            'categoria': p.categoria.nombre if p.categoria else 'General'
-        } for p in productos]
-        
-        return jsonify({
-            'success': True,
-            'resultados': resultados,
-            'total': len(resultados)
-        })
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        if usuario:
+            return jsonify({
+                'logged_in': True,
+                'user': {
+                    'username': usuario.nombre_usuario,
+                    'id': usuario.id_usuario,
+                    'email': usuario.correo,
+                    'is_admin': usuario.rol_id == 1
+                }
+            })
+    return jsonify({'logged_in': False})
