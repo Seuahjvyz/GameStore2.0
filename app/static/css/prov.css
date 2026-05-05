@@ -57,6 +57,13 @@ body {
     letter-spacing: 0.5px;
 
 }
+.marca .logo-titulo {
+    font-family: 'Orbitron'; 
+    margin: 0 10px;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
 .marca a{
     text-decoration: none;
     color: white;
@@ -290,6 +297,7 @@ body {
 /*--------------------------- CONTENEDOR PRINCIPAL ---------------------------*/
 
 .contenedor-principal {
+    background-color: #2c2b2b; 
     display: flex;
     flex: 1;
     position: relative;
@@ -2919,10 +2927,13 @@ body {
     width: 8px;
 }
 
-.barra-lateral::-webkit-scrollbar-track,
-.principal::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
+.barra-lateral::-webkit-scrollbar-track{
+    background: linear-gradient(#484848, #2d2d2d);
 }
+.principal::-webkit-scrollbar-track {
+    background-color: #2c2b2b; 
+}
+
 
 .barra-lateral::-webkit-scrollbar-thumb,
 .principal::-webkit-scrollbar-thumb {

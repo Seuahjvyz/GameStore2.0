@@ -5,14 +5,14 @@
 .btn-chatbot {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    right: 10px;
     z-index: 1000;
     background: linear-gradient(145deg, #a4105c, #a7126b);
     color: white;
     border: none;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     font-size: 24px;
     cursor: pointer;
     box-shadow: 0 6px 16px rgba(0,0,0,0.3);

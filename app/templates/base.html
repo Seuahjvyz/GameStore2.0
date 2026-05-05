@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <script>(function (w, d, s, l, i) {
@@ -16,6 +16,7 @@
     {% block extra_css %}{% endblock %}
     <link rel="stylesheet" href="/static/css/stylee.css">
     <link rel="stylesheet" href="/static/css/chatbot.css">
+    <link rel="stylesheet" href="/static/css/accesibilidad.css">
     <link rel="icon" type="image/x-icon" href="/static/img/Icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -23,10 +24,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
     <script src="/static/js/revisar-sesion.js"></script>
     <script src="/static/js/chatbot.js"></script>
-
+    <script src="/static/js/accesibilidad.js"></script>
 </head>
 
 <body>
+    <a href="#main-content" class="accesibility-skip-link" id="accesibility-skip-link-main">
+        Saltar al contenido principal
+    </a>
+
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRN3TK3K" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
     <div id="content">

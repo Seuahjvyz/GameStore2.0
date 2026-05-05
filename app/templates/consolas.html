@@ -13,17 +13,17 @@
         <button id="btn-menu" class="btn-menu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
     </div>
     <div class="marca">
-        <h1><a href="/">Game Store</a></h1>
+        <div class="logo-titulo"><a href="/">Game Store</a></div>
     </div>
 
     <section class="iconos">
         <!--<button class="btn_notificaciones" id="mostrarNotificaciones"><i class="fa-solid fa-bell"></i></button> -->
         <div class="contenedor-btn-carrito">
-            <a class="btn-carrito" href="/carrito"><i class="fa-solid fa-cart-shopping"></i><span
+            <a class="btn-carrito" href="/carrito" aria-label="Carrito de compras"><i class="fa-solid fa-cart-shopping"></i><span
                     class="carrito-count">0</span></a>
         </div>
         <!-- Menu usuario -->
-            <button class="btn-menu-user" id="btn-menu-user">
+            <button class="btn-menu-user" id="btn-menu-user" aria-label="Menú de usuario">
                 <i class="fa-solid fa-circle-user"></i>
                 <i class="fa-solid fa-chevron-down"></i>
             </button>
@@ -64,7 +64,7 @@
         </ul>
     </nav>
 
-    <div class="principal">
+    <div class="principal" id="main-content" tabindex="-1">
         <div class="contenido">
             <h1>Consolas</h1>
             <p class="subtitulo">Las mejores consolas para tu experiencia gaming</p>
