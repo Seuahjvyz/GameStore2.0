@@ -32,14 +32,13 @@
 
 /* ===== PANEL DE ACCESIBILIDAD - ESTILOS MEJORADOS ===== */
 .accesibilidad-panel {
-  bottom: 90px;
-  position: fixed;
   top: 80px;
-  right: 25px;
+  position: fixed;
+  bottom: 160px;
+  right: 20px;
+  width: 350px;
   z-index: 10000;
-  width: 380px;
   max-width: calc(100vw - 40px);
-  height: 450px;
   max-height: 70vh;
   background: #1a1a2e;
   color: #e0e0e0;
@@ -1315,7 +1314,8 @@ body.accesibilidad-text-resize-200 h4 { font-size: 32px !important; }
     width: 300px;
     right: 10px;
     bottom: 170px;
-    max-height: 65vh;
+    top: 80px;
+    max-height: calc(100vh - 200px);
   }
 
   .accesibility-caption-bar {

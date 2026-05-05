@@ -27,8 +27,8 @@
     </section>
 </header>
 
-<div class="main-content">
-    <div class="container">
+<div class="main-content" >
+    <div class="container" id="main-content" tabindex="-1">
         <div class="volver">
             <a href="/" class="btn-volver"><i class="fa-solid fa-circle-arrow-left"></i> Volver</a>
         </div>
@@ -50,6 +50,11 @@
                     placeholder="Ingresa tu contraseña" required>
                 <span class="error-message" id="password-error"></span>
             </div>
+
+            <div class="captcha-container">
+                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-theme="dark"></div>
+            </div>
+            <div id="captcha-error" class="captcha-error"></div>
 
             <div class="register-section">
                 <button type="submit" class="register-btn" id="login-btn">
@@ -116,8 +121,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script src="/static/js/login.js"></script>
 <script src="/static/js/user-menu.js"></script>
+
 
 
 {% endblock %}

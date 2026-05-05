@@ -8,6 +8,16 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             const isVisible = userDropdown.style.display === 'block';
             userDropdown.style.display = isVisible ? 'none' : 'block';
+            // Close accessibility panel if opening menu
+            if (!isVisible && window.accessibilityManager && window.accessibilityManager.isOpen) {
+                window.accessibilityManager.closePanel();
+            }
+            // Close chatbot if opening menu
+            var ventanaChatbot = document.getElementById('ventana-chatbot');
+            if (!isVisible && ventanaChatbot && ventanaChatbot.classList.contains('ventana-visible-chatbot')) {
+                ventanaChatbot.classList.remove('ventana-visible-chatbot');
+                ventanaChatbot.classList.add('ventana-oculto-chatbot');
+            }
         });
 
         // Close dropdown when clicking outside

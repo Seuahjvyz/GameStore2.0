@@ -43,6 +43,10 @@ $(document).ready(function() {
     
     btnChatbot.on('click', function() {
         ventanaChatbot.removeClass('ventana-oculto-chatbot').addClass('ventana-visible-chatbot');
+        // Close accessibility panel if open
+        if (window.accessibilityManager && window.accessibilityManager.isOpen) {
+            window.accessibilityManager.closePanel();
+        }
     });
     
     btnCerrar.on('click', function() {

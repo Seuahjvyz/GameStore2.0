@@ -519,4 +519,12 @@ async guardarProducto() {
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
     window.adminInventario = new AdminInventario();
+    
+    // Setup keyboard navigation for product modal
+    const modalProducto = document.getElementById('modal-producto');
+    if (modalProducto) {
+        setupModalKeyboardNav(modalProducto);
+        setupModalClickOutside(modalProducto);
+        setupModalCloseButtons(modalProducto);
+    }
 });

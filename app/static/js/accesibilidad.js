@@ -40,6 +40,7 @@
         this.syncCheckboxes();
         this.setupEventListeners();
         this.improveAriaAttributes();
+        this.setupEscapeKeyHandler();
         // Mark initial load as complete so future toggles trigger reading
         this.isInitialLoad = false;
     };
@@ -212,17 +213,74 @@
     };
 
     AccessibilityManager.prototype.openPanel = function() {
+        // Close chatbot if open
+        this.closeChatbot();
+        // Close user menu if open
+        this.closeUserMenu();
         this.panel.classList.add("active");
         this.isOpen = true;
         var btn = document.querySelector(".btn-accesibilidad");
         if (btn) { btn.setAttribute("aria-expanded", "true"); }
+        // Focus first focusable element in panel
+        setTimeout(function() {
+            var firstFocusable = panel.querySelector('button, input, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusable) firstFocusable.focus();
+        }, 100);
     };
 
     AccessibilityManager.prototype.closePanel = function() {
         this.panel.classList.remove("active");
         this.isOpen = false;
         var btn = document.querySelector(".btn-accesibilidad");
-        if (btn) { btn.setAttribute("aria-expanded", "false"); }
+        if (btn) { btn.setAttribute("aria-expanded", "false"); btn.focus(); }
+    };
+
+    AccessibilityManager.prototype.closeChatbot = function() {
+        var ventanaChatbot = document.getElementById('ventana-chatbot');
+        if (ventanaChatbot) {
+            ventanaChatbot.classList.remove('ventana-visible-chatbot');
+            ventanaChatbot.classList.add('ventana-oculto-chatbot');
+        }
+    };
+
+    AccessibilityManager.prototype.closeUserMenu = function() {
+        var userDropdown = document.getElementById('menu-user');
+        if (userDropdown) {
+            userDropdown.style.display = 'none';
+        }
+    };
+
+    AccessibilityManager.prototype.setupEscapeKeyHandler = function() {
+        var self = this;
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close accessibility panel if open
+                if (self.isOpen) {
+                    e.preventDefault();
+                    self.closePanel();
+                    return;
+                }
+                // Close chatbot if open
+                var ventanaChatbot = document.getElementById('ventana-chatbot');
+                if (ventanaChatbot && ventanaChatbot.classList.contains('ventana-visible-chatbot')) {
+                    e.preventDefault();
+                    ventanaChatbot.classList.remove('ventana-visible-chatbot');
+                    ventanaChatbot.classList.add('ventana-oculto-chatbot');
+                    var btnChatbot = document.querySelector('.btn-chatbot');
+                    if (btnChatbot) btnChatbot.focus();
+                    return;
+                }
+                // Close user menu if open
+                var userDropdown = document.getElementById('menu-user');
+                if (userDropdown && userDropdown.style.display === 'block') {
+                    e.preventDefault();
+                    userDropdown.style.display = 'none';
+                    var btnUser = document.getElementById('btn-menu-user');
+                    if (btnUser) btnUser.focus();
+                    return;
+                }
+            }
+        });
     };
 
     AccessibilityManager.prototype.setupEventListeners = function() {
@@ -254,6 +312,14 @@
                                 span.textContent = self.state.lightTheme ? "Modo oscuro" : "Modo claro";
                             }
                         }
+                    }
+                });
+                // Allow keyboard activation with Space/Enter
+                element.addEventListener("keydown", function(e) {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        element.checked = !element.checked;
+                        element.dispatchEvent(new Event("change"));
                     }
                 });
             }
@@ -300,6 +366,65 @@
         if (resetBtn) {
             resetBtn.addEventListener("click", function() { self.resetAll(); });
         }
+
+        // Keyboard navigation within the panel
+        this.setupPanelKeyboardNav();
+    };
+
+    AccessibilityManager.prototype.setupPanelKeyboardNav = function() {
+        var self = this;
+        if (!this.panel) return;
+
+        this.panel.addEventListener("keydown", function(e) {
+            if (!self.isOpen) return;
+
+            var selector = 'button:not([disabled]), input[type="checkbox"]:not([disabled]), [tabindex]:not([tabindex="-1"])';
+            var focusableElements = self.panel.querySelectorAll(selector);
+            var focusableArray = Array.from(focusableElements);
+            if (focusableArray.length === 0) return;
+
+            var currentIndex = focusableArray.indexOf(document.activeElement);
+            if (currentIndex === -1) currentIndex = 0;
+
+            switch(e.key) {
+                case 'ArrowDown':
+                case 'ArrowRight':
+                    e.preventDefault();
+                    var nextIndex = (currentIndex + 1) % focusableArray.length;
+                    focusableArray[nextIndex].focus();
+                    break;
+                case 'ArrowUp':
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    var prevIndex = currentIndex <= 0 ? focusableArray.length - 1 : currentIndex - 1;
+                    focusableArray[prevIndex].focus();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    focusableArray[0].focus();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    focusableArray[focusableArray.length - 1].focus();
+                    break;
+                case 'Tab':
+                    var firstElement = focusableArray[0];
+                    var lastElement = focusableArray[focusableArray.length - 1];
+
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstElement) {
+                            e.preventDefault();
+                            lastElement.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastElement) {
+                            e.preventDefault();
+                            firstElement.focus();
+                        }
+                    }
+                    break;
+            }
+        });
     };
 
     AccessibilityManager.prototype.applySetting = function(key) {

@@ -29,6 +29,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalNuevoPaso1 = document.getElementById('modalNuevoPedidoPaso1');
     const modalNuevoPaso2 = document.getElementById('modalNuevoPedidoPaso2');
     
+    // Setup keyboard navigation for modals
+    setupModalKeyboardNav(modalDetalle);
+    setupModalKeyboardNav(modalEstado);
+    setupModalKeyboardNav(modalNuevoPaso1);
+    setupModalKeyboardNav(modalNuevoPaso2);
+    setupModalClickOutside(modalDetalle);
+    setupModalClickOutside(modalEstado);
+    setupModalClickOutside(modalNuevoPaso1);
+    setupModalClickOutside(modalNuevoPaso2);
+
+    
     // Elementos de modales
     const modalCerrar = document.getElementById('modalCerrar');
     const modalEstadoCerrar = document.getElementById('modalEstadoCerrar');

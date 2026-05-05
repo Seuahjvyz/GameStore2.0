@@ -387,9 +387,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>${mensaje}</span>
             </div>
         `;
-
+        
         document.body.appendChild(notificacion);
-
+        
         // Remover después de 5 segundos
         setTimeout(() => {
             notificacion.style.animation = 'slideOutRight 0.3s ease-out';
@@ -399,5 +399,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 300);
         }, 5000);
+    }
+    
+    // Setup keyboard navigation for modal
+    const modalUsuario = document.getElementById('modal-usuario');
+    if (modalUsuario) {
+        setupModalKeyboardNav(modalUsuario);
+        setupModalClickOutside(modalUsuario);
+        setupModalCloseButtons(modalUsuario);
     }
 });

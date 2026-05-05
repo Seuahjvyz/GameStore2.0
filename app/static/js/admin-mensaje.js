@@ -85,6 +85,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Setup keyboard navigation for message modal
+    setupModalKeyboardNav(modalMensaje);
+    setupModalClickOutside(modalMensaje);
+    setupModalCloseButtons(modalMensaje, ['.close-modal', '.btn-secondary']);
+    
     // Cerrar modal al hacer clic fuera
     window.addEventListener('click', (e) => {
         if (e.target === modalMensaje) {
