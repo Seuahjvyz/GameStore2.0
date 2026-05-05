@@ -14,7 +14,9 @@ class Usuario(UserMixin, db.Model):
     telefono = db.Column(db.String(15))
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id_rol'), nullable=False)
     activo = db.Column(db.Boolean, default=True)  # Este campo ya existe en tu BD
-    
+    verificacion = db.Column(db.Boolean, default=False) #Este siempre va en falso para que cuando se verifique el correo se ponga en verdadero y no puedan iniciar sesión sin verificar su correo
+    email_verification_token = db.Column(db.String(200), nullable=True)
+
     # Para Flask-Login
     def get_id(self):
         return str(self.id_usuario)

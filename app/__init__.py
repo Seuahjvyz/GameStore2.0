@@ -10,6 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import os
 import atexit
 import datetime 
+from flask_mail import Mail, Message
 
 # IMPORTAR PAYPAL SDK
 import paypalrestsdk
@@ -17,6 +18,7 @@ import paypalrestsdk
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
+mail = Mail()
 
 #------------------------------------ Scheduler para mantener la BD activa
 scheduler = BackgroundScheduler()
@@ -76,6 +78,7 @@ def create_app():
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'web.login'
+    mail.init_app(app)
 
     #Manejador de Errores 
     @app.errorhandler(404)
@@ -135,6 +138,7 @@ def create_app():
     from app.api.carrito import bp as carrito_api_bp
     from app.api.auth import bp as auth_bp  
     from app.routes.chatbot import chatbot_bp
+    from app.routes.verification import verification_bp
     
     # BLUEPRINT 
     app.register_blueprint(web_bp)
@@ -142,7 +146,8 @@ def create_app():
     app.register_blueprint(productos_bp)
     app.register_blueprint(carrito_api_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(chatbot_bp)  
+    app.register_blueprint(chatbot_bp) 
+    app.register_blueprint(verification_bp) 
     
     print("Blueprints registrados: Web, Carrito, Productos, Auth, Chatbot")
     

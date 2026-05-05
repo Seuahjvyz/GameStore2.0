@@ -11,9 +11,14 @@ from app.models.models import Carrito, CarritoItem, Producto, Categoria
 from app.models.role import Role
 from app.models.favorito import Favorito
 from app.models.contacto import Contacto
-
+from flask_mail import Message
+from itsdangerous import URLSafeTimedSerializer
+from flask import current_app
+import os
+from app.routes.verification import generate_verification_token, send_verification_email
 
 web_bp = Blueprint('web', __name__)
+
 
 # ----------------------------------------- DECORATORS ---------------------------------------- #
 
@@ -276,6 +281,13 @@ def api_login():
                 'error': 'Tu cuenta ha sido desactivada. Contacta al administrador.'
             }), 403  # 403 = Forbidden
         
+        if not usuario.verificacion:
+            return jsonify ({
+                'error' : 'Tu usuario no ha sido verificado. Revisa tu correo para verificar tu cuenta o solicita un nuevo correo de verificación.',
+                'requires_verification' : True,
+                'email' : usuario.correo
+            }), 403
+        
         # Verificar contraseña
         if not check_password_hash(usuario.password, password):
             return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
@@ -302,7 +314,8 @@ def api_login():
                 'username': usuario.nombre_usuario,
                 'email': usuario.correo,
                 'role': usuario.rol_id,
-                'activo': usuario.activo  # Incluir estado
+                'activo': usuario.activo,  # Incluir estado
+                'verificado' : usuario.verificacion 
             }
         }), 200
         
@@ -389,23 +402,37 @@ def api_registro():
         if Usuario.query.filter_by(correo=email).first():
             return jsonify({'error': 'Este email ya está registrado'}), 400
         
+        token = generate_verification_token(email)
+        
         # Crear usuario normal
         nuevo_usuario = Usuario(
             nombre_usuario=username,
             correo=email,
             password=generate_password_hash(password),
-            rol_id=2  # Cliente
+            rol_id=2,  # Cliente
+            verificacion=False,
+            email_verification_token=token
         )
         
         db.session.add(nuevo_usuario)
         db.session.commit()
         
+        email_enviado = send_verification_email(email, username, token)
+        
         print(f"USUARIO GUARDADO EN BD: {username}, Email: {email}")
         
-        return jsonify({
-            'success': True, 
-            'message': 'Usuario registrado exitosamente'
-        }), 201
+        if email_enviado:
+            return jsonify({
+                'success': True, 
+                'message': 'Registro exitoso. Revisa tu correo para verificar tu cuenta antes de iniciar sesión.',
+                'requested_email': True
+            }), 201
+        else:
+            return jsonify({
+                'success': True,
+                'message': 'Registro exitoso, pero no se pudo enviar el correo de verificación. Contacta al soporte.',
+                'requires_verification': True
+            }), 201
         
     except Exception as e:
         db.session.rollback()
@@ -450,7 +477,8 @@ def api_registro_admin():
             nombre_usuario=username,
             correo=email,
             password=generate_password_hash(password),
-            rol_id=1  # Administrador
+            rol_id=1,  # Administrador
+            verificacion = True
         )
         
         db.session.add(nuevo_admin)
