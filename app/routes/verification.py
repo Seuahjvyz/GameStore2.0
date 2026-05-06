@@ -34,7 +34,7 @@ def get_base_url():
 
 def send_verification_email(user_email, username, token):
     try:
-        base_url = os.getenv("BASE_URL", "http://localhost:5000")
+        base_url = get_base_url()
         verification_url = f"{base_url}/verify-email/{token}"
 
         html_content = render_template(
@@ -53,11 +53,9 @@ def send_verification_email(user_email, username, token):
             json={
                 "sender": {
                     "name": "GameStore",
-                    "email": "gamevaultcontacto@gmail.com"  
+                    "email": "gamevaultcontacto@gmail.com"
                 },
-                "to": [
-                    {"email": user_email}
-                ],
+                "to": [{"email": user_email}],
                 "subject": "Verifica tu cuenta - GameStore",
                 "htmlContent": html_content
             }
@@ -65,6 +63,9 @@ def send_verification_email(user_email, username, token):
 
         print("BREVO STATUS:", response.status_code)
         print("BREVO RESPONSE:", response.text)
+
+        if response.status_code not in [200, 201]:
+            print("❌ ERROR EN BREVO:", response.text)
 
         return response.status_code in [200, 201]
 
@@ -90,7 +91,7 @@ def lanzar_hilo_correo(email, username, token):
         args=(app, email, username, token)
     )
 
-    hilo.daemon = True
+    hilo.daemon = False
     hilo.start()
 
 # -------------------- VERIFICAR --------------------
