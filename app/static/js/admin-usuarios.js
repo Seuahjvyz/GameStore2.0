@@ -402,7 +402,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Setup keyboard navigation for modal
-    const modalUsuario = document.getElementById('modal-usuario');
     if (modalUsuario) {
         setupModalKeyboardNav(modalUsuario);
         setupModalClickOutside(modalUsuario);
