@@ -20,28 +20,8 @@
             e.preventDefault();
             e.target.blur();
 
-            // Focus first element in modal
-            var buttons = modal.getElementsByTagName("button");
-            var inputs = modal.getElementsByTagName("input");
-            var selects = modal.getElementsByTagName("select");
-            var textareas = modal.getElementsByTagName("textarea");
-            var tabindexEls = modal.querySelectorAll("[tabindex]");
-
-            var list = [];
-
-            function addIfVisible(el) {
-                if (el.offsetParent !== null && !el.disabled) {
-                    if (el.getAttribute("tabindex") !== "-1") {
-                        list.push(el);
-                    }
-                }
-            }
-
-            for (var a = 0; a < buttons.length; a++) addIfVisible(buttons[a]);
-            for (var b = 0; b < inputs.length; b++) addIfVisible(inputs[b]);
-            for (var c = 0; c < selects.length; c++) addIfVisible(selects[c]);
-            for (var d = 0; d < textareas.length; d++) addIfVisible(textareas[d]);
-            for (var f = 0; f < tabindexEls.length; f++) addIfVisible(tabindexEls[f]);
+            // Focus first element in modal (in DOM order)
+            var list = getFocusableElements(modal);
 
             if (list.length > 0) {
                 list[0].focus();
@@ -67,28 +47,8 @@
 
         e.preventDefault();
 
-        // Get all focusable elements
-        var buttons = modal.getElementsByTagName("button");
-        var inputs = modal.getElementsByTagName("input");
-        var selects = modal.getElementsByTagName("select");
-        var textareas = modal.getElementsByTagName("textarea");
-        var tabindexEls = modal.querySelectorAll("[tabindex]");
-
-        var list = [];
-        
-        function addIfVisible(el) {
-            if (el.offsetParent !== null && !el.disabled) {
-                if (el.getAttribute("tabindex") !== "-1") {
-                    list.push(el);
-                }
-            }
-        }
-
-        for (var a = 0; a < buttons.length; a++) addIfVisible(buttons[a]);
-        for (var b = 0; b < inputs.length; b++) addIfVisible(inputs[b]);
-        for (var c = 0; c < selects.length; c++) addIfVisible(selects[c]);
-        for (var d = 0; d < textareas.length; d++) addIfVisible(textareas[d]);
-        for (var f = 0; f < tabindexEls.length; f++) addIfVisible(tabindexEls[f]);
+        // Get all focusable elements in DOM order
+        var list = getFocusableElements(modal);
 
         if (list.length === 0) return;
 
@@ -129,6 +89,29 @@
         }
     }, true);
 
+    // Function to get all focusable elements in DOM order
+    function getFocusableElements(modal) {
+        var focusableSelectors = [
+            'button:not([disabled]):not([tabindex="-1"])',
+            'input:not([disabled]):not([tabindex="-1"])',
+            'select:not([disabled]):not([tabindex="-1"])',
+            'textarea:not([disabled]):not([tabindex="-1"])',
+            'a[href]:not([tabindex="-1"])',
+            '[tabindex]:not([tabindex="-1"])'
+        ];
+
+        var elements = modal.querySelectorAll(focusableSelectors.join(', '));
+        var list = [];
+
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].offsetParent !== null) {
+                list.push(elements[i]);
+            }
+        }
+
+        return list;
+    }
+
     function setupModalKeyboardNav(modal) {
         if (!modal) return;
 
@@ -147,27 +130,8 @@
             document.body.style.overflow = "hidden";
 
             setTimeout(function() {
-                var buttons = modal.getElementsByTagName("button");
-                var inputs = modal.getElementsByTagName("input");
-                var selects = modal.getElementsByTagName("select");
-                var textareas = modal.getElementsByTagName("textarea");
-                var tabindexEls = modal.querySelectorAll("[tabindex]");
-
-                var list = [];
-                
-                function addIfVisible(el) {
-                    if (el.offsetParent !== null && !el.disabled) {
-                        if (el.getAttribute("tabindex") !== "-1") {
-                            list.push(el);
-                        }
-                    }
-                }
-
-                for (var a = 0; a < buttons.length; a++) addIfVisible(buttons[a]);
-                for (var b = 0; b < inputs.length; b++) addIfVisible(inputs[b]);
-                for (var c = 0; c < selects.length; c++) addIfVisible(selects[c]);
-                for (var d = 0; d < textareas.length; d++) addIfVisible(textareas[d]);
-                for (var f = 0; f < tabindexEls.length; f++) addIfVisible(tabindexEls[f]);
+                // Get focusable elements in DOM order
+                var list = getFocusableElements(modal);
 
                 if (list.length > 0) {
                     list[0].focus();
