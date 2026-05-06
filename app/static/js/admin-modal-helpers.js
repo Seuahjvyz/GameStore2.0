@@ -218,57 +218,6 @@
                 onClose();
             }
         });
-
-        // Arrow key navigation
-        modal.addEventListener("keydown", function(e) {
-            if (modal.style.display !== "block") return;
-
-            var key = e.key;
-            if (key !== "ArrowUp" && key !== "ArrowDown" && key !== "ArrowLeft" && key !== "ArrowRight" && key !== "Home" && key !== "End") {
-                return;
-            }
-
-            var buttons = modal.getElementsByTagName("button");
-            var inputs = modal.getElementsByTagName("input");
-            var selects = modal.getElementsByTagName("select");
-            var textareas = modal.getElementsByTagName("textarea");
-            var tabindexEls = modal.querySelectorAll("[tabindex]");
-
-            var list = [];
-            
-            function addIfVisible(el) {
-                if (el.offsetParent !== null && !el.disabled) {
-                    if (el.getAttribute("tabindex") !== "-1") {
-                        list.push(el);
-                    }
-                }
-            }
-
-            for (var a = 0; a < buttons.length; a++) addIfVisible(buttons[a]);
-            for (var b = 0; b < inputs.length; b++) addIfVisible(inputs[b]);
-            for (var c = 0; c < selects.length; c++) addIfVisible(selects[c]);
-            for (var d = 0; d < textareas.length; d++) addIfVisible(textareas[d]);
-            for (var f = 0; f < tabindexEls.length; f++) addIfVisible(tabindexEls[f]);
-
-            if (list.length === 0) return;
-
-            var idx = list.indexOf(document.activeElement);
-            if (idx === -1) idx = 0;
-
-            e.preventDefault();
-
-            if (key === "ArrowDown" || key === "ArrowRight") {
-                var next = (idx + 1) % list.length;
-                list[next].focus();
-            } else if (key === "ArrowUp" || key === "ArrowLeft") {
-                var prev = idx <= 0 ? list.length - 1 : idx - 1;
-                list[prev].focus();
-            } else if (key === "Home") {
-                list[0].focus();
-            } else if (key === "End") {
-                list[list.length - 1].focus();
-            }
-        });
     }
 
     function setupModalClickOutside(modal) {
