@@ -4,6 +4,7 @@ from itsdangerous import URLSafeTimedSerializer
 from app.models.usuario import Usuario
 from app import db, mail
 import os
+import requests
 import threading
 
 verification_bp = Blueprint('verification', __name__)
@@ -32,28 +33,43 @@ def get_base_url():
 # -------------------- EMAIL --------------------
 
 def send_verification_email(user_email, username, token):
-    
-    base_url = get_base_url()
-    verification_url = f"{base_url}/verify-email/{token}"
-    
-    html_content = render_template(
-        'correos/verificacion.html', 
-        username=username,
-        verification_url=verification_url
-    )
-
-    msg = Message(
-        subject="Verifica tu cuenta - GameStore",
-        recipients=[user_email],
-        html=html_content
-    )
-
     try:
-        mail.send(msg)
-        print(f"[EMAIL OK] {user_email}")
-        return True
+        base_url = os.getenv("BASE_URL", "http://localhost:5000")
+        verification_url = f"{base_url}/verify-email/{token}"
+
+        html_content = render_template(
+            'correos/verificacion.html',
+            username=username,
+            verification_url=verification_url
+        )
+
+        response = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers={
+                "accept": "application/json",
+                "api-key": os.getenv("BREVO_API_KEY"),
+                "content-type": "application/json"
+            },
+            json={
+                "sender": {
+                    "name": "GameStore",
+                    "email": "gamevaultcontacto@gmail.com"  
+                },
+                "to": [
+                    {"email": user_email}
+                ],
+                "subject": "Verifica tu cuenta - GameStore",
+                "htmlContent": html_content
+            }
+        )
+
+        print("BREVO STATUS:", response.status_code)
+        print("BREVO RESPONSE:", response.text)
+
+        return response.status_code in [200, 201]
+
     except Exception as e:
-        print(f"[EMAIL ERROR] {e}")
+        print(f"[EMAIL ERROR BREVO] {e}")
         return False
 
 # -------------------- THREAD --------------------
