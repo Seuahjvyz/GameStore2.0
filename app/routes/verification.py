@@ -1,14 +1,15 @@
-from flask import Blueprint, redirect, url_for, flash, request, jsonify, render_template
+from flask import Blueprint, redirect, url_for, flash, request, jsonify, render_template, current_app
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
-from flask import current_app
 from app.models.usuario import Usuario
 from app import db, mail
 import os
+import threading
 
 verification_bp = Blueprint('verification', __name__)
 
-#------------------------------------------ token diferente por cada usuario -------------------------
+# -------------------- TOKEN --------------------
+
 def generate_verification_token(email):
     serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     return serializer.dumps(email, salt='email-verification')
@@ -16,45 +17,68 @@ def generate_verification_token(email):
 def verify_verification_token(token, expiration=3600):
     serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     try:
-        email = serializer.loads(token, salt='email-verification', max_age=expiration)
-        return email
+        return serializer.loads(token, salt='email-verification', max_age=expiration)
     except:
         return None
 
-#------------------------------------------ Cuerpo del correo -------------------------------------
+# -------------------- BASE URL AUTO --------------------
+
+def get_base_url():
+    if os.getenv('RENDER_EXTERNAL_URL'):
+        return os.getenv('RENDER_EXTERNAL_URL')
+    else:
+        return "http://localhost:5000"
+
+# -------------------- EMAIL --------------------
 
 def send_verification_email(user_email, username, token):
     
-    base_url = "http://localhost:5000"
-    
-    if os.getenv('RENDER_EXTERNAL_URL'):
-        base_url = os.getenv('RENDER_EXTERNAL_URL')
-    elif os.getenv('RAILWAY_PUBLIC_DOMAIN'):
-        base_url = f"https://{os.getenv('RAILWAY_PUBLIC_DOMAIN')}"
-    elif os.getenv('PRODUCTION_URL'):
-        base_url = os.getenv('PRODUCTION_URL')
-    
+    base_url = get_base_url()
     verification_url = f"{base_url}/verify-email/{token}"
     
-    html_content = render_template('correos/verificacion.html', 
-                                   username=username,
-                                   verification_url=verification_url)
-    
+    html_content = render_template(
+        'correos/verificacion.html', 
+        username=username,
+        verification_url=verification_url
+    )
+
     msg = Message(
-        subject="Verifica tu cuenta - GameStore ",
+        subject="Verifica tu cuenta - GameStore",
         recipients=[user_email],
         html=html_content
     )
-    
+
     try:
         mail.send(msg)
-        print(f" Email enviado a {user_email}")
+        print(f"[EMAIL OK] {user_email}")
         return True
     except Exception as e:
-        print(f" Error enviando email: {e}")
+        print(f"[EMAIL ERROR] {e}")
         return False
 
-#-------------------------------Verificación ----------------------------------
+# -------------------- THREAD --------------------
+
+def enviar_correo_async(app, email, username, token):
+    with app.app_context():
+        try:
+            print(f"[EMAIL] Enviando a {email}")
+            send_verification_email(email, username, token)
+        except Exception as e:
+            print(f"[ERROR HILO EMAIL] {e}")
+
+def lanzar_hilo_correo(email, username, token):
+    app = current_app._get_current_object()
+
+    hilo = threading.Thread(
+        target=enviar_correo_async,
+        args=(app, email, username, token)
+    )
+
+    hilo.daemon = True
+    hilo.start()
+
+# -------------------- VERIFICAR --------------------
+
 @verification_bp.route('/verify-email/<token>')
 def verify_email(token):
     email = verify_verification_token(token)
@@ -70,14 +94,16 @@ def verify_email(token):
         return redirect(url_for('web.login'))
     
     if usuario.verificacion:
-        flash('Tu cuenta ya estaba verificada. ¡Puedes iniciar sesión!', 'info')
+        flash('Tu cuenta ya estaba verificada.', 'info')
     else:
         usuario.verificacion = True
         usuario.email_verification_token = None
         db.session.commit()
-        flash('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión.', 'success')
+        flash('Cuenta verificada exitosamente.', 'success')
     
     return redirect(url_for('web.login'))
+
+# -------------------- REENVÍO --------------------
 
 @verification_bp.route('/api/resend-verification', methods=['POST'])
 def resend_verification():
@@ -94,19 +120,18 @@ def resend_verification():
             return jsonify({'error': 'Usuario no encontrado'}), 404
         
         if usuario.verificacion:
-            return jsonify({'error': 'Esta cuenta ya está verificada'}), 400
+            return jsonify({'error': 'Cuenta ya verificada'}), 400
         
         token = generate_verification_token(email)
         usuario.email_verification_token = token
         db.session.commit()
         
-        if send_verification_email(email, usuario.nombre_usuario, token):
-            return jsonify({
-                'success': True,
-                'message': 'Correo de verificación reenviado. Revisa tu bandeja de entrada.'
-            })
-        else:
-            return jsonify({'error': 'Error al enviar el correo. Intenta más tarde.'}), 500
+        lanzar_hilo_correo(email, usuario.nombre_usuario, token)
+
+        return jsonify({
+            'success': True,
+            'message': 'Correo reenviado correctamente'
+        })
             
     except Exception as e:
         print(f"Error reenviando verificación: {e}")

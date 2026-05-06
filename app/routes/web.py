@@ -15,7 +15,7 @@ from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
 import os
-from app.routes.verification import generate_verification_token, send_verification_email
+from app.routes.verification import generate_verification_token, send_verification_email, lanzar_hilo_correo
 
 web_bp = Blueprint('web', __name__)
 
@@ -468,21 +468,17 @@ def api_registro():
         
         db.session.add(nuevo_usuario)
         db.session.commit()
+
+        lanzar_hilo_correo(email, username, token)
         
-        email_enviado = send_verification_email(email, username, token)
         
-        if email_enviado:
-            return jsonify({
-                'success': True, 
-                'message': '¡Registro exitoso!.',
-                'requested_email': True
-            }), 201
-        else:
-            return jsonify({
-                'success': True,
-                'message': 'Registro exitoso, pero no se pudo enviar el correo de verificación. Contacta al soporte.',
-                'requires_verification': True
-            }), 201
+        
+        return jsonify({
+            'success': True, 
+            'message': '¡Registro exitoso!. Revisa tu correo para verificar tu cuenta.',
+            'requested_email': True
+        }), 201
+       
         
     except Exception as e:
         db.session.rollback()
