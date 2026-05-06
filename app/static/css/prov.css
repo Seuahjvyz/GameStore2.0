@@ -1869,7 +1869,7 @@ body {
 
 .contenedor-footer{
     background: linear-gradient(135deg, #3a1a5e, #60149a );
-    
+    margin: 0;
     padding: 30px 40px;
     display: flex;
     flex-wrap: wrap; 

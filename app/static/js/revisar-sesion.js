@@ -22,7 +22,7 @@ async function checkUserStatus() {
             }
         } else {
             sesionVerificada = true;
-            console.log('Sesión válida:', data.user);
+            console.log('Sesión válida');
         }
     } catch (error) {
         console.error('Error checking user status:', error);

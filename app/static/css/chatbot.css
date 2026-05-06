@@ -31,13 +31,14 @@
 }
 
 .ventana-visible-chatbot {
+    top: 80px;
     display: flex;
     flex-direction: column;
     position: fixed;
     bottom: 90px;
     right: 20px;
     width: 350px;
-    height: 450px;
+    height: 430px;
     background: #1F2937;  /* Fondo gris oscuro uniforme */
     border-radius: 16px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
@@ -222,5 +223,4 @@
     0%, 100% { opacity: 0.7; }
     50% { opacity: 0.4; }
 }
-
 

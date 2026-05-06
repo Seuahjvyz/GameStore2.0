@@ -3,15 +3,18 @@ import re
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 
-
 class Config:
     
     # PayPal Configuration - SIN CREDENCIALES HARDCODEADAS
     PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
     PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET') 
     PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')
+    RECAPTCHA_SITE_KEY = os.getenv('RECAPTCHA_SITE_KEY')
+    RECAPTCHA_SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY')
     
-    
+    if not RECAPTCHA_SITE_KEY or not RECAPTCHA_SECRET_KEY:
+        print("⚠️ ADVERTENCIA: reCAPTCHA keys no configuradas en .env")
+
     # Validar que existan las variables de entorno
     if not PAYPAL_CLIENT_ID or not PAYPAL_CLIENT_SECRET:
         raise ValueError("ERROR: PayPal credentials not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET environment variables.")

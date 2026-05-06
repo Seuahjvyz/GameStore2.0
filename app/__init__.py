@@ -1,5 +1,3 @@
-# En app/__init__.py
-
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
@@ -11,6 +9,7 @@ import os
 import atexit
 import datetime 
 from flask_mail import Mail, Message
+from app.routes.captcha import captcha_bp
 
 # IMPORTAR PAYPAL SDK
 import paypalrestsdk
@@ -50,10 +49,21 @@ def create_app():
     else:
         app.config.from_object('config.DevelopmentConfig')
         app.config.update(
-        SESSION_PERMANENT=False,  # La sesión NO es permanente
-        PERMANENT_SESSION_LIFETIME=1600,  # 1h
-        SESSION_REFRESH_EACH_REQUEST=True
-    )
+            SESSION_PERMANENT=False,
+            PERMANENT_SESSION_LIFETIME=1600,
+            SESSION_REFRESH_EACH_REQUEST=True
+        )
+    
+    # 🔥 IMPORTANTE: Verificar que las claves de reCAPTCHA estén cargadas
+    print(f"🔑 reCAPTCHA Site Key configurada: {'✅ Sí' if app.config.get('RECAPTCHA_SITE_KEY') else '❌ No'}")
+    print(f"🔑 reCAPTCHA Secret Key configurada: {'✅ Sí' if app.config.get('RECAPTCHA_SECRET_KEY') else '❌ No'}")
+    
+    # 🔥 Mover el context processor DESPUÉS de que app.config esté configurado
+    @app.context_processor
+    def utility_processor():
+        return {
+            'recaptcha_site_key': app.config.get('RECAPTCHA_SITE_KEY', '')
+        }
     
     # Asegurar la clave secreta
     if not app.config.get('SECRET_KEY'):
@@ -148,6 +158,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(chatbot_bp) 
     app.register_blueprint(verification_bp) 
+    app.register_blueprint(captcha_bp)
     
     print("Blueprints registrados: Web, Carrito, Productos, Auth, Chatbot")
     

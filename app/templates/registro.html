@@ -46,9 +46,13 @@
             </div>
 
             <div class="form-line">
-                <span class="label">Email:</span>
+                <span class="label">Correo Electrónico:</span>
                 <input type="email" id="email" name="email" class="input-field"
                     placeholder="Ingresa tu correo electrónico" required>
+                <small>
+                    <i class="fa-solid fa-circle-info"></i>
+                    Asegurate de poner un correo electronico valido
+                </small>
                 <span class="error-message" id="email-error"></span>
             </div>
 
@@ -56,6 +60,36 @@
                 <span class="label">Contraseña:</span>
                 <input type="password" id="password" name="password" class="input-field"
                     placeholder="Crea una contraseña segura" required>
+
+                <!-- Panel de requisitos de contraseña - Estilo cálido -->
+                <div class="password-requirements-panel">
+                    <div class="panel-header">
+                        <i class="fa-solid fa-shield-haltered"></i> Requisitos de seguridad
+                    </div>
+                    <ul class="requisitos-lista">
+                        <li id="req-longitud" class="requisito-item">
+                            <i class="fa-solid fa-circle"></i>
+                            <span>Mínimo 8 caracteres</span>
+                        </li>
+                        <li id="req-mayuscula" class="requisito-item">
+                            <i class="fa-solid fa-circle"></i>
+                            <span>Al menos 1 mayúscula (A-Z)</span>
+                        </li>
+                        <li id="req-minuscula" class="requisito-item">
+                            <i class="fa-solid fa-circle"></i>
+                            <span>Al menos 1 minúscula (a-z)</span>
+                        </li>
+                        <li id="req-numero" class="requisito-item">
+                            <i class="fa-solid fa-circle"></i>
+                            <span>Al menos 1 número (0-9)</span>
+                        </li>
+                        <li id="req-especial" class="requisito-item">
+                            <i class="fa-solid fa-circle"></i>
+                            <span>Al menos 1 carácter especial (!@#$%^&*)</span>
+                        </li>
+                    </ul>
+                </div>
+
                 <span class="error-message" id="password-error"></span>
             </div>
 
@@ -79,6 +113,8 @@
         </div>
     </div>
 </div>
+
+
 
 <footer class="contenedor-footer">
     <div class="contenedor-redes-sociales">
@@ -113,7 +149,7 @@
 </footer>
 
 <!-- Scripts -->
-
+<script src="/static/js/chatbot.js"></script>
 <script src="/static/js/registro.js"></script>
 <script src="/static/js/user-menu.js"></script>
 

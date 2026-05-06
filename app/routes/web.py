@@ -252,7 +252,6 @@ def pago_cancelado():
 
 # ----------------------------------------- AUTENTICACIÓN Y SESIÓN ---------------------------------------- #
 
-# En web.py - Ruta de login
 @web_bp.route('/api/login', methods=['POST'])
 def api_login():
     try:
@@ -263,7 +262,42 @@ def api_login():
         
         login_input = data.get('login_input')
         password = data.get('password')
+        captcha_response = data.get('g-recaptcha-response') or data.get('captcha_response')
         
+        # 🔥 NUEVO: Validar captcha
+        if not captcha_response:
+            return jsonify({'error': 'Por favor completa el captcha "No soy un robot"'}), 400
+        
+        # 🔥 NUEVO: Verificar captcha con Google
+        secret_key = current_app.config.get('RECAPTCHA_SECRET_KEY')
+        if not secret_key:
+            print("ERROR: RECAPTCHA_SECRET_KEY no configurada")
+            return jsonify({'error': 'Error de configuración del servidor'}), 500
+        
+        try:
+            import requests
+            verify_data = {
+                'secret': secret_key,
+                'response': captcha_response
+            }
+            response = requests.post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                data=verify_data,
+                timeout=5
+            )
+            result = response.json()
+            
+            if not result.get('success'):
+                print(f"Captcha fallido: {result.get('error-codes')}")
+                return jsonify({'error': 'Captcha inválido o expirado. Intenta nuevamente.'}), 400
+                
+        except requests.exceptions.Timeout:
+            return jsonify({'error': 'Error de conexión con el servicio de verificación'}), 500
+        except Exception as e:
+            print(f"Error verificando captcha: {e}")
+            return jsonify({'error': 'Error al verificar captcha'}), 500
+        
+        # Validar campos
         if not login_input or not password:
             return jsonify({'error': 'Completa todos los campos'}), 400
         
@@ -275,11 +309,11 @@ def api_login():
         if not usuario:
             return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
         
-        # 🔥 VERIFICAR SI LA CUENTA ESTÁ ACTIVA
+        # Verificar si la cuenta está activa
         if not usuario.activo:
             return jsonify({
                 'error': 'Tu cuenta ha sido desactivada. Contacta al administrador.'
-            }), 403  # 403 = Forbidden
+            }), 403
         
         if not usuario.verificacion:
             return jsonify ({
@@ -314,13 +348,15 @@ def api_login():
                 'username': usuario.nombre_usuario,
                 'email': usuario.correo,
                 'role': usuario.rol_id,
-                'activo': usuario.activo,  # Incluir estado
-                'verificado' : usuario.verificacion 
+                'activo': usuario.activo,
+                'verificado': usuario.verificacion 
             }
         }), 200
         
     except Exception as e:
         print(f"Error en login: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': 'Error interno del servidor'}), 500
 
 @web_bp.route('/logout')
@@ -382,15 +418,31 @@ def api_registro():
         password = data.get('password')
         confirm_password = data.get('confirm_password')
         
-        # Validaciones
+        # Validaciones básicas
         if not username or len(username) < 6:
             return jsonify({'error': 'El nombre de usuario debe tener al menos 6 caracteres'}), 400
         
         if not email or '@' not in email:
             return jsonify({'error': 'Email inválido'}), 400
         
-        if not password or len(password) < 8:
+        # ✅ VALIDACIÓN SEGURA DE CONTRASEÑA
+        if not password:
+            return jsonify({'error': 'La contraseña es obligatoria'}), 400
+        
+        if len(password) < 8:
             return jsonify({'error': 'La contraseña debe tener al menos 8 caracteres'}), 400
+        
+        if not any(c.isupper() for c in password):
+            return jsonify({'error': 'La contraseña debe contener al menos 1 mayúscula'}), 400
+        
+        if not any(c.islower() for c in password):
+            return jsonify({'error': 'La contraseña debe contener al menos 1 minúscula'}), 400
+        
+        if not any(c.isdigit() for c in password):
+            return jsonify({'error': 'La contraseña debe contener al menos 1 número'}), 400
+        
+        if not any(c in '!@#$%^&*(),.?":{}|<>' for c in password):
+            return jsonify({'error': 'La contraseña debe contener al menos 1 carácter especial (!@#$%^&*)'}), 400
         
         if password != confirm_password:
             return jsonify({'error': 'Las contraseñas no coinciden'}), 400
@@ -400,16 +452,16 @@ def api_registro():
             return jsonify({'error': 'Este usuario ya existe'}), 400
             
         if Usuario.query.filter_by(correo=email).first():
-            return jsonify({'error': 'Este email ya está registrado'}), 400
+            return jsonify({'error': 'Este correo electrónico ya está registrado'}), 400
         
         token = generate_verification_token(email)
         
-        # Crear usuario normal
+        # Crear usuario
         nuevo_usuario = Usuario(
             nombre_usuario=username,
             correo=email,
             password=generate_password_hash(password),
-            rol_id=2,  # Cliente
+            rol_id=2,
             verificacion=False,
             email_verification_token=token
         )
@@ -419,12 +471,10 @@ def api_registro():
         
         email_enviado = send_verification_email(email, username, token)
         
-        print(f"USUARIO GUARDADO EN BD: {username}, Email: {email}")
-        
         if email_enviado:
             return jsonify({
                 'success': True, 
-                'message': 'Registro exitoso. Revisa tu correo para verificar tu cuenta antes de iniciar sesión.',
+                'message': '¡Registro exitoso!.',
                 'requested_email': True
             }), 201
         else:

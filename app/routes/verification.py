@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, redirect, url_for, flash, request, jsonify, render_template
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
@@ -36,32 +36,9 @@ def send_verification_email(user_email, username, token):
     
     verification_url = f"{base_url}/verify-email/{token}"
     
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            body {{ font-family: Arial, sans-serif; }}
-            .button {{
-                background-color: #4CAF50;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                display: inline-block;
-            }}
-        </style>
-    </head>
-    <body>
-        <h2>🎮 GameStore </h2>
-        <p>Hola <strong>{username}</strong>,</p>
-        <p>Gracias por registrarte. Verifica tu cuenta:</p>
-        <a href="{verification_url}" class="button">Verificar mi cuenta</a>
-        <p>O copia: {verification_url}</p>
-        <p> Este enlace expira en 1 hora.</p>
-    </body>
-    </html>
-    """
+    html_content = render_template('correos/verificacion.html', 
+                                   username=username,
+                                   verification_url=verification_url)
     
     msg = Message(
         subject="Verifica tu cuenta - GameStore ",

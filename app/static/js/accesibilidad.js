@@ -2,7 +2,7 @@
 // ACCESIBILIDAD AVANZADA
 // ========================
 
-(function() {
+(function () {
     "use strict";
 
     function AccessibilityManager() {
@@ -33,7 +33,7 @@
         this.init();
     }
 
-    AccessibilityManager.prototype.init = function() {
+    AccessibilityManager.prototype.init = function () {
         this.loadSettings();
         this.createPanel();
         this.applyAllSettings();
@@ -45,7 +45,7 @@
         this.isInitialLoad = false;
     };
 
-    AccessibilityManager.prototype.createPanel = function() {
+    AccessibilityManager.prototype.createPanel = function () {
         var self = this;
         if (!document.querySelector(".btn-accesibilidad")) {
             var btnChatbot = document.querySelector(".btn-chatbot");
@@ -59,7 +59,7 @@
             } else {
                 document.body.appendChild(btn);
             }
-            btn.addEventListener("click", function(e) {
+            btn.addEventListener("click", function (e) {
                 e.stopPropagation();
                 self.togglePanel();
             });
@@ -82,7 +82,7 @@
                 { id: 'acc-invertColors', icon: 'fa-adjust', color: '#10b981', label: 'Invertir colores', prop: 'invertColors' }/*,
                 { id: 'acc-lightTheme', icon: 'fa-sun', color: '#fbbf24', label: self.state.lightTheme ? 'Modo oscuro' : 'Modo claro', prop: 'lightTheme' }*/
             ];
-            visualOptions.forEach(function(opt) {
+            visualOptions.forEach(function (opt) {
                 panelHTML += '<div class="accesibilidad-option">';
                 panelHTML += '<div class="option-info">';
                 panelHTML += '<i class="fa-solid ' + opt.icon + '" style="color:' + opt.color + '; margin-right:10px;"></i>';
@@ -104,7 +104,7 @@
                 { id: 'acc-readingGuide', icon: 'fa-ruler-horizontal', color: '#3b82f6', label: 'Guia de lectura', prop: 'readingGuide' },
                 { id: 'acc-dyslexicFont', icon: 'fa-font', color: '#a855f7', label: 'Fuente para dislexia', prop: 'dyslexicFont' }
             ];
-            readingOptions.forEach(function(opt) {
+            readingOptions.forEach(function (opt) {
                 panelHTML += '<div class="accesibilidad-option">';
                 panelHTML += '<div class="option-info">';
                 panelHTML += '<i class="fa-solid ' + opt.icon + '" style="color:' + opt.color + '; margin-right:10px;"></i>';
@@ -140,7 +140,7 @@
                 { id: 'acc-highlightLinks', icon: 'fa-link', color: '#ec4899', label: 'Resaltar enlaces', prop: 'highlightLinks' },
                 { id: 'acc-screenReader', icon: 'fa-volume-high', color: '#ef4444', label: 'Lector de pantalla', prop: 'screenReader' }
             ];
-            navOptions.forEach(function(opt) {
+            navOptions.forEach(function (opt) {
                 panelHTML += '<div class="accesibilidad-option">';
                 panelHTML += '<div class="option-info">';
                 panelHTML += '<i class="fa-solid ' + opt.icon + '" style="color:' + opt.color + '; margin-right:10px;"></i>';
@@ -175,11 +175,11 @@
         this.panel = document.querySelector(".accesibilidad-panel");
         var closeBtn = this.panel.querySelector(".btn-cerrar-panel");
         if (closeBtn) {
-            closeBtn.addEventListener("click", function() { self.closePanel(); });
+            closeBtn.addEventListener("click", function () { self.closePanel(); });
         }
     };
 
-    AccessibilityManager.prototype.syncCheckboxes = function() {
+    AccessibilityManager.prototype.syncCheckboxes = function () {
         var self = this;
         var toggles = [
             { id: "acc-grayscale", prop: "grayscale" },
@@ -192,7 +192,7 @@
             { id: "acc-highlightLinks", prop: "highlightLinks" },
             { id: "acc-screenReader", prop: "screenReader" }
         ];
-        toggles.forEach(function(item) {
+        toggles.forEach(function (item) {
             var checkbox = document.getElementById(item.id);
             if (checkbox) {
                 checkbox.checked = self.state[item.prop];
@@ -208,11 +208,11 @@
         }
     };
 
-    AccessibilityManager.prototype.togglePanel = function() {
+    AccessibilityManager.prototype.togglePanel = function () {
         if (this.isOpen) { this.closePanel(); } else { this.openPanel(); }
     };
 
-    AccessibilityManager.prototype.openPanel = function() {
+    AccessibilityManager.prototype.openPanel = function () {
         // Close chatbot if open
         this.closeChatbot();
         // Close user menu if open
@@ -222,20 +222,20 @@
         var btn = document.querySelector(".btn-accesibilidad");
         if (btn) { btn.setAttribute("aria-expanded", "true"); }
         // Focus first focusable element in panel
-        setTimeout(function() {
-            var firstFocusable = panel.querySelector('button, input, [tabindex]:not([tabindex="-1"])');
+        setTimeout(function () {
+            var firstFocusable = self.panel.querySelector('button, input, [tabindex]:not([tabindex="-1"])');
             if (firstFocusable) firstFocusable.focus();
         }, 100);
     };
 
-    AccessibilityManager.prototype.closePanel = function() {
+    AccessibilityManager.prototype.closePanel = function () {
         this.panel.classList.remove("active");
         this.isOpen = false;
         var btn = document.querySelector(".btn-accesibilidad");
         if (btn) { btn.setAttribute("aria-expanded", "false"); btn.focus(); }
     };
 
-    AccessibilityManager.prototype.closeChatbot = function() {
+    AccessibilityManager.prototype.closeChatbot = function () {
         var ventanaChatbot = document.getElementById('ventana-chatbot');
         if (ventanaChatbot) {
             ventanaChatbot.classList.remove('ventana-visible-chatbot');
@@ -243,16 +243,16 @@
         }
     };
 
-    AccessibilityManager.prototype.closeUserMenu = function() {
+    AccessibilityManager.prototype.closeUserMenu = function () {
         var userDropdown = document.getElementById('menu-user');
         if (userDropdown) {
             userDropdown.style.display = 'none';
         }
     };
 
-    AccessibilityManager.prototype.setupEscapeKeyHandler = function() {
+    AccessibilityManager.prototype.setupEscapeKeyHandler = function () {
         var self = this;
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 // Close accessibility panel if open
                 if (self.isOpen) {
@@ -283,7 +283,7 @@
         });
     };
 
-    AccessibilityManager.prototype.setupEventListeners = function() {
+    AccessibilityManager.prototype.setupEventListeners = function () {
         var self = this;
         var toggles = [
             { id: "acc-grayscale", prop: "grayscale" },
@@ -296,10 +296,10 @@
             { id: "acc-highlightLinks", prop: "highlightLinks" },
             { id: "acc-screenReader", prop: "screenReader" }
         ];
-        toggles.forEach(function(item) {
+        toggles.forEach(function (item) {
             var element = document.getElementById(item.id);
             if (element) {
-                element.addEventListener("change", function(e) {
+                element.addEventListener("change", function (e) {
                     self.state[item.prop] = e.target.checked;
                     self.applySetting(item.prop);
                     self.saveSettings();
@@ -315,7 +315,7 @@
                     }
                 });
                 // Allow keyboard activation with Space/Enter
-                element.addEventListener("keydown", function(e) {
+                element.addEventListener("keydown", function (e) {
                     if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         element.checked = !element.checked;
@@ -326,7 +326,7 @@
         });
         var textScaleBtn = document.getElementById("acc-textScale");
         if (textScaleBtn) {
-            textScaleBtn.addEventListener("click", function() {
+            textScaleBtn.addEventListener("click", function () {
                 self.currentScaleIndex = (self.currentScaleIndex + 1) % self.textScaleOptions.length;
                 self.state.textScale = self.textScaleOptions[self.currentScaleIndex];
                 self.applySetting("textScale");
@@ -336,7 +336,7 @@
         }
         var lineSpacingBtn = document.getElementById("acc-lineSpacing");
         if (lineSpacingBtn) {
-            lineSpacingBtn.addEventListener("click", function() {
+            lineSpacingBtn.addEventListener("click", function () {
                 var options = [1.0, 1.5, 2.0, 2.5];
                 var currentIndex = options.indexOf(self.state.lineSpacing);
                 currentIndex = (currentIndex + 1) % options.length;
@@ -350,7 +350,7 @@
         }
         var letterSpacingBtn = document.getElementById("acc-letterSpacing");
         if (letterSpacingBtn) {
-            letterSpacingBtn.addEventListener("click", function() {
+            letterSpacingBtn.addEventListener("click", function () {
                 var options = [0, 2, 4, 6];
                 var currentIndex = options.indexOf(self.state.letterSpacing);
                 currentIndex = (currentIndex + 1) % options.length;
@@ -364,18 +364,18 @@
         }
         var resetBtn = document.getElementById("resetAccessibility");
         if (resetBtn) {
-            resetBtn.addEventListener("click", function() { self.resetAll(); });
+            resetBtn.addEventListener("click", function () { self.resetAll(); });
         }
 
         // Keyboard navigation within the panel
         this.setupPanelKeyboardNav();
     };
 
-    AccessibilityManager.prototype.setupPanelKeyboardNav = function() {
+    AccessibilityManager.prototype.setupPanelKeyboardNav = function () {
         var self = this;
         if (!this.panel) return;
 
-        this.panel.addEventListener("keydown", function(e) {
+        this.panel.addEventListener("keydown", function (e) {
             if (!self.isOpen) return;
 
             var selector = 'button:not([disabled]), input[type="checkbox"]:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -386,7 +386,7 @@
             var currentIndex = focusableArray.indexOf(document.activeElement);
             if (currentIndex === -1) currentIndex = 0;
 
-            switch(e.key) {
+            switch (e.key) {
                 case 'ArrowDown':
                 case 'ArrowRight':
                     e.preventDefault();
@@ -427,7 +427,7 @@
         });
     };
 
-    AccessibilityManager.prototype.applySetting = function(key) {
+    AccessibilityManager.prototype.applySetting = function (key) {
         var body = document.body;
         switch (key) {
             case "grayscale":
@@ -483,7 +483,7 @@
         }
     };
 
-    AccessibilityManager.prototype.createReadingMask = function() {
+    AccessibilityManager.prototype.createReadingMask = function () {
         this.removeReadingMask();
         var overlay = document.createElement("div");
         overlay.id = "reading-mask-overlay";
@@ -493,7 +493,7 @@
 
         // Position the mask based on mouse position
         var self = this;
-        this._maskMouseMove = function(e) {
+        this._maskMouseMove = function (e) {
             if (self.state.readingMask) {
                 var lineHeight = 60;
                 var top = e.clientY - lineHeight / 2;
@@ -511,7 +511,7 @@
         document.addEventListener("mousemove", this._maskMouseMove);
     };
 
-    AccessibilityManager.prototype.removeReadingMask = function() {
+    AccessibilityManager.prototype.removeReadingMask = function () {
         var mask = document.getElementById("reading-mask-overlay");
         if (mask) mask.remove();
         if (this._maskMouseMove) {
@@ -520,7 +520,7 @@
         }
     };
 
-    AccessibilityManager.prototype.createReadingGuide = function() {
+    AccessibilityManager.prototype.createReadingGuide = function () {
         this.removeReadingGuide();
         var guide = document.createElement("div");
         guide.id = "reading-guide-line";
@@ -528,7 +528,7 @@
         guide.innerHTML = '<div class="guide-line-horizontal"></div>';
         document.body.appendChild(guide);
         var self = this;
-        this._guideMouseMove = function(e) {
+        this._guideMouseMove = function (e) {
             if (self.state.readingGuide) {
                 guide.style.top = e.clientY + "px";
             }
@@ -536,7 +536,7 @@
         document.addEventListener("mousemove", this._guideMouseMove);
     };
 
-    AccessibilityManager.prototype.removeReadingGuide = function() {
+    AccessibilityManager.prototype.removeReadingGuide = function () {
         var guide = document.getElementById("reading-guide-line");
         if (guide) guide.remove();
         if (this._guideMouseMove) {
@@ -545,22 +545,22 @@
         }
     };
 
-    AccessibilityManager.prototype.applyTextScale = function() {
+    AccessibilityManager.prototype.applyTextScale = function () {
         document.body.classList.remove("accesibilidad-text-resize-50", "accesibilidad-text-resize-100", "accesibilidad-text-resize-150", "accesibilidad-text-resize-200");
         document.body.classList.add("accesibilidad-text-resize-" + this.state.textScale);
     };
 
-    AccessibilityManager.prototype.applySpacing = function() {
+    AccessibilityManager.prototype.applySpacing = function () {
         document.body.style.lineHeight = this.state.lineSpacing;
         document.body.style.letterSpacing = this.state.letterSpacing + "px";
     };
 
-    AccessibilityManager.prototype.disableScreenReader = function() {
+    AccessibilityManager.prototype.disableScreenReader = function () {
         this.screenReaderActive = false;
         if (this.speechSynthesis) { this.speechSynthesis.cancel(); }
     };
 
-    AccessibilityManager.prototype.toggleSkipToContent = function() {
+    AccessibilityManager.prototype.toggleSkipToContent = function () {
         var existingLink = document.querySelector("#accesibility-skip-link");
         if (existingLink) existingLink.remove();
         if (this.state.skipToContent) {
@@ -570,7 +570,7 @@
             skipLink.className = "accesibility-skip-link";
             skipLink.textContent = "Saltar al contenido principal";
             skipLink.setAttribute("aria-label", "Saltar al contenido principal");
-            skipLink.addEventListener("click", function(e) {
+            skipLink.addEventListener("click", function (e) {
                 e.preventDefault();
                 var mainContent = document.querySelector("#main-content") || document.querySelector(".principal");
                 if (mainContent) {
@@ -583,12 +583,12 @@
         }
     };
 
-    AccessibilityManager.prototype.applyAllSettings = function() {
+    AccessibilityManager.prototype.applyAllSettings = function () {
         var self = this;
-        Object.keys(this.state).forEach(function(key) { self.applySetting(key); });
+        Object.keys(this.state).forEach(function (key) { self.applySetting(key); });
     };
 
-    AccessibilityManager.prototype.improveAriaAttributes = function() {
+    AccessibilityManager.prototype.improveAriaAttributes = function () {
         var menuBtn = document.getElementById("btn-menu");
         if (menuBtn) {
             menuBtn.setAttribute("aria-expanded", "false");
@@ -601,17 +601,17 @@
         }
     };
 
-    AccessibilityManager.prototype.enableScreenReader = function() {
+    AccessibilityManager.prototype.enableScreenReader = function () {
         if (this.screenReaderActive) return;
         this.screenReaderActive = true;
         // Only read page when user manually activates the toggle, not on page load
         if (!this.isInitialLoad) {
             var self = this;
-            setTimeout(function() { self.readEntirePage(); }, 500);
+            setTimeout(function () { self.readEntirePage(); }, 500);
         }
     };
 
-    AccessibilityManager.prototype.readEntirePage = function() {
+    AccessibilityManager.prototype.readEntirePage = function () {
         if (!this.screenReaderActive) return;
         // Get all text nodes from the entire page
         var bodyText = this.extractTextFromNode(document.body);
@@ -620,7 +620,7 @@
         }
     };
 
-    AccessibilityManager.prototype.extractTextFromNode = function(node) {
+    AccessibilityManager.prototype.extractTextFromNode = function (node) {
         var text = "";
         if (node.nodeType === Node.TEXT_NODE) {
             var trimmed = node.textContent.trim();
@@ -644,7 +644,7 @@
         return text;
     };
 
-    AccessibilityManager.prototype.speak = function(text) {
+    AccessibilityManager.prototype.speak = function (text) {
         if (!this.speechSynthesis) return;
         this.speechSynthesis.cancel();
         var utterance = new SpeechSynthesisUtterance(text);
@@ -653,7 +653,7 @@
         this.speechSynthesis.speak(utterance);
     };
 
-    AccessibilityManager.prototype.resetAll = function() {
+    AccessibilityManager.prototype.resetAll = function () {
         this.state = {
             grayscale: false, highContrast: false, invertColors: false,
             readingMask: false, readingGuide: false, highlightLinks: false,
@@ -672,11 +672,11 @@
         if (textScaleBtn) { textScaleBtn.textContent = "100%"; }
     };
 
-    AccessibilityManager.prototype.saveSettings = function() {
+    AccessibilityManager.prototype.saveSettings = function () {
         localStorage.setItem("accesibilitySettings", JSON.stringify(this.state));
     };
 
-    AccessibilityManager.prototype.loadSettings = function() {
+    AccessibilityManager.prototype.loadSettings = function () {
         var saved = localStorage.getItem("accesibilitySettings");
         if (saved) {
             try {
@@ -688,7 +688,7 @@
         }
     };
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         window.accessibilityManager = new AccessibilityManager();
     });
 })();

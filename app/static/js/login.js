@@ -3,20 +3,20 @@ var Login = Backbone.Model.extend({
         login_input: '',
         password: ''
     },
-    
+
     url: '/api/login',
-    
-    validate: function(attrs) {
+
+    validate: function (attrs) {
         var errors = [];
-        
+
         if (!attrs.login_input) {
             errors.push('Ingresa tu usuario o email');
         }
-        
+
         if (!attrs.password) {
             errors.push('Ingresa tu contraseña');
         }
-        
+
         return errors.length > 0 ? errors : undefined;
     }
 });
@@ -24,78 +24,104 @@ var Login = Backbone.Model.extend({
 // Vista del Formulario de Login
 var LoginView = Backbone.View.extend({
     el: '#login-form',
-    
+
     events: {
         'submit': 'iniciarSesion',
         'input #login-input': 'limpiarError',
         'input #login-password': 'limpiarError'
     },
-    
-    initialize: function() {
+
+    initialize: function () {
         this.login = new Login();
         this.listenTo(this.login, 'invalid', this.mostrarErrores);
         this.listenTo(this.login, 'sync', this.loginExitoso);
         this.listenTo(this.login, 'error', this.loginFallido);
     },
-    
-    iniciarSesion: function(e) {
+
+    iniciarSesion: function (e) {
         e.preventDefault();
-        
+
+        // Obtener token del captcha
+        var captchaResponse = grecaptcha.getResponse();
+
+        if (!captchaResponse) {
+            this.mostrarErrorGeneral('Por favor completa el captcha "No soy un robot"');
+            return;
+        }
+
         var datos = {
             login_input: this.$('#login-input').val(),
-            password: this.$('#login-password').val()
+            password: this.$('#login-password').val(),
+            'g-recaptcha-response': captchaResponse  // 🔥 Enviar captcha
         };
-        
+
         this.limpiarTodosErrores();
         this.login.set(datos);
-        
+
         if (this.login.isValid()) {
             this.mostrarCargando(true);
-            this.login.save();
+            this.login.save(null, {
+                data: JSON.stringify(datos),
+                contentType: 'application/json',
+                processData: false
+            });
         }
     },
-    
-    mostrarErrores: function(model, errors) {
+
+    mostrarErrores: function (model, errors) {
         this.mostrarCargando(false);
-        errors.forEach(function(error) {
+        errors.forEach(function (error) {
             this.mostrarErrorGeneral(error);
         }.bind(this));
     },
-    
-    mostrarErrorGeneral: function(mensaje) {
+
+    mostrarErrorGeneral: function (mensaje) {
         var $errorDiv = $('<div class="error-alerta">').text(mensaje);
         this.$('#login-btn').before($errorDiv);
-        
-        setTimeout(function() {
-            $errorDiv.fadeOut(function() {
+
+        setTimeout(function () {
+            $errorDiv.fadeOut(function () {
                 $(this).remove();
             });
         }, 5000);
     },
-    
-    loginExitoso: function(model, response) {
+
+    loginExitoso: function (model, response) {
         this.mostrarCargando(false);
         this.mostrarExito('¡Sesión iniciada! Redirigiendo...');
 
+        // ✅ LIMPIAR FORMULARIO
+        this.$('#login-input').val('');
+        this.$('#login-password').val('');
+
+        // Resetear captcha
+        if (typeof grecaptcha !== 'undefined') {
+            grecaptcha.reset();
+        }
+
         if (window.userMenu) {
-        window.userMenu.updateMenu();
-    }
-        
-        setTimeout(function() {
-            // Redirigir a la página principal o perfil
+            window.userMenu.updateMenu();
+        }
+
+        setTimeout(function () {
             window.location.href = response.redirect_url || '/';
         }, 1500);
     },
-    
-    loginFallido: function(model, response) {
+
+    loginFallido: function (model, response) {
         this.mostrarCargando(false);
-        var mensaje = response.responseJSON && response.responseJSON.error 
-                     ? response.responseJSON.error 
-                     : 'Error en el servidor. Intenta nuevamente.';
+        var mensaje = response.responseJSON && response.responseJSON.error
+            ? response.responseJSON.error
+            : 'Error en el servidor. Intenta nuevamente.';
         this.mostrarErrorGeneral(mensaje);
+
+        // 🔥 Resetear captcha
+        if (typeof grecaptcha !== 'undefined') {
+            grecaptcha.reset();
+        }
     },
-    
-    mostrarCargando: function(mostrar) {
+
+    mostrarCargando: function (mostrar) {
         var $btn = this.$('#login-btn');
         if (mostrar) {
             $btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Iniciando sesión...');
@@ -105,19 +131,19 @@ var LoginView = Backbone.View.extend({
             $btn.prop('disabled', false);
         }
     },
-    
-    mostrarExito: function(mensaje) {
+
+    mostrarExito: function (mensaje) {
         var $exitoDiv = $('<div class="exito-alerta">').text(mensaje);
         this.$('#login-btn').before($exitoDiv);
     },
-    
-    limpiarError: function(e) {
+
+    limpiarError: function (e) {
         var $input = $(e.target);
         $input.removeClass('error-input');
         $input.siblings('.error-message').text('');
     },
-    
-    limpiarTodosErrores: function() {
+
+    limpiarTodosErrores: function () {
         this.$('.error-alerta').remove();
         this.$('.error-input').removeClass('error-input');
         this.$('.error-message').text('');
@@ -125,6 +151,6 @@ var LoginView = Backbone.View.extend({
 });
 
 // Inicializar cuando el DOM esté listo
-$(document).ready(function() {
+$(document).ready(function () {
     new LoginView();
 });

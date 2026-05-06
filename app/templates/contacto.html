@@ -18,8 +18,8 @@
 
     <section class="iconos">
         <div class="contenedor-btn-carrito">
-            <a class="btn-carrito" href="/carrito" aria-label="Carrito de compras"><i class="fa-solid fa-cart-shopping"></i><span
-                    class="carrito-count">0</span></a>
+            <a class="btn-carrito" href="/carrito" aria-label="Carrito de compras"><i
+                    class="fa-solid fa-cart-shopping"></i><span class="carrito-count">0</span></a>
         </div>
         <button class="btn-menu-user" id="btn-menu-user" aria-label="Menú de usuario">
             <i class="fa-solid fa-circle-user"></i>
@@ -57,8 +57,10 @@
             <li><a class="barra-lateral-link" href="/consolas"><i class="fa-solid fa-tv"></i> Consolas</a></li>
             <li><a class="barra-lateral-link" href="/controles"><i class="fa-solid fa-gamepad"></i> Controles</a></li>
             <div class="divisor"></div>
-            <li><a class="barra-lateral-link" href="/sobre-nosotros"><i class="fa-solid fa-circle-info"></i>¿Quienes somos?</a></li>
-            <li><a class="barra-lateral-link" href="/contacto"><i class="fa-solid fa-circle-question"></i>Contactanos</a></li>
+            <li><a class="barra-lateral-link" href="/sobre-nosotros"><i class="fa-solid fa-circle-info"></i>¿Quienes
+                    somos?</a></li>
+            <li><a class="barra-lateral-link" href="/contacto"><i
+                        class="fa-solid fa-circle-question"></i>Contactanos</a></li>
         </ul>
     </nav>
 
@@ -74,11 +76,11 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="nombre">Nombre completo</label>
-                            <input type="text" id="nombre" name="nombre"  required>
+                            <input type="text" id="nombre" name="nombre" required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email"  required>
+                            <input type="email" id="email" name="email" required>
                         </div>
                     </div>
 
@@ -130,19 +132,19 @@
             <div class="contenedor-redes-sociales">
                 <h3>Redes Sociales</h3>
                 <div class="iconos-redes-sociales">
-                    <a href="https://www.instagram.com/game_store2.0?igsh=MThoZHN0NDMwZjVmZg==" target="_blank" class="instagram"
-                        aria-label="Instagram">
+                    <a href="https://www.instagram.com/game_store2.0?igsh=MThoZHN0NDMwZjVmZg==" target="_blank"
+                        class="instagram" aria-label="Instagram">
                         <i class="fa-brands fa-instagram"></i>
                     </a>
                     <a href="https://www.facebook.com/profile.php?id=61588437300186" target="_blank" class="facebook"
                         aria-label="Facebook">
                         <i class="fa-brands fa-facebook"></i>
                     </a>
-                    <a href="https://x.com/Game_Store_20" target="_blank" class="twitter"
-                        aria-label="Twitter/X">
+                    <a href="https://x.com/Game_Store_20" target="_blank" class="twitter" aria-label="Twitter/X">
                         <i class="fa-brands fa-x-twitter"></i>
                     </a>
-                    <a href="https://api.whatsapp.com/send?phone=5531908274&text=Hola%20=)" target="_blank" class="whatsapp" aria-label="WhatsApp" ><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://api.whatsapp.com/send?phone=5531908274&text=Hola%20=)" target="_blank"
+                        class="whatsapp" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                 </div>
             </div>
             <div class="contenedor-sobre-nosotros">
@@ -163,72 +165,73 @@
 <div id="fondo"></div>
 
 <!-- Scripts -->
+<script src="/static/js/chatbot.js"></script>
 <script src="/static/js/user-menu.js"></script>
 <script src="/static/js/carrito-sync.js"></script>
 <script src="/static/js/barra-lateral.js"></script>
 
 <!-- Script de contacto (nuevo) -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('formulario-contacto');
-    const mensajeExito = document.getElementById('mensaje-exito');
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('formulario-contacto');
+        const mensajeExito = document.getElementById('mensaje-exito');
 
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const nombre = document.getElementById('nombre').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const telefono = document.getElementById('telefono').value.trim();
-            const asunto = document.getElementById('asunto').value;
-            const mensaje = document.getElementById('mensaje').value.trim();
+        if (form) {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-            if (!nombre || !email || !asunto || !mensaje) {
-                alert('Por favor completa todos los campos obligatorios');
-                return;
-            }
+                const nombre = document.getElementById('nombre').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const telefono = document.getElementById('telefono').value.trim();
+                const asunto = document.getElementById('asunto').value;
+                const mensaje = document.getElementById('mensaje').value.trim();
 
-            if (!email.includes('@') || !email.includes('.')) {
-                alert('Por favor ingresa un email válido');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/contacto/enviar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        nombre: nombre,
-                        email: email,
-                        telefono: telefono,
-                        asunto: asunto,
-                        mensaje: mensaje
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    mensajeExito.style.display = 'block';
-                    form.reset();
-                    
-                    setTimeout(() => {
-                        mensajeExito.style.display = 'none';
-                    }, 5000);
-                    
-                    mensajeExito.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    alert('Error: ' + (data.error || 'No se pudo enviar el mensaje'));
+                if (!nombre || !email || !asunto || !mensaje) {
+                    alert('Por favor completa todos los campos obligatorios');
+                    return;
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error de conexión. Por favor intenta de nuevo.');
-            }
-        });
-    }
-});
+
+                if (!email.includes('@') || !email.includes('.')) {
+                    alert('Por favor ingresa un email válido');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/contacto/enviar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            nombre: nombre,
+                            email: email,
+                            telefono: telefono,
+                            asunto: asunto,
+                            mensaje: mensaje
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        mensajeExito.style.display = 'block';
+                        form.reset();
+
+                        setTimeout(() => {
+                            mensajeExito.style.display = 'none';
+                        }, 5000);
+
+                        mensajeExito.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        alert('Error: ' + (data.error || 'No se pudo enviar el mensaje'));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error de conexión. Por favor intenta de nuevo.');
+                }
+            });
+        }
+    });
 </script>
 
 {% endblock %}
