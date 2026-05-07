@@ -31,8 +31,8 @@ async function checkUserStatus() {
         if (timeoutVerificacion) {
             clearTimeout(timeoutVerificacion);
         }
-        // Verificar cada 30 segundos en lugar de cada 2 segundos
-        timeoutVerificacion = setTimeout(checkUserStatus, 30000);
+        // Verificar cada 30 segundos
+        timeoutVerificacion = setTimeout(checkUserStatus, 60000);
     }
 }
 

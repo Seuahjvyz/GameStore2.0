@@ -10,6 +10,7 @@ import atexit
 import datetime 
 from flask_mail import Mail, Message
 from app.routes.captcha import captcha_bp
+from sqlalchemy import text
 
 # IMPORTAR PAYPAL SDK
 import paypalrestsdk
@@ -22,14 +23,16 @@ mail = Mail()
 #------------------------------------ Scheduler para mantener la BD activa
 scheduler = BackgroundScheduler()
 
-def keep_db_alive():
+def keep_db_alive(app):
     """Ejecuta una query simple cada 4 minutos para mantener activa la BD de Neon"""
-    try:
-        db.session.execute(db.text('SELECT 1'))
-        db.session.commit()
-        print(" Ping a BD ejecutado - Neon activa")
-    except Exception as e:
-        print(f" Error en ping a BD: {e}")
+    with app.app_context():
+        try:
+            # Forma correcta de ejecutar SQL simple
+            db.session.execute(text('SELECT 1'))
+            db.session.commit()
+            print("✅ Ping a BD ejecutado - Neon activa")
+        except Exception as e:
+            print(f"❌ Error en ping a BD: {e}")
 
 def create_app():
     app = Flask(__name__)
@@ -179,20 +182,20 @@ def create_app():
     
     # Iniciar scheduler para mantener BD activa (solo si no está corriendo)
     if not scheduler.running:
-        with app.app_context():
-            # Agregar job que se ejecuta cada 4 minutos
-            scheduler.add_job(
-                func=lambda: keep_db_alive(),
-                trigger="interval",
-                minutes=4,
-                id='keep_neon_alive',
-                name='Mantener BD Neon activa',
-                replace_existing=True
-            )
-            scheduler.start()
-            print("✅ Scheduler iniciado - BD Neon se mantendrá activa")
-            
-            # Asegurar que el scheduler se detenga cuando la app se cierre
-            atexit.register(lambda: scheduler.shutdown())
+        # Agregar job que se ejecuta cada 4 minutos
+        scheduler.add_job(
+            func=keep_db_alive,
+            args=[app],
+            trigger="interval",
+            minutes=4,
+            id='keep_neon_alive',
+            name='Mantener BD Neon activa',
+            replace_existing=True
+        )
+        scheduler.start()
+        print("✅ Scheduler iniciado - BD Neon se mantendrá activa")
+        
+        # Asegurar que el scheduler se detenga cuando la app se cierre
+        atexit.register(lambda: scheduler.shutdown())
     
     return app
