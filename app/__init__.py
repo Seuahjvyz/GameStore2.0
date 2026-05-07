@@ -24,15 +24,15 @@ mail = Mail()
 scheduler = BackgroundScheduler()
 
 def keep_db_alive(app):
-    """Ejecuta una query simple cada 4 minutos para mantener activa la BD de Neon"""
-    with app.app_context():
-        try:
-            # Forma correcta de ejecutar SQL simple
-            db.session.execute(text('SELECT 1'))
-            db.session.commit()
-            print("✅ Ping a BD ejecutado - Neon activa")
-        except Exception as e:
-            print(f"❌ Error en ping a BD: {e}")
+    """Ping a Neon BD cada 4 min para mantenerla activa.
+    Usa engine.connect() directo para evitar problemas de contexto con Gunicorn workers."""
+    try:
+        with app.app_context():
+            with db.engine.connect() as conn:
+                conn.execute(text('SELECT 1'))
+        print("✅ Ping a BD ejecutado - Neon activa")
+    except Exception as e:
+        print(f"❌ Error en ping a BD: {e}")
 
 def create_app():
     app = Flask(__name__)
@@ -180,9 +180,13 @@ def create_app():
         except Exception as e:
             print(f" Error creando tablas: {e}")
     
-    # Iniciar scheduler para mantener BD activa (solo si no está corriendo)
+    # Iniciar scheduler solo en el worker principal (evita duplicados con Gunicorn)
+    # Gunicorn define la variable GUNICORN_WORKER_CLASS; en Render también podemos
+    # detectarlo con el PID del proceso padre.
+    import os as _os
+    es_worker_principal = _os.environ.get('SERVER_SOFTWARE', '').startswith('gunicorn') == False         or _os.environ.get('WERKZEUG_RUN_MAIN') == 'true'         or not _os.environ.get('SERVER_SOFTWARE', '')
+
     if not scheduler.running:
-        # Agregar job que se ejecuta cada 4 minutos
         scheduler.add_job(
             func=keep_db_alive,
             args=[app],
@@ -190,12 +194,11 @@ def create_app():
             minutes=4,
             id='keep_neon_alive',
             name='Mantener BD Neon activa',
-            replace_existing=True
+            replace_existing=True,
+            misfire_grace_time=60
         )
         scheduler.start()
         print("✅ Scheduler iniciado - BD Neon se mantendrá activa")
-        
-        # Asegurar que el scheduler se detenga cuando la app se cierre
-        atexit.register(lambda: scheduler.shutdown())
+        atexit.register(lambda: scheduler.shutdown(wait=False))
     
     return app
