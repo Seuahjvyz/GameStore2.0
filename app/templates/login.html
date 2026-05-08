@@ -32,22 +32,22 @@
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} flash-message">
-                    {% if category == 'success' %}
-                        <i class="fa-solid fa-circle-check"></i>
-                    {% elif category == 'danger' %}
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                    {% elif category == 'info' %}
-                        <i class="fa-solid fa-circle-info"></i>
-                    {% else %}
-                        <i class="fa-solid fa-bell"></i>
-                    {% endif %}
-                    {{ message | safe }}
-                </div>
-            {% endfor %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} flash-message">
+            {% if category == 'success' %}
+            <i class="fa-solid fa-circle-check"></i>
+            {% elif category == 'danger' %}
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {% elif category == 'info' %}
+            <i class="fa-solid fa-circle-info"></i>
+            {% else %}
+            <i class="fa-solid fa-bell"></i>
+            {% endif %}
+            {{ message | safe }}
+        </div>
+        {% endfor %}
         {% endif %}
-    {% endwith %}
+        {% endwith %}
 
         <div class="volver">
             <a href="/" class="btn-volver"><i class="fa-solid fa-circle-arrow-left"></i> Volver</a>

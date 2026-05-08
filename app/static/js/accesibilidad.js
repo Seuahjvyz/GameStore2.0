@@ -79,8 +79,8 @@
             var visualOptions = [
                 { id: 'acc-grayscale', icon: 'fa-palette', color: '#8b5cf6', label: 'Escala de grises', prop: 'grayscale' },
                 { id: 'acc-highContrast', icon: 'fa-circle-half-stroke', color: '#f59e0b', label: 'Alto contraste', prop: 'highContrast' },
-                { id: 'acc-invertColors', icon: 'fa-adjust', color: '#10b981', label: 'Invertir colores', prop: 'invertColors' }/*,
-                { id: 'acc-lightTheme', icon: 'fa-sun', color: '#fbbf24', label: self.state.lightTheme ? 'Modo oscuro' : 'Modo claro', prop: 'lightTheme' }*/
+                { id: 'acc-invertColors', icon: 'fa-adjust', color: '#10b981', label: 'Invertir colores', prop: 'invertColors' },
+                { id: 'acc-lightTheme', icon: 'fa-sun', color: '#fbbf24', label: 'Modo claro', prop: 'lightTheme' }
             ];
             visualOptions.forEach(function (opt) {
                 panelHTML += '<div class="accesibilidad-option">';

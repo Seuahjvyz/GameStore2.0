@@ -1,0 +1,653 @@
+
+/* ── Variables del modo claro ──────────────────────────────────── */
+body.accesibilidad-light {
+  --acc-bg:          #f0edf8;
+  --acc-bg-2:        #e4dff5;
+  --acc-bg-card:     #ffffff;
+  --acc-bg-sidebar:  #ede8f8;
+  --acc-bg-header:   #5b21b6;        /* morado oscuro — contraste con blanco */
+  --acc-bg-footer:   #3b1078;
+  --acc-border:      #c4b5fd;
+  --acc-border-soft: #ddd6fe;
+  --acc-text:        #1e1333;
+  --acc-text-soft:   #4c3a6e;
+  --acc-text-muted:  #6d5a8e;
+  --acc-accent:      #7c3aed;
+  --acc-accent-2:    #ec4899;
+  --acc-price:       #059669;        /* verde para precios — diferencia del purple */
+  --acc-success:     #065f46;
+  --acc-error:       #991b1b;
+  --acc-warning:     #92400e;
+}
+
+/* ── Reset base ────────────────────────────────────────────────── */
+body.accesibilidad-light {
+  background: var(--acc-bg) !important;
+  color:      var(--acc-text) !important;
+}
+
+/* ── Contenedores principales ──────────────────────────────────── */
+body.accesibilidad-light .contenedor-principal,
+body.accesibilidad-light .principal,
+body.accesibilidad-light .contenido {
+  background: var(--acc-bg) !important;
+  color:      var(--acc-text) !important;
+}
+
+/* ── Barra superior — se mantiene morada para anclar identidad ─── */
+body.accesibilidad-light .barra-superior {
+  background: linear-gradient(135deg, var(--acc-bg-header), #7c3aed) !important;
+  box-shadow: 0 2px 16px rgba(91, 33, 182, 0.25) !important;
+}
+body.accesibilidad-light .marca a,
+body.accesibilidad-light .marca h1,
+body.accesibilidad-light .marca .logo-titulo,
+body.accesibilidad-light .barra-superior,
+body.accesibilidad-light .btn-menu,
+body.accesibilidad-light .btn-menu i {
+  color: #ffffff !important;
+}
+body.accesibilidad-light .contenedor-btn-carrito,
+body.accesibilidad-light .btn-menu-user {
+  background: rgba(255,255,255,0.18) !important;
+  border-color: rgba(255,255,255,0.35) !important;
+  color: #fff !important;
+}
+body.accesibilidad-light .contenedor-btn-carrito:hover,
+body.accesibilidad-light .btn-menu-user:hover {
+  background: rgba(255,255,255,0.28) !important;
+}
+
+/* ── Barra lateral ─────────────────────────────────────────────── */
+body.accesibilidad-light .barra-lateral {
+  background: linear-gradient(180deg, var(--acc-bg-sidebar) 0%, #ddd5f8 100%) !important;
+  border-right: 2px solid var(--acc-border) !important;
+  box-shadow: 4px 0 20px rgba(124, 58, 237, 0.08) !important;
+}
+body.accesibilidad-light .barra-lateral-link {
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .barra-lateral-link i {
+  color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .barra-lateral-link:hover {
+  background: rgba(124, 58, 237, 0.12) !important;
+  color: var(--acc-accent) !important;
+  transform: translateX(4px) !important;
+}
+body.accesibilidad-light .barra-lateral-link.activo {
+  background: rgba(124, 58, 237, 0.18) !important;
+  color: var(--acc-accent) !important;
+  box-shadow: inset 4px 0 0 var(--acc-accent) !important;
+}
+body.accesibilidad-light .divisor {
+  border-color: var(--acc-bg-header) !important;
+}
+
+/* ── Productos ─────────────────────────────────────────────────── */
+body.accesibilidad-light .producto {
+  background: var(--acc-bg-card) !important;
+  border: 1.5px solid var(--acc-border-soft) !important;
+  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.07) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .producto:hover {
+  border-color: var(--acc-accent) !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15) !important;
+}
+body.accesibilidad-light .producto h3 {
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .producto .categoria {
+  color: var(--acc-text-muted) !important;
+}
+body.accesibilidad-light .producto .descripcion {
+  color: var(--acc-text-soft) !important;
+}
+body.accesibilidad-light .producto .precio {
+  color: var(--acc-price) !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+/* ── Menú de usuario (dropdown) ────────────────────────────────── */
+body.accesibilidad-light .menu-user {
+  color: var(--acc-text) !important;
+  background: var(--acc-bg-card) !important;
+  border: 2px solid var(--acc-border) !important;
+  box-shadow: 0 12px 36px rgba(91, 33, 182, 0.2), 0 0 0 1px var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .dropdown-item {
+  color: var(--acc-text) !important;
+  background: transparent !important;
+}
+body.accesibilidad-light .dropdown-item:hover {
+  background: rgba(124, 58, 237, 0.08) !important;
+  color: var(--acc-accent) !important;
+}
+
+body.accesibilidad-light .dropdown-divider {
+  background: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .contenido-menu-user .loading {
+  color: var(--acc-text-muted) !important;
+  background: transparent !important;
+}
+
+/* ── Chatbot ───────────────────────────────────────────────────── */
+body.accesibilidad-light .btn-chatbot {
+  background: linear-gradient(135deg, var(--acc-accent), #6d28d9) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35) !important;
+}
+body.accesibilidad-light .ventana-visible-chatbot {
+  background: #ffffff !important;
+  border: 2px solid var(--acc-border) !important;
+  box-shadow: 0 16px 48px rgba(91, 33, 182, 0.2) !important;
+}
+body.accesibilidad-light .cabecera-chatbot {
+  background: linear-gradient(135deg, #5b21b6, #7c3aed) !important;
+  border-bottom: 2px solid var(--acc-border-soft) !important;
+  color: #fff !important;
+}
+body.accesibilidad-light .cabecera-chatbot p,
+body.accesibilidad-light .cabecera-chatbot i,
+body.accesibilidad-light .cabecera-chatbot button,
+body.accesibilidad-light .cabecera-chatbot button i {
+  color: #fff !important;
+}
+body.accesibilidad-light .mensajes-chatbot {
+  background: #f5f0ff !important;
+}
+body.accesibilidad-light .mensaje-usuario {
+  background: #7c3aed !important;
+  color: #ffffff !important;
+}
+body.accesibilidad-light .mensaje-bot {
+  background: #ede9fe !important;
+  color: #1e1333 !important;
+}
+body.accesibilidad-light .input-chatbot {
+  background: #f3eeff !important;
+  border-top: 1.5px solid var(--acc-border-soft) !important;
+}
+body.accesibilidad-light #mensaje-input-chatbot {
+  background: #ffffff !important;
+  border: 1.5px solid var(--acc-border) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light #mensaje-input-chatbot::placeholder {
+  color: var(--acc-text-muted) !important;
+}
+body.accesibilidad-light #btn-enviar-mensaje-chatbot {
+  background: var(--acc-accent) !important;
+  color: #fff !important;
+}
+body.accesibilidad-light .mensajes-chatbot::-webkit-scrollbar-track {
+  background: #ede9fe !important;
+}
+body.accesibilidad-light .mensajes-chatbot::-webkit-scrollbar-thumb {
+  background: #c4b5fd !important;
+}
+body.accesibilidad-light .mensajes-chatbot::-webkit-scrollbar-thumb:hover {
+  background: var(--acc-accent) !important;
+}
+
+/* ── Panel de accesibilidad ────────────────────────────────────── */
+body.accesibilidad-light .accesibilidad-panel {
+  background: var(--acc-bg-card) !important;
+  border: 2px solid var(--acc-border) !important;
+  box-shadow: 0 12px 40px rgba(91, 33, 182, 0.18), 0 0 0 1px var(--acc-border-soft) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .accesibilidad-panel-header {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe) !important;
+  border-bottom: 2px solid var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .accesibilidad-panel-header h3 {
+  color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .accesibilidad-panel-header i {
+  color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .btn-cerrar-panel {
+  color: var(--acc-text-soft) !important;
+}
+body.accesibilidad-light .btn-cerrar-panel:hover {
+  color: var(--acc-accent-2) !important;
+  background: rgba(236, 72, 153, 0.1) !important;
+}
+body.accesibilidad-light .accesibilidad-seccion {
+  border-bottom-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .accesibilidad-seccion h4 {
+  color: var(--acc-accent-2) !important;
+}
+body.accesibilidad-light .accesibilidad-seccion h4 i {
+  color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .accesibilidad-option {
+  border-bottom-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .option-info span {
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .toggle-slider {
+  background: #c4b5fd !important;
+}
+body.accesibilidad-light .toggle-switch input:checked + .toggle-slider {
+  background: var(--acc-accent) !important;
+}
+body.accesibilidad-light .text-scale-btn {
+  background: #ede9fe !important;
+  color: var(--acc-accent) !important;
+  border-color: var(--acc-border) !important;
+}
+body.accesibilidad-light .text-scale-btn:hover {
+  background: var(--acc-accent) !important;
+  color: #fff !important;
+}
+body.accesibilidad-light .reset-btn {
+  background: linear-gradient(135deg, #fca5a5, #f87171) !important;
+  color: #7f1d1d !important;
+}
+body.accesibilidad-light .reset-btn:hover {
+  background: linear-gradient(135deg, #f87171, #ef4444) !important;
+  color: #fff !important;
+}
+
+/* ── Panel de accesibilidad scrollbar ─────────────────────────── */
+body.accesibilidad-light .accesibilidad-panel::-webkit-scrollbar-track,
+body.accesibilidad-light .accesibilidad-panel-body::-webkit-scrollbar-track {
+  background: #f0ebff !important;
+}
+body.accesibilidad-light .accesibilidad-panel::-webkit-scrollbar-thumb,
+body.accesibilidad-light .accesibilidad-panel-body::-webkit-scrollbar-thumb {
+  background: var(--acc-border) !important;
+}
+
+/* ── Formularios login / registro ──────────────────────────────── */
+body.accesibilidad-light .btn-volver  {
+  background: var(--acc-bg-card) !important;
+  border: 1.5px solid var(--acc-border-soft) !important;
+  box-shadow: 0 12px 40px rgba(91, 33, 182, 0.1) !important;
+}
+body.accesibilidad-light .main-content {
+  background: var(--acc-bg) !important;
+}
+body.accesibilidad-light .main-content .container {
+  background: var(--acc-bg-card) !important;
+  border: 1.5px solid var(--acc-border-soft) !important;
+  box-shadow: 0 12px 40px rgba(91, 33, 182, 0.1) !important;
+}
+body.accesibilidad-light .main-content .container h1 {
+  color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .main-content .container .description {
+  color: var(--acc-text-soft) !important;
+  border-bottom-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .form-line .label {
+  color: var(--acc-text-soft) !important;
+}
+body.accesibilidad-light .form-line .input-field {
+  background: #f8f4ff !important;
+  border-color: var(--acc-border) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .form-line .input-field:focus {
+  border-color: var(--acc-accent) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+body.accesibilidad-light .form-line .input-field::placeholder {
+  color: var(--acc-text-muted) !important;
+}
+body.accesibilidad-light .sidebar-register-section .preguntaxd {
+  color: var(--acc-text-soft) !important;
+}
+body.accesibilidad-light .sidebar-register-section .sidebar-register-btn {
+  background: #ede9fe !important;
+  border-color: var(--acc-accent) !important;
+  color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .sidebar-register-section .sidebar-register-btn:hover {
+  background: var(--acc-accent) !important;
+  color: #fff !important;
+}
+body.accesibilidad-light .btn-volver {
+  color: var(--acc-accent) !important;
+}
+
+/* Requisitos de contraseña */
+body.accesibilidad-light .password-requirements-panel {
+  background: #fef9e7 !important;
+  border-left-color: #d97706 !important;
+}
+body.accesibilidad-light .panel-header {
+  color: #b45309 !important;
+  border-bottom-color: #d97706 !important;
+}
+body.accesibilidad-light .requisito-item span { color: #92400e !important; }
+body.accesibilidad-light .requisito-item.valid span { color: var(--acc-success) !important; }
+body.accesibilidad-light .requisito-item.invalid span { color: var(--acc-error) !important; }
+
+/* Alertas */
+body.accesibilidad-light .error-alerta {
+  background: #fff1f2 !important;
+  color: var(--acc-error) !important;
+  border-color: #fecdd3 !important;
+}
+body.accesibilidad-light .exito-alerta {
+  background: #f0fdf4 !important;
+  color: var(--acc-success) !important;
+  border-color: #bbf7d0 !important;
+}
+body.accesibilidad-light .flash-message.alert-success {
+  background: #f0fdf4 !important;
+  color: #065f46 !important;
+  border-left-color: #10b981 !important;
+}
+body.accesibilidad-light .flash-message.alert-danger {
+  background: #fff1f2 !important;
+  color: #991b1b !important;
+  border-left-color: #f87171 !important;
+}
+
+/* ── Footer ───────────────────────────────────────────────────── */
+body.accesibilidad-light .contenedor-footer {
+  background: linear-gradient(135deg, var(--acc-bg-footer), #5b21b6) !important;
+  color: #e9d5ff !important;
+}
+body.accesibilidad-light .contenedor-footer h3 {
+  color: #c4b5fd !important;
+  border-bottom-color: #7c3aed !important;
+}
+body.accesibilidad-light .contenedor-footer a {
+  color: #ddd6fe !important;
+}
+body.accesibilidad-light .contenedor-footer li {
+  color: #ede9fe !important;
+}
+body.accesibilidad-light .contenedor-footer i {
+  color: #a78bfa !important;
+}
+body.accesibilidad-light .contenedor-sobre-nosotros a:hover {
+  background: #7c3aed !important;
+  color: #fff !important;
+}
+
+/* ── Carrito ──────────────────────────────────────────────────── */
+body.accesibilidad-light .carrito-page {
+  background: var(--acc-bg) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .carrito-page h1,
+body.accesibilidad-light .carrito-page .subtitulo {
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .carrito-con-items {
+  background: var(--acc-bg-card) !important;
+  border: 1.5px solid var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .carrito-item {
+  background: #faf8ff !important;
+}
+body.accesibilidad-light .carrito-item:hover {
+  background: #f3eeff !important;
+  border-color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .item-info h4 { color: var(--acc-text) !important; }
+body.accesibilidad-light .item-precio-unitario { color: var(--acc-text-soft) !important; }
+body.accesibilidad-light .cantidad-value { color: var(--acc-text) !important; }
+body.accesibilidad-light .item-cantidad { background: #ede9fe !important; }
+body.accesibilidad-light .btn-cantidad {
+  background: var(--acc-accent) !important;
+  border-color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .item-total .total-price { color: var(--acc-accent) !important; }
+body.accesibilidad-light .carrito-resumen { background: #f5f0ff !important; }
+body.accesibilidad-light .resumen-card {
+  background: var(--acc-bg-card) !important;
+  border-color: var(--acc-border) !important;
+}
+body.accesibilidad-light .resumen-card h4 { color: var(--acc-text) !important; }
+body.accesibilidad-light .resumen-linea { color: var(--acc-text) !important; border-bottom-color: var(--acc-border-soft) !important; }
+body.accesibilidad-light .resumen-linea.total { color: var(--acc-accent) !important; border-top-color: var(--acc-border) !important; }
+body.accesibilidad-light .carrito-vacio {
+  background: var(--acc-bg-card) !important;
+  border-color: var(--acc-border) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .carrito-vacio p { color: var(--acc-text-soft) !important; }
+
+/* ── Pedidos ──────────────────────────────────────────────────── */
+
+body.accesibilidad-light .filtros-pedidos {
+  background: var(--acc-bg --acc-bg-card) !important;
+  color: var(--acc-text) !important;
+}
+
+body.accesibilidad-light .pedido-item {
+  background: var(--acc-bg-card) !important;
+  border: 1.5px solid var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .pedido-item:hover {
+  border-color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .product-title {
+  background: linear-gradient(135deg, var(--acc-accent), var(--acc-accent-2)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+body.accesibilidad-light .pedido-fecha {
+  background: #ede9fe !important;
+  color: var(--acc-text-soft) !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .pedido-fechas {
+  background: #f5f0ff !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .pedido-fechas p,
+body.accesibilidad-light .pedido-info p { color: var(--acc-text) !important; }
+body.accesibilidad-light .pedido-fechas strong { color: var(--acc-accent) !important; }
+body.accesibilidad-light .pedido-total {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(236,72,153,0.06)) !important;
+  border-color: var(--acc-border) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .pedido-producto {
+  background: #f8f4ff !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .producto-info h4 { color: var(--acc-text) !important; }
+body.accesibilidad-light .pedido-precio { color: var(--acc-text-soft) !important; }
+body.accesibilidad-light .pedido-cantidad { color: var(--acc-accent) !important; }
+body.accesibilidad-light .no-pedidos {
+  background: var(--acc-bg-card) !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .no-pedidos h2 { color: var(--acc-text) !important; }
+body.accesibilidad-light .no-pedidos p { color: var(--acc-text-soft) !important; }
+
+/* ── Favoritos ────────────────────────────────────────────────── */
+body.accesibilidad-light .no-favoritos,
+body.accesibilidad-light .no-autenticado {
+  background: var(--acc-bg-card) !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .no-favoritos h3,
+body.accesibilidad-light .no-autenticado h3 { color: var(--acc-text) !important; }
+body.accesibilidad-light .no-favoritos p,
+body.accesibilidad-light .no-autenticado p { color: var(--acc-text-soft) !important; }
+
+/* ── Página Sobre Nosotros ────────────────────────────────────── */
+body.accesibilidad-light .historia-container,
+body.accesibilidad-light .mision-card,
+body.accesibilidad-light .vision-card,
+body.accesibilidad-light .valores-card,
+body.accesibilidad-light .contenedor-mapa {
+  background: var(--acc-bg-card) !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .historia-texto h2,
+body.accesibilidad-light .mision-card h3,
+body.accesibilidad-light .vision-card h3,
+body.accesibilidad-light .valores-card h3 { color: var(--acc-accent) !important; }
+body.accesibilidad-light .historia-texto p,
+body.accesibilidad-light .mision-card p,
+body.accesibilidad-light .vision-card p { color: var(--acc-text-soft) !important; }
+body.accesibilidad-light .valores-card li { color: var(--acc-text) !important; }
+body.accesibilidad-light .contenedor-mapa h3 { color: var(--acc-accent) !important; }
+body.accesibilidad-light .direccion {
+  color: var(--acc-text-soft) !important;
+  background: #ede9fe !important;
+}
+body.accesibilidad-light .mapa-info { color: var(--acc-text) !important; }
+body.accesibilidad-light .mapa-info i { color: var(--acc-accent) !important; }
+
+/* ── Página Contacto ──────────────────────────────────────────── */
+body.accesibilidad-light .contacto-section {
+  background: var(--acc-bg-card) !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .contacto-section h2 { color: var(--acc-accent) !important; }
+body.accesibilidad-light .contacto-subtitulo { color: var(--acc-text-soft) !important; border-bottom-color: var(--acc-border-soft) !important; }
+body.accesibilidad-light .form-group label { color: var(--acc-text-soft) !important; }
+body.accesibilidad-light .form-group input,
+body.accesibilidad-light .form-group select,
+body.accesibilidad-light .form-group textarea {
+  background: #f8f4ff !important;
+  border-color: var(--acc-border) !important;
+  color: var(--acc-text) !important;
+}
+body.accesibilidad-light .form-group input:focus,
+body.accesibilidad-light .form-group select:focus,
+body.accesibilidad-light .form-group textarea:focus {
+  border-color: var(--acc-accent) !important;
+  background: #fff !important;
+}
+body.accesibilidad-light .form-group input::placeholder,
+body.accesibilidad-light .form-group textarea::placeholder {
+  color: var(--acc-text-muted) !important;
+}
+
+/* ── Notificaciones ───────────────────────────────────────────── */
+body.accesibilidad-light .notification-custom {
+  background: var(--acc-bg-card) !important;
+  color: var(--acc-text) !important;
+  border: 1.5px solid var(--acc-border) !important;
+  box-shadow: 0 4px 16px rgba(91, 33, 182, 0.15) !important;
+}
+body.accesibilidad-light .notification-custom.success {
+  background: #f0fdf4 !important;
+  color: #065f46 !important;
+  border-color: #6ee7b7 !important;
+}
+body.accesibilidad-light .notification-custom.error {
+  background: #fff1f2 !important;
+  color: #991b1b !important;
+  border-color: #fca5a5 !important;
+}
+body.accesibilidad-light .notificacion.success { background: #059669 !important; }
+body.accesibilidad-light .notificacion.error   { background: #dc2626 !important; }
+
+/* ── Loading / spinner ────────────────────────────────────────── */
+body.accesibilidad-light .loading {
+  background: var(--acc-bg-card) !important;
+  color: var(--acc-text-soft) !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .loading i { color: var(--acc-accent) !important; }
+body.accesibilidad-light .spinner {
+  border-color: var(--acc-border-soft) !important;
+  border-top-color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .error {
+  background: #fff1f2 !important;
+  border-color: #fca5a5 !important;
+  color: var(--acc-error) !important;
+}
+
+/* ── Scrollbars ───────────────────────────────────────────────── */
+body.accesibilidad-light .principal::-webkit-scrollbar-track,
+body.accesibilidad-light .barra-lateral::-webkit-scrollbar-track {
+  background: var(--acc-bg-2) !important;
+}
+body.accesibilidad-light .principal::-webkit-scrollbar-thumb,
+body.accesibilidad-light .barra-lateral::-webkit-scrollbar-thumb {
+  background: #c4b5fd !important;
+}
+body.accesibilidad-light .principal::-webkit-scrollbar-thumb:hover,
+body.accesibilidad-light .barra-lateral::-webkit-scrollbar-thumb:hover {
+  background: var(--acc-accent) !important;
+}
+
+/* ── Perfil ───────────────────────────────────────────────────── */
+body.accesibilidad-light .contenido-centrado { background: var(--acc-bg) !important; }
+body.accesibilidad-light .perfil-card-centrado {
+  background: var(--acc-bg-card) !important;
+  border-color: var(--acc-border-soft) !important;
+}
+body.accesibilidad-light .titulo-centrado { color: var(--acc-text) !important; }
+body.accesibilidad-light .nombre-usuario { color: var(--acc-text) !important; }
+body.accesibilidad-light .numero-cliente { color: var(--acc-text-muted) !important; }
+body.accesibilidad-light .separador { background: var(--acc-border-soft) !important; }
+body.accesibilidad-light .dato-label { color: var(--acc-text-muted) !important; }
+body.accesibilidad-light .dato-valor { color: var(--acc-text) !important; }
+body.accesibilidad-light .accion-item-simple {
+  background: rgba(124, 58, 237, 0.06) !important;
+  border-color: var(--acc-border) !important;
+}
+body.accesibilidad-light .accion-item-simple:hover {
+  background: var(--acc-accent) !important;
+  border-color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .accion-texto { color: var(--acc-text) !important; }
+body.accesibilidad-light .accion-item-simple:hover .accion-texto { color: #fff !important; }
+
+/* ── Panel de accesibilidad & botón — NO se afectan por modo claro (ya son claros) ─ */
+body.accesibilidad-light .btn-accesibilidad {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.4) !important;
+}
+
+/* ── Botones de sin stock ─────────────────────────────────────── */
+body.accesibilidad-light .btn-sin-stock {
+  background: #e5e7eb !important;
+  color: #6b7280 !important;
+}
+
+/* ── Página de error ──────────────────────────────────────────── */
+body.accesibilidad-light .contenedor-error {
+  background: radial-gradient(circle at center, #ddd6fe 0%, #ede9fe 100%) !important;
+}
+body.accesibilidad-light .mensaje-error h1 { color: var(--acc-accent) !important; text-shadow: 2px 2px 0 #c4b5fd !important; }
+body.accesibilidad-light .mensaje-error h2 { color: var(--acc-text-soft) !important; }
+body.accesibilidad-light .mensaje-error p { color: var(--acc-text-soft) !important; }
+body.accesibilidad-light .boton-volver {
+  background: rgba(124, 58, 237, 0.08) !important;
+  border-color: rgba(124, 58, 237, 0.4) !important;
+  color: var(--acc-accent) !important;
+}
+body.accesibilidad-light .boton-volver:hover {
+  background: var(--acc-accent) !important;
+  color: #fff !important;
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  body.accesibilidad-light .accesibilidad-panel {
+    background: var(--acc-bg-card) !important;
+    border-color: var(--acc-border) !important;
+  }
+  body.accesibilidad-light .menu-user {
+    background: var(--acc-bg-card) !important;
+  }
+  body.accesibilidad-light .ventana-visible-chatbot {
+    background: var(--acc-bg-card) !important;
+  }
+}

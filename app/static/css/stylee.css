@@ -3681,10 +3681,7 @@ tr:last-child td {
     color: white;
 }
 
-.btn-volver {
-    background: #6c757d;
-    color: white;
-}
+
 
 .btn-reintentar:hover {
     background: #005ea6;
@@ -3746,6 +3743,7 @@ tr:last-child td {
 
 /* Filtros de pedidos */
 .filtros-pedidos {
+    background-color: #059669;
     display: flex;
     gap: 15px;
     align-items: center;

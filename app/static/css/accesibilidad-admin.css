@@ -1,0 +1,752 @@
+/* ================================================================
+   SECCIÓN 1 — ADMIN EN MODO CLARO
+   ================================================================ */
+
+/* ── Variables reutilizadas del modo claro ─────────────────────── */
+body.accesibilidad-light .admin-mensajes-container h1,
+body.accesibilidad-light .admin-mensajes-container h2 {
+  color: #5b21b6 !important;
+}
+
+/* Filtros admin */
+body.accesibilidad-light .filtros-container {
+  background: #ffffff !important;
+  border: 1.5px solid #ddd6fe !important;
+  box-shadow: 0 2px 12px rgba(91,33,182,0.07) !important;
+}
+body.accesibilidad-light .filtros-container label {
+  color: #6d5a8e !important;
+}
+body.accesibilidad-light .search-input,
+body.accesibilidad-light .filtros-container select,
+body.accesibilidad-light .filtros-pedidos,
+body.accesibilidad-light .filtros-container input[type="date"],
+body.accesibilidad-light .filtro-select {
+  background: #f8f4ff !important;
+  border-color: #c4b5fd !important;
+  color: #1e1333 !important;
+}
+body.accesibilidad-light .search-input:focus,
+body.accesibilidad-light .filtros-container select:focus,
+body.accesibilidad-light .filtro-select:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.12) !important;
+  background: #fff !important;
+}
+body.accesibilidad-light .search-input::placeholder { color: #a0879e !important; }
+body.accesibilidad-light .filtros-container select option { background: #f8f4ff !important; color: #1e1333 !important; }
+body.accesibilidad-light .search-button {
+  background: #7c3aed !important;
+  color: #fff !important;
+}
+body.accesibilidad-light .search-button:hover { background: #6d28d9 !important; }
+
+body.accesibilidad-light .btn-secondary {
+  background: #f3eeff !important;
+  border-color: #c4b5fd !important;
+  color: #5b21b6 !important;
+}
+body.accesibilidad-light .btn-secondary:hover {
+  background: #ede9fe !important;
+  border-color: #7c3aed !important;
+}
+body.accesibilidad-light .btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  color: #fff !important;
+}
+
+/* Stats cards admin */
+body.accesibilidad-light .stat-card {
+  background: #ffffff !important;
+  border-color: #ddd6fe !important;
+  box-shadow: 0 2px 12px rgba(91,33,182,0.07) !important;
+}
+body.accesibilidad-light .stat-card:hover {
+  border-color: #7c3aed !important;
+  box-shadow: 0 6px 20px rgba(124,58,237,0.15) !important;
+}
+body.accesibilidad-light .stat-value { color: #5b21b6 !important; }
+body.accesibilidad-light .stat-label { color: #6d5a8e !important; }
+body.accesibilidad-light .stat-icon { color: #7c3aed !important; background: rgba(124,58,237,0.08) !important; }
+
+/* Tabla admin */
+body.accesibilidad-light .table-responsive,
+body.accesibilidad-light .table-container,
+body.accesibilidad-light .productos-admin-container {
+  background: #ffffff !important;
+  border-color: #ddd6fe !important;
+  box-shadow: 0 2px 12px rgba(91,33,182,0.06) !important;
+}
+body.accesibilidad-light .mensajes-table th,
+body.accesibilidad-light #tabla-productos th,
+body.accesibilidad-light #tabla-usuarios th,
+body.accesibilidad-light .pedidos-table th,
+body.accesibilidad-light table th {
+  background: #f3eeff !important;
+  color: #5b21b6 !important;
+  border-bottom-color: #ddd6fe !important;
+}
+body.accesibilidad-light .mensajes-table td,
+body.accesibilidad-light #tabla-productos td,
+body.accesibilidad-light #tabla-usuarios td,
+body.accesibilidad-light .pedidos-table td,
+body.accesibilidad-light table td {
+  color: #1e1333 !important;
+  border-bottom-color: #ede9fe !important;
+}
+body.accesibilidad-light .mensajes-table tbody tr:hover,
+body.accesibilidad-light #tabla-productos tr:hover,
+body.accesibilidad-light #tabla-usuarios tr:hover,
+body.accesibilidad-light .pedidos-table tbody tr:hover,
+body.accesibilidad-light table tbody tr:hover {
+  background: rgba(124,58,237,0.04) !important;
+}
+body.accesibilidad-light .mensajes-table tbody tr.no-leido {
+  background: rgba(124,58,237,0.06) !important;
+  border-left-color: #7c3aed !important;
+}
+
+/* Badges en tabla admin */
+body.accesibilidad-light .estado-badge.activo {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+  border-color: #6ee7b7 !important;
+}
+body.accesibilidad-light .estado-badge.inactivo {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border-color: #fca5a5 !important;
+}
+body.accesibilidad-light .status-badge.pendiente {
+  background: #fef3c7 !important; color: #92400e !important; border: 1px solid #fcd34d !important;
+}
+body.accesibilidad-light .status-badge.procesando {
+  background: #dbeafe !important; color: #1e40af !important; border: 1px solid #93c5fd !important;
+}
+body.accesibilidad-light .status-badge.completado {
+  background: #d1fae5 !important; color: #065f46 !important; border: 1px solid #6ee7b7 !important;
+}
+body.accesibilidad-light .status-badge.cancelado {
+  background: #fee2e2 !important; color: #991b1b !important; border: 1px solid #fca5a5 !important;
+}
+body.accesibilidad-light .estado-leido {
+  background: rgba(124,58,237,0.1) !important; color: #5b21b6 !important;
+}
+body.accesibilidad-light .estado-respondido {
+  background: #d1fae5 !important; color: #065f46 !important;
+}
+
+/* Botones acción tabla */
+body.accesibilidad-light .btn-editar {
+  background: #dbeafe !important; color: #1e40af !important; border-color: #93c5fd !important;
+}
+body.accesibilidad-light .btn-editar:hover { background: #3b82f6 !important; color: #fff !important; }
+body.accesibilidad-light .btn-activar {
+  background: #d1fae5 !important; color: #065f46 !important; border-color: #6ee7b7 !important;
+}
+body.accesibilidad-light .btn-activar:hover { background: #10b981 !important; color: #fff !important; }
+body.accesibilidad-light .btn-desactivar {
+  background: #fef3c7 !important; color: #92400e !important; border-color: #fcd34d !important;
+}
+body.accesibilidad-light .btn-desactivar:hover { background: #f59e0b !important; color: #fff !important; }
+body.accesibilidad-light .btn-eliminar, body.accesibilidad-light .btn_eliminar {
+  background: #fee2e2 !important; color: #991b1b !important; border-color: #fca5a5 !important;
+}
+body.accesibilidad-light .btn-eliminar:hover,
+body.accesibilidad-light .btn_eliminar:hover { background: #ef4444 !important; color: #fff !important; }
+body.accesibilidad-light .btn-icon.ver-detalle {
+  background: #dbeafe !important; color: #1e40af !important; border-color: #93c5fd !important;
+}
+body.accesibilidad-light .btn-icon.ver-detalle:hover { background: #3b82f6 !important; color: #fff !important; }
+body.accesibilidad-light .btn-icon.editar-estado {
+  background: #ede9fe !important; color: #5b21b6 !important; border-color: #c4b5fd !important;
+}
+body.accesibilidad-light .btn-icon.editar-estado:hover { background: #7c3aed !important; color: #fff !important; }
+body.accesibilidad-light .btn-small.btn-primary { background: #7c3aed !important; color: #fff !important; }
+body.accesibilidad-light .btn-small.btn-danger { background: #ef4444 !important; color: #fff !important; }
+
+/* Modal admin */
+body.accesibilidad-light .modal-content {
+  background: #ffffff !important;
+  border-color: #c4b5fd !important;
+  box-shadow: 0 20px 48px rgba(91,33,182,0.2) !important;
+}
+body.accesibilidad-light .modal-header {
+  background: #f3eeff !important;
+  border-bottom-color: #ddd6fe !important;
+}
+body.accesibilidad-light .modal-header h2 { color: #5b21b6 !important; }
+body.accesibilidad-light .modal-header h2 span { color: #7c3aed !important; }
+body.accesibilidad-light .close-modal,
+body.accesibilidad-light .modal-close { color: #6d5a8e !important; }
+body.accesibilidad-light .close-modal:hover,
+body.accesibilidad-light .modal-close:hover { color: #ef4444 !important; }
+body.accesibilidad-light .modal-body { color: #1e1333 !important; }
+body.accesibilidad-light .modal-body p { color: #1e1333 !important; }
+body.accesibilidad-light .modal-footer,
+body.accesibilidad-light .modal-footer {
+  background: #f8f4ff !important;
+  border-top-color: #ddd6fe !important;
+}
+body.accesibilidad-light .modal-footer .btn-primary { background: #7c3aed !important; color: #fff !important; }
+body.accesibilidad-light .modal-footer .btn-success { background: #10b981 !important; color: #fff !important; }
+body.accesibilidad-light .modal-footer .btn-danger  { background: #ef4444 !important; color: #fff !important; }
+body.accesibilidad-light .modal-footer .btn-secondary {
+  background: #f3eeff !important; color: #5b21b6 !important; border-color: #c4b5fd !important;
+}
+
+/* Detalle mensaje admin */
+body.accesibilidad-light .detalle-mensaje p { color: #1e1333 !important; }
+body.accesibilidad-light .detalle-mensaje strong { color: #5b21b6 !important; }
+body.accesibilidad-light .detalle-mensaje hr { border-color: #ddd6fe !important; }
+body.accesibilidad-light .mensaje-texto {
+  background: #f8f4ff !important;
+  border-left-color: #7c3aed !important;
+  border-color: #ddd6fe !important;
+  color: #1e1333 !important;
+}
+body.accesibilidad-light .detail-section {
+  background: #f8f4ff !important;
+  border-color: #ddd6fe !important;
+}
+body.accesibilidad-light .section-title { color: #7c3aed !important; }
+body.accesibilidad-light .detail-info p { color: #1e1333 !important; }
+body.accesibilidad-light .detail-info strong { color: #6d5a8e !important; }
+body.accesibilidad-light .data-table { background: #ffffff !important; }
+body.accesibilidad-light .data-table th { background: #f3eeff !important; color: #5b21b6 !important; }
+body.accesibilidad-light .data-table td { color: #1e1333 !important; border-color: #ede9fe !important; }
+body.accesibilidad-light .totals-section { border-top-color: #ddd6fe !important; }
+body.accesibilidad-light .totals-section p { color: #5b21b6 !important; }
+body.accesibilidad-light .totals-section p strong { color: #1e1333 !important; }
+body.accesibilidad-light .info-message {
+  background: #f0ebff !important;
+  border-left-color: #7c3aed !important;
+  color: #4c3a6e !important;
+}
+body.accesibilidad-light .badge {
+  background: linear-gradient(135deg, #7c3aed, #ec4899) !important;
+  color: #fff !important;
+}
+
+/* Dashboard admin */
+body.accesibilidad-light .producto-top-card {
+  background: #ffffff !important;
+  border-color: #ddd6fe !important;
+}
+body.accesibilidad-light .producto-top-card:hover { border-color: #7c3aed !important; }
+body.accesibilidad-light .producto-top-info h4 { color: #1e1333 !important; }
+body.accesibilidad-light .producto-top-porcentaje { color: #6d5a8e !important; }
+body.accesibilidad-light .producto-top-barra { background: #ddd6fe !important; }
+body.accesibilidad-light #grafica-productos,
+body.accesibilidad-light #grafica-ventas-mes {
+  background: #ffffff !important;
+  border-color: #ddd6fe !important;
+}
+body.accesibilidad-light #grafica-productos h2,
+body.accesibilidad-light #grafica-ventas-mes h2 {
+  color: #1e1333 !important;
+  border-bottom-color: #ddd6fe !important;
+}
+
+/* Reportes */
+body.accesibilidad-light .reporte_venta {
+  background: #ffffff !important;
+  border: 1.5px solid #ddd6fe !important;
+}
+body.accesibilidad-light .info_reporte { border-color: #7c3aed !important; }
+body.accesibilidad-light .no_reporte { background: #7c3aed !important; }
+body.accesibilidad-light .detalles_reporte {
+  background: #ede9fe !important;
+  color: #5b21b6 !important;
+  border: 1px solid #c4b5fd !important;
+}
+
+/* Stock badges */
+body.accesibilidad-light .stock-badge.bajo {
+  background: #fee2e2 !important; color: #991b1b !important; border-color: #fca5a5 !important;
+}
+body.accesibilidad-light .stock-badge.medio {
+  background: #fef3c7 !important; color: #92400e !important; border-color: #fcd34d !important;
+}
+body.accesibilidad-light .stock-badge.alto {
+  background: #d1fae5 !important; color: #065f46 !important; border-color: #6ee7b7 !important;
+}
+body.accesibilidad-light .producto-precio { color: #7c3aed !important; }
+body.accesibilidad-light .no-data { color: #6d5a8e !important; }
+body.accesibilidad-light .no-data i { color: #7c3aed !important; }
+body.accesibilidad-light .no-data-message {
+  background: #ffffff !important; border-color: #ddd6fe !important; color: #6d5a8e !important;
+}
+body.accesibilidad-light .no-data-message h3 { color: #1e1333 !important; }
+
+/* Encabezado admin */
+body.accesibilidad-light .encabezado {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe) !important;
+}
+body.accesibilidad-light .buscador input {
+  background: #f8f4ff !important;
+  border: 1.5px solid #c4b5fd !important;
+  color: #1e1333 !important;
+}
+body.accesibilidad-light .buscador input::placeholder { color: #a0879e !important; }
+body.accesibilidad-light .btn_buscar { color: #7c3aed !important; }
+
+/* Pago en admin */
+body.accesibilidad-light .pago-contenedor {
+  background: #ffffff !important;
+  border-color: #c4b5fd !important;
+}
+body.accesibilidad-light .pago-header { background: #7c3aed !important; }
+body.accesibilidad-light .resumen-pedido-pago,
+body.accesibilidad-light .metodo-pago-seccion {
+  background: #f8f4ff !important;
+  border-color: #c4b5fd !important;
+}
+body.accesibilidad-light .resumen-pedido-pago h3,
+body.accesibilidad-light .metodo-pago-seccion h3 { color: #5b21b6 !important; border-color: #c4b5fd !important; }
+body.accesibilidad-light .producto-pago { color: #1e1333 !important; border-color: #ede9fe !important; }
+body.accesibilidad-light .producto-pago h4 { color: #1e1333 !important; }
+body.accesibilidad-light .info-producto-pago p { color: #6d5a8e !important; }
+body.accesibilidad-light .linea-total { color: #1e1333 !important; border-color: #ede9fe !important; }
+body.accesibilidad-light .linea-total.total-final { color: #7c3aed !important; }
+body.accesibilidad-light .opcion-pago {
+  background: #f8f4ff !important;
+  border-color: #c4b5fd !important;
+  color: #1e1333 !important;
+}
+body.accesibilidad-light .compra-exitosa {
+  background: #ffffff !important;
+  border-color: #c4b5fd !important;
+  color: #1e1333 !important;
+}
+body.accesibilidad-light .total-cell { color: #7c3aed !important; }
+body.accesibilidad-light .cliente-info strong { color: #1e1333 !important; }
+body.accesibilidad-light .cliente-info small { color: #6d5a8e !important; }
+
+/* Carrousel home */
+body.accesibilidad-light .carousel-container { border: 1.5px solid #ddd6fe !important; }
+
+/* Loading container admin */
+body.accesibilidad-light .loading-container {
+  background: #ffffff !important;
+  border-color: #ddd6fe !important;
+  color: #6d5a8e !important;
+}
+body.accesibilidad-light .loading-container i { color: #7c3aed !important; }
+
+
+/* ================================================================
+   SECCIÓN 2 — CHATBOT RESPONSIVO COMPLETO
+   ================================================================ */
+
+/* ── Base del chatbot ──────────────────────────────────────────── */
+.ventana-visible-chatbot,
+.ventana-oculto-chatbot {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ventana visible — posición y tamaño base */
+.ventana-visible-chatbot {
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 16px !important;
+  width: 360px !important;
+  max-width: calc(100vw - 32px) !important;
+  max-height: calc(100vh - 120px) !important;
+  min-height: 420px !important;
+  height: auto !important;
+  z-index: 9996 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35) !important;
+}
+
+/* Cabecera */
+.cabecera-chatbot {
+  flex-shrink: 0 !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+/* Área de mensajes — crece y hace scroll */
+#mensajes-chatbot {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 12px 14px !important;
+  min-height: 0 !important;
+  scroll-behavior: smooth !important;
+}
+
+/* Scrollbar del chat */
+#mensajes-chatbot::-webkit-scrollbar { width: 5px; }
+#mensajes-chatbot::-webkit-scrollbar-track { background: transparent; }
+#mensajes-chatbot::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.4); border-radius: 10px; }
+
+/* Input area */
+.input-chatbot {
+  flex-shrink: 0 !important;
+  padding: 10px 12px !important;
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+#mensaje-input-chatbot {
+  flex: 1 !important;
+  min-width: 0 !important;
+  padding: 10px 14px !important;
+  border-radius: 20px !important;
+  font-size: 0.9rem !important;
+  border: none !important;
+  outline: none !important;
+}
+
+#btn-enviar-mensaje-chatbot {
+  flex-shrink: 0 !important;
+  width: 38px !important;
+  height: 38px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1rem !important;
+}
+
+/* Mensajes */
+.mensaje {
+  display: flex !important;
+  animation: chatMsgIn 0.2s ease !important;
+}
+@keyframes chatMsgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.mensaje-contenido {
+  border-radius: 16px !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  word-break: break-word !important;
+}
+
+.mensaje-hora {
+  display: block !important;
+  font-size: 0.68rem !important;
+  margin-top: 2px !important;
+  opacity: 0.65 !important;
+  text-align: right !important;
+}
+
+/* Escribiendo */
+.escribiendo { display: flex !important; gap: 4px !important; align-items: center !important; padding: 4px 0 !important; }
+.escribiendo span {
+  width: 7px !important; height: 7px !important; border-radius: 50% !important;
+  background: currentColor !important; opacity: 0.5 !important;
+  animation: typing 1.2s infinite !important;
+}
+.escribiendo span:nth-child(2) { animation-delay: 0.2s !important; }
+.escribiendo span:nth-child(3) { animation-delay: 0.4s !important; }
+@keyframes typing {
+  0%,100% { transform: translateY(0); opacity: 0.4; }
+  50%      { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Botón chatbot flotante */
+.btn-chatbot {
+  position: fixed !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  z-index: 9997 !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.3rem !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.btn-chatbot:hover { transform: scale(1.08) !important; }
+
+/* Limpiar chat button */
+.btn-limpiar-chat {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
+  font-size: 0.75rem !important;
+  opacity: 0.7 !important;
+  transition: opacity 0.2s !important;
+}
+.btn-limpiar-chat:hover { opacity: 1 !important; }
+
+/* ── Responsive chatbot: tablet ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .ventana-visible-chatbot {
+    bottom: 76px !important;
+    right: 12px !important;
+    width: calc(100vw - 24px) !important;
+    max-width: 420px !important;
+    max-height: calc(100vh - 100px) !important;
+    min-height: 380px !important;
+    border-radius: 16px !important;
+  }
+  .mensaje-contenido { max-width: 86% !important; font-size: 0.85rem !important; }
+  #mensajes-chatbot { padding: 10px 12px !important; }
+  .cabecera-chatbot { padding: 12px 14px !important; }
+}
+
+/* ── Responsive chatbot: móvil pequeño ──────────────────────────── */
+@media (max-width: 480px) {
+  .ventana-visible-chatbot {
+    bottom: 72px !important;
+    right: 8px !important;
+    left: 8px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    max-height: calc(100dvh - 90px) !important;
+    min-height: 340px !important;
+    border-radius: 14px !important;
+  }
+  .btn-chatbot {
+    bottom: 12px !important;
+    right: 12px !important;
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .mensaje-contenido { max-width: 90% !important; font-size: 0.82rem !important; padding: 9px 11px !important; }
+  #mensaje-input-chatbot { font-size: 0.85rem !important; padding: 9px 12px !important; }
+  #btn-enviar-mensaje-chatbot { width: 36px !important; height: 36px !important; }
+}
+
+/* ── Responsive chatbot: muy pequeño ───────────────────────────── */
+@media (max-width: 360px) {
+  .ventana-visible-chatbot {
+    right: 4px !important;
+    left: 4px !important;
+    min-height: 300px !important;
+    border-radius: 12px !important;
+  }
+  .cabecera-chatbot { padding: 10px 12px !important; }
+  .mensaje-contenido { font-size: 0.8rem !important; }
+}
+
+
+/* ================================================================
+   SECCIÓN 3 — PANEL DE ACCESIBILIDAD RESPONSIVO COMPLETO
+   ================================================================ */
+
+/* ── Botón accesibilidad ────────────────────────────────────────── */
+.btn-accesibilidad {
+  position: fixed !important;
+  bottom: 76px !important;   /* encima del chatbot */
+  right: 16px !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.4rem !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.btn-accesibilidad:hover { transform: scale(1.1) !important; }
+.btn-accesibilidad:focus-visible { outline: 3px solid #fff !important; outline-offset: 3px !important; }
+
+/* ── Panel base ─────────────────────────────────────────────────── */
+.accesibilidad-panel {
+  position: fixed !important;
+  bottom: 140px !important;
+  right: 16px !important;
+  width: 330px !important;
+  max-width: calc(100vw - 32px) !important;
+  max-height: calc(100vh - 170px) !important;
+  z-index: 9999 !important;
+  border-radius: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(12px) scale(0.97) !important;
+  transition: opacity 0.25s ease, transform 0.25s ease !important;
+}
+.accesibilidad-panel.active {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  pointer-events: auto !important;
+}
+
+/* Header siempre visible (sticky) */
+.accesibilidad-panel-header {
+  flex-shrink: 0 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  border-radius: 18px 18px 0 0 !important;
+}
+
+/* Body scrollable */
+.accesibilidad-panel-body {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  padding: 12px 16px !important;
+  scrollbar-width: thin !important;
+}
+
+/* Opciones */
+.accesibilidad-option {
+  padding: 10px 0 !important;
+  min-height: 44px !important;        /* tap target mínimo */
+}
+.toggle-switch {
+  flex-shrink: 0 !important;
+  width: 48px !important;
+  height: 26px !important;
+}
+.toggle-slider:before {
+  width: 20px !important;
+  height: 20px !important;
+}
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(22px) !important;
+}
+
+/* ── Responsive accesibilidad: tablet ───────────────────────────── */
+@media (max-width: 768px) {
+  .btn-accesibilidad {
+    bottom: 72px !important;
+    right: 12px !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.25rem !important;
+  }
+  .accesibilidad-panel {
+    bottom: 128px !important;
+    right: 12px !important;
+    width: calc(100vw - 24px) !important;
+    max-width: 340px !important;
+    max-height: calc(100vh - 155px) !important;
+  }
+}
+
+/* ── Responsive accesibilidad: móvil ────────────────────────────── */
+@media (max-width: 480px) {
+  .btn-accesibilidad {
+    bottom: 68px !important;
+    right: 10px !important;
+    width: 46px !important;
+    height: 46px !important;
+    font-size: 1.15rem !important;
+  }
+  .accesibilidad-panel {
+    bottom: 122px !important;
+    right: 8px !important;
+    left: 8px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    max-height: calc(100dvh - 140px) !important;
+    border-radius: 16px !important;
+  }
+  .accesibilidad-panel-header h3 { font-size: 0.9rem !important; }
+  .accesibilidad-panel-body { padding: 10px 14px !important; }
+  .option-info span { font-size: 0.85rem !important; }
+  .accesibilidad-seccion h4 { font-size: 0.65rem !important; }
+  .text-scale-btn { padding: 4px 10px !important; font-size: 0.8rem !important; }
+  .reset-btn { font-size: 0.85rem !important; padding: 8px 12px !important; }
+}
+
+/* ── Responsive accesibilidad: muy pequeño ──────────────────────── */
+@media (max-width: 360px) {
+  .accesibilidad-panel {
+    right: 4px !important;
+    left: 4px !important;
+    bottom: 116px !important;
+    border-radius: 14px !important;
+  }
+  .btn-accesibilidad {
+    right: 8px !important;
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* ── Stack vertical de botones flotantes ────────────────────────── */
+/* chatbot: bottom:16px → acc: bottom:76px → si hay más, bottom:136px */
+@media (max-width: 480px) {
+  .btn-chatbot      { bottom: 12px !important; right: 12px !important; }
+  .btn-accesibilidad { bottom: 66px !important; right: 12px !important; }
+}
+@media (max-width: 360px) {
+  .btn-chatbot      { bottom: 10px !important; right: 8px !important; }
+  .btn-accesibilidad { bottom: 62px !important; right: 8px !important; }
+}
+
+
+/* ================================================================
+   SECCIÓN 4 — MEJORAS RESPONSIVE GENERALES
+   ================================================================ */
+
+/* Skip link siempre accesible */
+.accesibility-skip-link {
+  position: fixed !important;
+  top: -100px !important;
+  left: 12px !important;
+  z-index: 99999 !important;
+  padding: 10px 18px !important;
+  border-radius: 0 0 10px 10px !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: top 0.2s ease !important;
+}
+.accesibility-skip-link:focus { top: 0 !important; outline: 3px solid #fff !important; outline-offset: 2px !important; }
+
+/* Máscara de lectura — nunca bloquea paneles */
+#reading-mask-overlay { z-index: 9990 !important; }
+#reading-guide-line   { z-index: 9991 !important; }
+
+/* Focus ring mejorado para teclado */
+body:not(.accesibilidad-light) *:focus-visible {
+  outline: 3px solid #a78bfa !important;
+  outline-offset: 3px !important;
+  border-radius: 4px !important;
+}
+body.accesibilidad-light *:focus-visible {
+  outline: 3px solid #7c3aed !important;
+  outline-offset: 3px !important;
+  border-radius: 4px !important;
+}
+
+/* Mejora tap targets en móvil */
+@media (max-width: 768px) {
+  .barra-lateral-link { min-height: 48px !important; }
+  .dropdown-item { min-height: 44px !important; }
+  .btn-agregar-carrito { min-height: 44px !important; }
+  .favorito-btn { min-width: 44px !important; min-height: 44px !important; }
+  .btn-cantidad { min-width: 36px !important; min-height: 36px !important; }
+}
+
+/* Texto alternativo de imágenes — visible solo en modo de alto contraste */
+body.accesibilidad-high-contrast img[alt]:not([alt=""])::after {
+  content: attr(alt);
+}
+
+/* Responsive: ocultar logo texto en móviles muy pequeños */
+@media (max-width: 380px) {
+  .marca .logo-titulo,
+  .marca h1 { font-size: 18px !important; }
+}
