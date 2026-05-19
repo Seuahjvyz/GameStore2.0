@@ -1,7 +1,10 @@
-/*--------------------------- CHATBOT---------------------------*/
+/* ================================================================
+   GAME STORE — chatbot.css
+   Contiene TODOS los estilos del chatbot incluyendo responsive.
+   NO necesita accesibilidad-extras.css para el chatbot.
+   ================================================================ */
 
-/* ---------------------- BOTON CHAT ---------------------- */
-
+/* ── Botón flotante ─────────────────────────────────────────────── */
 .btn-chatbot {
     position: fixed;
     bottom: 20px;
@@ -17,6 +20,9 @@
     cursor: pointer;
     box-shadow: 0 6px 16px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-chatbot:hover {
@@ -24,39 +30,48 @@
     box-shadow: 0 8px 20px rgba(28, 163, 236, 0.5);
 }
 
-/* ---------------------- VENTANA CHATBOT ---------------------- */
+.btn-chatbot:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
 
+/* ── Ventana ────────────────────────────────────────────────────── */
 .ventana-oculto-chatbot {
-    display: none;
+    display: none !important;
 }
 
 .ventana-visible-chatbot {
-    top: 80px;
     display: flex;
     flex-direction: column;
     position: fixed;
+    /* Con top+bottom el navegador calcula la altura automáticamente */
+    top: 80px;
     bottom: 90px;
     right: 20px;
     width: 350px;
-    height: 430px;
-    background: #1F2937;  /* Fondo gris oscuro uniforme */
+    /* Sin height fijo — se adapta al espacio disponible */
+    background: #1F2937;
     border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
     z-index: 1001;
     overflow: hidden;
+    /* Asegurar que no se mueva al hacer skip-to-content */
+    transform: none !important;
 }
 
+/* ── Cabecera ───────────────────────────────────────────────────── */
 .cabecera-chatbot {
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background: #0B2B40;  /* Azul oscuro metálico */
+    background: #0B2B40;
     color: white;
     font-family: 'Orbitron', sans-serif;
     font-weight: 600;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .cabecera-chatbot p {
@@ -78,149 +93,302 @@
     height: 30px;
     border-radius: 50%;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .cabecera-chatbot button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255,255,255,0.2);
     transform: rotate(90deg);
 }
 
 .cabecera-chatbot i {
-    color: white;  /* Cambiado a blanco en lugar de rojo */
+    color: white;
 }
 
+/* ── Contenedor chatbot ─────────────────────────────────────────── */
 .chatbot {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0;
 }
 
+/* ── Área de mensajes ───────────────────────────────────────────── */
 .mensajes-chatbot {
     flex: 1;
-    padding: 20px;
+    padding: 16px 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
     background: #1F2937;
+    min-height: 0;
+    scroll-behavior: smooth;
 }
 
-/* Scroll personalizado */
-.mensajes-chatbot::-webkit-scrollbar {
-    width: 6px;
-}
+.mensajes-chatbot::-webkit-scrollbar { width: 6px; }
+.mensajes-chatbot::-webkit-scrollbar-track { background: #374151; border-radius: 3px; }
+.mensajes-chatbot::-webkit-scrollbar-thumb { background: #1CA3EC; border-radius: 3px; }
+.mensajes-chatbot::-webkit-scrollbar-thumb:hover { background: #0d8ac7; }
 
-.mensajes-chatbot::-webkit-scrollbar-track {
-    background: #374151;
-}
-
-.mensajes-chatbot::-webkit-scrollbar-thumb {
-    background: #1CA3EC;
-    border-radius: 3px;
-}
-
+/* ── Input ──────────────────────────────────────────────────────── */
 .input-chatbot {
+    flex-shrink: 0;
     display: flex;
-    padding: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 15px;
+    border-top: 1px solid rgba(255,255,255,0.1);
     background: #111827;
+    gap: 8px;
+    align-items: center;
 }
 
-.input-chatbot input {
+.input-chatbot input,
+#mensaje-input-chatbot {
     flex: 1;
-    padding: 12px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 0;
+    padding: 11px 16px;
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 30px;
     background: #374151;
     color: white;
     font-family: 'Poppins', sans-serif;
+    font-size: 14px;
     outline: none;
     transition: all 0.3s ease;
 }
 
-.input-chatbot input:focus {
+.input-chatbot input:focus,
+#mensaje-input-chatbot:focus {
     border-color: #1CA3EC;
-    box-shadow: 0 0 0 3px rgba(28, 163, 236, 0.2);
+    box-shadow: 0 0 0 3px rgba(28,163,236,0.2);
 }
 
-.input-chatbot input::placeholder {
+.input-chatbot input::placeholder,
+#mensaje-input-chatbot::placeholder {
     color: #9CA3AF;
 }
 
-.input-chatbot button {
-    margin-left: 10px;
-    padding: 12px 20px;
+.input-chatbot button,
+#btn-enviar-mensaje-chatbot {
+    flex-shrink: 0;
+    padding: 11px 18px;
     background: #1d6388;
     border: none;
     border-radius: 30px;
     color: white;
     font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(28, 163, 236, 0.3);
+    box-shadow: 0 4px 12px rgba(28,163,236,0.3);
 }
 
-.input-chatbot button:hover {
+.input-chatbot button:hover,
+#btn-enviar-mensaje-chatbot:hover {
     background: #0B2B40;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(28, 163, 236, 0.4);
+    box-shadow: 0 6px 16px rgba(28,163,236,0.4);
 }
 
-.input-chatbot button i {
-    font-size: 16px;
-}
-
-/* ---------------------- MENSAJES CHATBOT ---------------------- */
+/* ── Mensajes ───────────────────────────────────────────────────── */
 .mensaje {
+    display: flex;
+    animation: chatFadeIn 0.25s ease;
+}
+
+@keyframes chatFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.mensaje-usuario { justify-content: flex-end; }
+.mensaje-bot     { justify-content: flex-start; }
+
+.mensaje-contenido {
     max-width: 80%;
     padding: 10px 15px;
     border-radius: 18px;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     line-height: 1.5;
-    word-wrap: break-word;
-    animation: fadeIn 0.3s ease;
+    word-break: break-word;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.mensaje-usuario {
-    align-self: flex-end;
+/* Burbuja usuario */
+.mensaje-usuario .mensaje-contenido {
     background: #1E5F74;
     color: white;
     border-bottom-right-radius: 4px;
 }
 
-.mensaje-bot {
-    align-self: flex-start;
+/* Burbuja bot */
+.mensaje-bot .mensaje-contenido,
+.mensaje-contenido.bot {
     background: #374151;
     color: #F3F4F6;
     border-bottom-left-radius: 4px;
 }
 
-/* Agrega esto a tu CSS */
+.mensaje-hora {
+    display: block;
+    font-size: 0.68rem;
+    margin-top: 4px;
+    opacity: 0.6;
+    text-align: right;
+}
+
+/* ── Indicador escribiendo ──────────────────────────────────────── */
+.escribiendo {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 2px 0;
+}
+
+.escribiendo span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #9CA3AF;
+    animation: blink 1.2s infinite;
+}
+
+.escribiendo span:nth-child(2) { animation-delay: 0.2s; }
+.escribiendo span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+    0%,100% { opacity: 0.3; transform: translateY(0); }
+    50%      { opacity: 1;   transform: translateY(-4px); }
+}
+
+/* ── Estado pensando (legacy) ───────────────────────────────────── */
 .mensaje-bot.pensando {
-    background: #374151;
     opacity: 0.7;
     animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 0.4; }
+    0%,100% { opacity: 0.7; }
+    50%      { opacity: 0.4; }
 }
 
+/* ── SKIP LINK: el chatbot NO se mueve ──────────────────────────── */
+/* Cuando el skip link hace scroll/focus al #main-content,
+   el chatbot debe quedarse fijo. position:fixed ya lo garantiza,
+   pero algunos navegadores cambian el scroll-container.
+   El transform:none en .ventana-visible-chatbot ya lo previene. */
+
+/* ── Responsive: tablet ─────────────────────────────────────────── */
+@media (max-width: 992px) {
+    .ventana-visible-chatbot {
+        right: 14px;
+        width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .btn-chatbot {
+        bottom: 16px;
+        right: 10px;
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
+    }
+
+    .ventana-visible-chatbot {
+        top: 70px;
+        bottom: 80px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        border-radius: 14px;
+    }
+
+    .cabecera-chatbot {
+        padding: 12px 16px;
+    }
+
+    .cabecera-chatbot p {
+        font-size: 14px;
+    }
+
+    .mensajes-chatbot {
+        padding: 12px 14px;
+        gap: 8px;
+    }
+
+    .mensaje-contenido {
+        max-width: 86%;
+        font-size: 13px;
+        padding: 9px 13px;
+    }
+
+    .input-chatbot {
+        padding: 10px 12px;
+    }
+
+    .input-chatbot input,
+    #mensaje-input-chatbot {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .input-chatbot button,
+    #btn-enviar-mensaje-chatbot {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-chatbot {
+        bottom: 12px;
+        right: 8px;
+        width: 46px;
+        height: 46px;
+        font-size: 20px;
+    }
+
+    .ventana-visible-chatbot {
+        top: 65px;
+        bottom: 68px;
+        right: 6px;
+        left: 6px;
+        border-radius: 12px;
+    }
+
+    .cabecera-chatbot p { font-size: 13px; }
+
+    .mensaje-contenido {
+        max-width: 90%;
+        font-size: 12.5px;
+        padding: 8px 11px;
+    }
+
+    .input-chatbot input,
+    #mensaje-input-chatbot {
+        font-size: 12.5px;
+        padding: 9px 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .ventana-visible-chatbot {
+        right: 4px;
+        left: 4px;
+        top: 60px;
+        bottom: 64px;
+    }
+
+    .btn-chatbot {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+        right: 6px;
+        bottom: 10px;
+    }
+}

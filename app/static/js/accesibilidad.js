@@ -198,14 +198,7 @@
                 checkbox.checked = self.state[item.prop];
             }
         });
-        // Update light theme label
-        var label = document.querySelector("#acc-lightTheme");
-        if (label) {
-            var span = label.parentNode.parentNode.querySelector(".option-info span");
-            if (span) {
-                span.textContent = self.state.lightTheme ? "Modo oscuro" : "Modo claro";
-            }
-        }
+        // El label "Modo claro" es fijo, no cambia al activarse
     };
 
     AccessibilityManager.prototype.togglePanel = function () {
@@ -303,16 +296,7 @@
                     self.state[item.prop] = e.target.checked;
                     self.applySetting(item.prop);
                     self.saveSettings();
-                    // Update light theme label dynamically
-                    if (item.prop === "lightTheme") {
-                        var label = document.querySelector("#acc-lightTheme");
-                        if (label) {
-                            var span = label.parentNode.parentNode.querySelector(".option-info span");
-                            if (span) {
-                                span.textContent = self.state.lightTheme ? "Modo oscuro" : "Modo claro";
-                            }
-                        }
-                    }
+
                 });
                 // Allow keyboard activation with Space/Enter
                 element.addEventListener("keydown", function (e) {

@@ -1116,33 +1116,4 @@ body {
 }
 
 
-/* ── FIX CHATBOT Y ACCESIBILIDAD: asegurar position:fixed real ── */
 
-/* El body NO debe ser flex container (rompe fixed de hijos) */
-body {
-    display: block !important;
-    flex-direction: unset !important;
-}
-
-/* #content ocupa todo el espacio visual */
-#content {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* main-content crece dentro de #content, NO del body */
-#content .main-content {
-    flex: 1;
-}
-
-/* Garantizar que el chatbot y accesibilidad sean siempre fixed */
-.btn-chatbot,
-#ventana-chatbot,
-.ventana-visible-chatbot,
-.btn-accesibilidad,
-.accesibilidad-panel {
-    position: fixed !important;
-    /* Sacarlos de cualquier contexto de apilamiento problemático */
-    transform: none;
-}
